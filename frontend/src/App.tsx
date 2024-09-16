@@ -1,41 +1,60 @@
-import React from 'react';
+import React, { useState } from 'react';
+import * as ReactDOM from "react-dom/client";
 import './App.css';
 import placeholderSquare from "./placeholder-square.png";
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
 
-function SongInfo() {
-  let artist = "Honestus";
-  let song = "Work That Back Boy";
-  let art = placeholderSquare;
+import TrackPage from './routes/track';
+import Home from './routes/home';
+import Login from './routes/login';
+import Signup from './routes/signup';
 
+function Footer() {
   return (
-    <div id="song-info">
-      <h1 id="artist-header">{artist}</h1>
-      <img width="300" height="300" alt="album-art" src={art} />
-      <h2 id="song-or-album-title">{song}</h2>
+    <div>
+      <div>made with 💜 in sunnyvale, ca 🌞</div>
+      <div><a href="/login">are you an artist? get <i>your</i> link here</a></div>
+      <div><a>buy me a ☕️</a></div>
     </div>
-  );
-}
-function ButtonBox() {
-  let providers = ["spotify", "applemusic", "youtube"];
-  let buttons = providers.map(provider => <IconLink provider={provider} /> );
-  return <div id="button-box">{buttons}</div>;
-}
-function IconLink({ provider }: { provider: string }) {
-  let alt = provider + "-icon";
-  return (
-    <a href={provider}>
-      <img width="100" height="100" alt={alt} src={placeholderSquare} />
-    </a>
-  );
+  )
 }
 
-function App() {
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home/>,
+    errorElement: <div> uh-oh, error!</div>,
+  },
+  {
+    path: "/track",
+    element: <TrackPage/>,
+    errorElement: <div> uh-oh, error!</div>,
+  },
+  {
+    path: "/login",
+    element: <Login/>,
+    errorElement: <div> uh-oh, error!</div>,
+  },
+  {
+    path: "/signup",
+    element: <Signup/>,
+    errorElement: <div> uh-oh, error!</div>,
+  },
+  {
+    path: "/artist",
+    element: <div>artist management page</div>,
+    errorElement: <div> uh-oh, error!</div>,
+  },
+]);
+
+export default function App() {
   return (
-    <div className="App">
-      <SongInfo />
-      <ButtonBox />
-    </div>
+    <>
+      <RouterProvider router={router}/>
+      <Footer/>
+    </>
   );
 }
-
-export default App;
