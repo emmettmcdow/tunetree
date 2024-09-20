@@ -89,7 +89,6 @@ export default function App() {
     <>
       <RouterProvider router={router}/>
       <Footer/>
-      <WebGLBackground/>
     </>
   );
 }
