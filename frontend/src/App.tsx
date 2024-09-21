@@ -11,6 +11,7 @@ import TrackPage from './routes/track';
 import Home from './routes/home';
 import Login from './routes/login';
 import Signup from './routes/signup';
+import Artist from './routes/artist';
 
 export function initGLCanvas(canvas: HTMLCanvasElement) {
   // Initialize the GL context
@@ -79,7 +80,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/artist",
-    element: <div>artist management page</div>,
+    element: <Artist/>,
     errorElement: <div> uh-oh, error!</div>,
   },
 ]);
