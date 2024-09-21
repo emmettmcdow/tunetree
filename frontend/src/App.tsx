@@ -48,10 +48,10 @@ function WebGLBackground() {
 
 function Footer() {
   return (
-    <div>
-      <div>made with 💜 in sunnyvale, ca 🌞</div>
-      <div><a href="/login">are you an artist? get <i>your</i> link here</a></div>
-      <div><a>buy me a ☕️</a></div>
+    <div className="flex flex-col text-center bg-indigo-200 py-4">
+        <div className="my-2" >made with 💜 in sunnyvale, ca 🌞</div>
+        <div className="my-2" ><a href="/login">are you an artist? get <i>your</i> link here</a></div>
+        <div className="my-2" ><a>buy me a ☕️</a></div>
     </div>
   )
 }
@@ -86,9 +86,9 @@ const router = createBrowserRouter([
 
 export default function App() {
   return (
-    <>
+    <div className="bg-indigo-100">
       <RouterProvider router={router}/>
       <Footer/>
-    </>
+    </div>
   );
 }
