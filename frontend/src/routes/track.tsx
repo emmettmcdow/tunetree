@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import placeholderSquare from "../placeholder-square.png";
 
-function SongInfo() {
+export function SongInfo() {
   let artist = "Honestus";
   let song = "Work That Back Boy";
   let art = placeholderSquare;
 
   return (
-    <div className="my-5">
+    <div className="flex flex-col my-5 items-center mx-auto">
       <h1 className="text-4xl">{artist}</h1>
-      <img width="250" height="250" alt="album-art" src={art} className="mx-auto my-2"/>
+      <img alt="album-art" src={art} className="w-52 my-2"/>
       <h2 className="text-2xl">{song}</h2>
     </div>
   );
@@ -17,7 +17,11 @@ function SongInfo() {
 function ButtonBox({togglePrompt}: {togglePrompt: Function}) {
   let providers = ["spotify", "applemusic", "youtube"];
   let buttons = providers.map(provider => <IconLink provider={provider} key={provider} togglePrompt={togglePrompt}/> );
-  return <div id="button-box" className="flex flex-wrap items-center justify-center mx-auto w-full h-full p-10" >{buttons}</div>;
+  return (
+    <div id="button-box" className="flex flex-wrap items-center justify-center mx-auto w-full h-full" >
+      {buttons}
+    </div>
+  );
 }
 
 function IconLink({ provider, togglePrompt }: { provider: string, togglePrompt: Function}) {
@@ -47,13 +51,21 @@ function SubscriptionPrompt({visible, toggle}: {visible: boolean, toggle: Functi
   }
 }
 
+function TrackInfo({togglePrompt}: {togglePrompt: Function}) {
+  return (
+      <div className="flex flex-col content-center text-center p-5">
+        <SongInfo />
+        <ButtonBox togglePrompt={togglePrompt}/>
+      </div>
+  );
+}
+
 export default function TrackPage() {
   const [visibleSubsPrompt, togglePrompt] = useState(false);
   return (
-      <div className="h-screen flex flex-col content-center text-center p-5">
-        <SongInfo />
-        <ButtonBox togglePrompt={togglePrompt}/>
+      <>
+        <TrackInfo togglePrompt={togglePrompt}/>
         <SubscriptionPrompt visible={visibleSubsPrompt} toggle={togglePrompt}/>
-      </div>
+      </>
   );
 }
