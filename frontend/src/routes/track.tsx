@@ -8,7 +8,7 @@ export function SongInfo() {
 
   return (
     <div className="flex flex-col items-center mx-auto">
-      <p className="text-4xl">{artist}</p>
+      <p className="text-4xl"><b>{artist}</b></p>
       <img alt="album-art" src={art} className="w-52 my-2"/>
       <p className="text-2xl">{song}</p>
     </div>
@@ -22,6 +22,8 @@ function ButtonBox({togglePrompt}: {togglePrompt: Function}) {
   let offset = 1;
   if (providers.length < 4) {
     offset = 3;
+  } else if (providers.length > 5) {
+    offset = 0.5;
   }
   const style = {
     "--tan": tan,

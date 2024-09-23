@@ -14,7 +14,7 @@ function ServiceSelectorBar({selected, setSelected}: {selected: any, setSelected
     if (!state) {    
       let alt = provider + "-icon";
       buttons.push(
-        <button className="" key={provider} onClick={(_) => {
+        <button className="text-xl" key={provider} onClick={(_) => {
           const newSelected = {...selected};
           newSelected[provider] = true;
           setSelected(newSelected);
@@ -29,6 +29,7 @@ function ServiceSelectorBar({selected, setSelected}: {selected: any, setSelected
       <div className="flex justify-start w-1/4 items-center">
         <p className="text-xl"> Add: </p>
       </div>
+      <div className="bracket-left"/>
       <div className="flex justify-evenly my-2 w-3/4">
         {buttons}
       </div>
@@ -75,12 +76,12 @@ function Editor({changeMode}: {changeMode: Function}) {
         <ServiceSelectorBar selected={selected} setSelected={setSelected}/>
         <ServiceURLs selected={selected} setSelected={setSelected}/>
         <textarea  className="w-full rounded-lg p-1 mb-2" name="message" placeholder="A message to your fans"/>
-        <button className="w-full bg-rose-500 rounded-lg" onClick={(_) => {
+        <button className="text-xl w-full bg-rose-500 rounded-lg" onClick={(_) => {
           changeMode(Mode.Standby);
         }}>
           <span className="p-4 py-2 text-white">cancel</span>
         </button>
-        <button className="w-full bg-emerald-500 rounded-lg" onClick={(_) => {
+        <button className="text-xl w-full bg-emerald-500 rounded-lg" onClick={(_) => {
           changeMode(Mode.Standby);
         }}>
           <span className="p-4 py-2 text-white">drop</span>
@@ -100,8 +101,8 @@ function EditPanel({mode, changeMode}: {mode: Mode, changeMode: Function}) {
     case Mode.Standby:
       return (
         <div className="flex h-1/4 items-center">
-          <button onClick={() => {changeMode(Mode.Edit)}} className="w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg"><span className="p-4 py-2 text-white">edit</span></button>
-          <button onClick={() => {changeMode(Mode.New)}} className="w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg"><span className="p-4 py-2 text-white">new</span></button>
+          <button onClick={() => {changeMode(Mode.Edit)}} className="text-xl w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg"><span className="p-4 py-2 text-white">edit</span></button>
+          <button onClick={() => {changeMode(Mode.New)}} className="text-xl w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg"><span className="p-4 py-2 text-white">new</span></button>
         </div>
       );
     case Mode.Edit:
@@ -125,8 +126,8 @@ function getHeader(mode: Mode) {
 export default function Artist() {
   const [mode, changeMode] = useState(Mode.Standby);
   return (
-    <div className="h-screen flex flex-col p-4">
-      <p className="text-xl">{getHeader(mode)}</p>
+    <div className="h-screen flex flex-col p-5">
+      <p className="text-2xl rainbow-text">{getHeader(mode)}</p>
       <div className="flex w-3/4 mx-auto rounded-lg">
         <SongInfo/>
       </div>
