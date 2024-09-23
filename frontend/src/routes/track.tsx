@@ -7,27 +7,41 @@ export function SongInfo() {
   let art = placeholderSquare;
 
   return (
-    <div className="flex flex-col my-5 items-center mx-auto">
-      <h1 className="text-4xl">{artist}</h1>
+    <div className="flex flex-col items-center mx-auto">
+      <p className="text-4xl">{artist}</p>
       <img alt="album-art" src={art} className="w-52 my-2"/>
-      <h2 className="text-2xl">{song}</h2>
+      <p className="text-2xl">{song}</p>
     </div>
   );
 }
 function ButtonBox({togglePrompt}: {togglePrompt: Function}) {
-  let providers = ["spotify", "applemusic", "youtube"];
-  let buttons = providers.map(provider => <IconLink provider={provider} key={provider} togglePrompt={togglePrompt}/> );
+  // TODO: fix display for <3 items
+  let providers = ["spotify", "applemusic", "youtube", "bandcamp", "deezer", "pandora"];
+  let buttons = providers.map((provider, index) => <IconLink n={index} m={providers.length} provider={provider} key={provider} togglePrompt={togglePrompt}/> );
+  const tan = Math.tan(Math.PI/providers.length);
+  let offset = 1;
+  if (providers.length < 4) {
+    offset = 3;
+  }
+  const style = {
+    "--tan": tan,
+    "--rel": offset
+  } as React.CSSProperties;
   return (
-    <div id="button-box" className="flex flex-wrap items-center justify-center mx-auto w-full h-full" >
+    <div id="button-box" style={style} className="w-52 img-circle mx-auto" >
       {buttons}
     </div>
   );
 }
 
-function IconLink({ provider, togglePrompt }: { provider: string, togglePrompt: Function}) {
+function IconLink({ n, m, provider, togglePrompt }: { n: number, m: number, provider: string, togglePrompt: Function}) {
   let alt = provider + "-icon";
+  const style = { 
+    "--i": String(n),
+    "--m": String(m)
+  } as React.CSSProperties;
   return (
-    <button className="mx-5 w-1/5" onClick={(_) => {togglePrompt(true); console.log("prompt toggled");} }>
+    <button className=""  style={style} onClick={(_) => {togglePrompt(true); console.log("prompt toggled");} }>
       <img  alt={alt} src={placeholderSquare} />
     </button>
   );
@@ -53,7 +67,7 @@ function SubscriptionPrompt({visible, toggle}: {visible: boolean, toggle: Functi
 
 function TrackInfo({togglePrompt}: {togglePrompt: Function}) {
   return (
-      <div className="flex flex-col content-center text-center p-5">
+      <div className="flex flex-col justify-evenly p-5 min-h-screen">
         <SongInfo />
         <ButtonBox togglePrompt={togglePrompt}/>
       </div>

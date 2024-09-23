@@ -15,3 +15,32 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+.img-circle {
+  /* image size */
+  --d: 4.5em;
+  /* circle radius */
+  --r: calc(.5*(1 + var(--rel))*var(--d)/var(--tan));
+  /* img-circle size */
+  --s: calc(2*var(--r) + var(--d));
+  position: relative;
+  width: var(--s);
+  height: var(--s);
+}
+
+.img-circle button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: calc(-.5*var(--d));
+  width: var(--d);
+  height: var(--d);
+  --az: calc(var(--i)*1turn/var(--m));
+  transform:
+    rotate(var(--az)) translate(var(--r)) rotate(calc(-1*var(--az)))
+}
+
+img {
+  max-width: 100%
+}
