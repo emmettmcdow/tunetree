@@ -3,7 +3,11 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
+	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,6 +15,118 @@ import (
 	"syscall"
 	"time"
 )
+
+func signup(res http.ResponseWriter, req *http.Request) {
+	var user User
+
+	// Check if it is post
+	if req.Method != "POST" {
+		http.Error(res, fmt.Sprintf("%s on /signup not allowed", req.Method), http.StatusMethodNotAllowed)
+		return
+	}
+	body, err := io.ReadAll(req.Body)
+	if err != nil {
+		http.Error(res, "Failed to read body of request", http.StatusInternalServerError)
+		return
+	}
+	// Check if there is a username and password
+	if err := json.Unmarshal(body, &user); err != nil {
+		http.Error(res, "Failed to parse body of request", http.StatusInternalServerError)
+		return
+	}
+
+	// TODO: Check if username is valid
+	// TODO: Check if password is valid
+	// Add to DB
+	if err := AddUser(&user); err != nil {
+		http.Error(res, fmt.Sprintf("Failed to add user: %s", err), http.StatusInternalServerError)
+		return
+	}
+
+	return
+}
+
+func getRole(user User) string {
+	if user.artist == "" {
+		return "USER"
+	} else {
+		return "ARTIST"
+	}
+}
+
+func generateToken(user User) (token string, err error) {
+	secret := []byte(os.Getenv("JWT_SECRET"))
+	// TODO: is this correct?
+	if secret == nil {
+		panic("JWT_SECRET not set")
+	}
+
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": user.email,                       // Subject (user identifier)
+		"iss": "tunetree",                       // Issuer
+		"aud": getRole(user),                    // Audience (user role)
+		"exp": time.Now().Add(time.Hour).Unix(), // Expiration time
+		"iat": time.Now().Unix(),                // Issued at
+	})
+
+	token, err = jwtToken.SignedString(secret)
+	if err != nil {
+		return "", err
+	}
+
+	return token, err
+}
+
+func login(res http.ResponseWriter, req *http.Request) {
+	var user User
+
+	// Check if it is post
+	if req.Method != "POST" {
+		http.Error(res, fmt.Sprintf("%s on /signup not allowed", req.Method), http.StatusMethodNotAllowed)
+		return
+	}
+	body, err := io.ReadAll(req.Body)
+	if err != nil {
+		http.Error(res, "Failed to read body of request", http.StatusInternalServerError)
+		return
+	}
+	// Check if there is a username and password
+	if err := json.Unmarshal(body, &user); err != nil {
+		http.Error(res, "Failed to parse body of request", http.StatusInternalServerError)
+		return
+	}
+
+	user2, err := GetUser(user.email)
+	if err != nil {
+		// TODO: is this the case for DB failures?
+		http.Error(res, fmt.Sprintf("Username/Password incorrect"), http.StatusUnauthorized)
+		return
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(user2.password), []byte(user.password))
+	if err != nil {
+		// TODO: is this the case for DB failures?
+		http.Error(res, fmt.Sprintf("Username/Password incorrect"), http.StatusUnauthorized)
+		return
+	}
+
+	// Shake dat ass jwt-y
+	token, err := generateToken(user)
+	if err != nil {
+		http.Error(res, fmt.Sprintf("Failed to generate token"), http.StatusInternalServerError)
+	}
+	tokenCookie := http.Cookie{
+		Name:     "token",
+		Value:    token,
+		Expires:  time.Now().Add(time.Hour),
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+	}
+	http.SetCookie(res, &tokenCookie)
+
+	return
+}
 
 func server(wg *sync.WaitGroup, port int, tlsEnabled bool) (s *http.Server) {
 	var config *tls.Config
