@@ -25,6 +25,39 @@ CREATE TABLE IF NOT EXISTS users(
 );
 `
 
+type Track struct {
+	Name    string
+	Image   []byte
+	Links   []Link
+	Message string
+}
+
+const TRACKTABLE = `
+CREATE TABLE IF NOT EXISTS tracks(
+	name TEXT NOT NULL,
+	image TEXT NOT NULL,
+	message TEXT,
+	artist_id INTEGER NOT NULL,
+	FOREIGN KEY (artist_id)
+		REFERENCES users (rowid)
+);
+`
+
+type Link struct {
+	Name string
+	Link string
+}
+
+const LINKTABLE = `
+CREATE TABLE IF NOT EXISTS links(
+	name TEXT NOT NULL,
+	link TEXT,
+	track_id INTEGER NOT NULL,
+	FOREIGN KEY (track_id)
+		REFERENCES tracks (rowid)
+);
+`
+
 func InitDB() {
 	var err error
 	db, err = sql.Open("sqlite3", DBFILE)
@@ -35,6 +68,38 @@ func InitDB() {
 	if _, err := db.Exec(USERTABLE); err != nil {
 		panic(err)
 	}
+	if _, err := db.Exec(TRACKTABLE); err != nil {
+		panic(err)
+	}
+	if _, err := db.Exec(LINKTABLE); err != nil {
+		panic(err)
+	}
+}
+
+func GetTrack(artistname string) (track Track, ok bool) {
+	var trackid int
+	err := db.QueryRow("SELECT t.name, t.image, t.message, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.artist = ?;", artistname).Scan(&track.Name, &track.Image, &track.Message, trackid)
+	if err == sql.ErrNoRows {
+		return track, false
+	} else if err != nil {
+		// TODO: deal with this
+		panic(err)
+	}
+
+	rows, _ := db.Query("SELECT t.name, t.image, t.message, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.artist = ?;", artistname)
+	for rows.Next() {
+		var link Link
+		err := rows.Scan(&link.Name, &link.Link)
+		if err == sql.ErrNoRows {
+			return track, false
+		} else if err != nil {
+			// TODO: deal with this
+			panic(err)
+		}
+		track.Links = append(track.Links, link)
+	}
+
+	return track, true
 }
 
 func GetUser(email string) (user User, ok bool) {

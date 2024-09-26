@@ -16,7 +16,29 @@ import (
 	"time"
 )
 
-func signup(res http.ResponseWriter, req *http.Request) {
+func trackHandler(res http.ResponseWriter, req *http.Request) {
+	// Check if it is post
+	if req.Method != "GET" {
+		http.Error(res, fmt.Sprintf("%s on /track not allowed", req.Method), http.StatusMethodNotAllowed)
+		return
+	}
+	artistname := req.PathValue("artistname")
+	if artistname == "" {
+		http.Error(res, "No artist name specified", http.StatusNotFound)
+		return
+	}
+
+	track, ok := GetTrack(artistname)
+	if !ok {
+		http.Error(res, "No track associated with that artist", http.StatusNotFound)
+		return
+	}
+
+	res.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(res).Encode(track)
+}
+
+func signupHandler(res http.ResponseWriter, req *http.Request) {
 	var user User
 
 	// Check if it is post
@@ -77,7 +99,7 @@ func generateToken(user User) (token string, err error) {
 	return token, err
 }
 
-func login(res http.ResponseWriter, req *http.Request) {
+func loginHandler(res http.ResponseWriter, req *http.Request) {
 	var user User
 
 	// Check if it is post
@@ -150,8 +172,9 @@ func server(wg *sync.WaitGroup, port int, tlsEnabled bool) (s *http.Server) {
 			fmt.Printf("Failed to write response: %s", err)
 		}
 	})
-	m.HandleFunc("/login", login)
-	m.HandleFunc("/signup", signup)
+	m.HandleFunc("/login/", loginHandler)
+	m.HandleFunc("/signup/", signupHandler)
+	m.HandleFunc("/track/{artistname}", trackHandler)
 
 	go func() {
 		defer wg.Done()
