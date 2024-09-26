@@ -47,7 +47,7 @@ func signup(res http.ResponseWriter, req *http.Request) {
 }
 
 func getRole(user User) string {
-	if user.artist == "" {
+	if user.Artist == "" {
 		return "USER"
 	} else {
 		return "ARTIST"
@@ -62,7 +62,7 @@ func generateToken(user User) (token string, err error) {
 	}
 
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": user.email,                       // Subject (user identifier)
+		"sub": user.Email,                       // Subject (user identifier)
 		"iss": "tunetree",                       // Issuer
 		"aud": getRole(user),                    // Audience (user role)
 		"exp": time.Now().Add(time.Hour).Unix(), // Expiration time
@@ -82,7 +82,7 @@ func login(res http.ResponseWriter, req *http.Request) {
 
 	// Check if it is post
 	if req.Method != "POST" {
-		http.Error(res, fmt.Sprintf("%s on /signup not allowed", req.Method), http.StatusMethodNotAllowed)
+		http.Error(res, fmt.Sprintf("%s on /login not allowed", req.Method), http.StatusMethodNotAllowed)
 		return
 	}
 	body, err := io.ReadAll(req.Body)
@@ -96,15 +96,14 @@ func login(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user2, err := GetUser(user.email)
-	if err != nil {
+	user2, ok := GetUser(user.Email)
+	if !ok {
 		// TODO: is this the case for DB failures?
 		http.Error(res, fmt.Sprintf("Username/Password incorrect"), http.StatusUnauthorized)
 		return
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(user2.password), []byte(user.password))
+	err = bcrypt.CompareHashAndPassword([]byte(user2.Password), []byte(user.Password))
 	if err != nil {
-		// TODO: is this the case for DB failures?
 		http.Error(res, fmt.Sprintf("Username/Password incorrect"), http.StatusUnauthorized)
 		return
 	}
@@ -131,6 +130,8 @@ func login(res http.ResponseWriter, req *http.Request) {
 func server(wg *sync.WaitGroup, port int, tlsEnabled bool) (s *http.Server) {
 	var config *tls.Config
 
+	InitDB()
+
 	m := http.NewServeMux()
 	if tlsEnabled {
 		cert, err := tls.LoadX509KeyPair("server.pem", "server.key")
@@ -149,6 +150,8 @@ func server(wg *sync.WaitGroup, port int, tlsEnabled bool) (s *http.Server) {
 			fmt.Printf("Failed to write response: %s", err)
 		}
 	})
+	m.HandleFunc("/login", login)
+	m.HandleFunc("/signup", signup)
 
 	go func() {
 		defer wg.Done()
