@@ -11,31 +11,112 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
 )
 
-func trackHandler(res http.ResponseWriter, req *http.Request) {
-	// Check if it is post
-	if req.Method != "GET" {
-		http.Error(res, fmt.Sprintf("%s on /track not allowed", req.Method), http.StatusMethodNotAllowed)
-		return
+func jwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Extract the token from the Authorization header
+		tokenString := extractToken(r)
+
+		if tokenString == "" {
+			http.Error(w, "Missing authorization token", http.StatusUnauthorized)
+			return
+		}
+
+		// Parse and validate the token
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			// Verify the signing method
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
+
+			// Return the secret key used to sign the token
+			return getSecret(), nil
+		})
+
+		if err != nil {
+			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			return
+		}
+
+		// Check if the token is valid
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			// Token is valid, you can access claims here
+			// For example: userID := claims["user_id"].(string)
+			issuer := claims["iss"].(string) // Issuer
+			if issuer != "tunetree" {
+				http.Error(w, "invalid token", http.StatusUnauthorized)
+				return
+			}
+			expiration, err := strconv.ParseInt(claims["exp"].(string), 10, 64) // Expiration time
+			if err != nil || expiration > time.Now().Unix() {
+				http.Error(w, "Expired token", http.StatusUnauthorized)
+				return
+			}
+			role := claims["aud"].(string)  // Audience (user role)
+			email := claims["sub"].(string) // Subject (user identifier)
+			ctx := context.WithValue(r.Context(), "role", role)
+			ctx = context.WithValue(r.Context(), "email", email)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		} else {
+			http.Error(w, "invalid token", http.StatusUnauthorized)
+		}
 	}
+}
+
+func extractToken(r *http.Request) string {
+	bearerToken := r.Header.Get("Authorization")
+	strArr := strings.Split(bearerToken, " ")
+	if len(strArr) == 2 {
+		return strArr[1]
+	}
+	return ""
+}
+
+func trackHandler(res http.ResponseWriter, req *http.Request) {
 	artistname := req.PathValue("artistname")
 	if artistname == "" {
 		http.Error(res, "No artist name specified", http.StatusNotFound)
 		return
 	}
 
-	track, ok := GetTrack(artistname)
-	if !ok {
-		http.Error(res, "No track associated with that artist", http.StatusNotFound)
+	switch req.Method {
+	case "GET":
+		track, ok := GetTrack(artistname)
+		if !ok {
+			http.Error(res, "No track associated with that artist", http.StatusNotFound)
+			return
+		}
+
+		res.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(res).Encode(track)
+	case "POST":
+		var track Track
+		// TODO: validate email = artistname etc here
+		body, err := io.ReadAll(req.Body)
+		if err != nil {
+			http.Error(res, "Failed to read body of request", http.StatusInternalServerError)
+			return
+		}
+		if err := json.Unmarshal(body, &track); err != nil {
+			http.Error(res, "Malformed data", http.StatusInternalServerError)
+			return
+		}
+		err = PutTrack(artistname, track)
+		if err != nil {
+			// TODO: error handling?
+			http.Error(res, "Failed to save track", http.StatusInternalServerError)
+			return
+		}
+	default:
+		http.Error(res, fmt.Sprintf("%s on /track not allowed", req.Method), http.StatusMethodNotAllowed)
 		return
 	}
-
-	res.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(res).Encode(track)
 }
 
 func signupHandler(res http.ResponseWriter, req *http.Request) {
@@ -60,7 +141,7 @@ func signupHandler(res http.ResponseWriter, req *http.Request) {
 	// TODO: Check if username is valid
 	// TODO: Check if password is valid
 	// Add to DB
-	if err := AddUser(&user); err != nil {
+	if err := PutUser(&user); err != nil {
 		http.Error(res, fmt.Sprintf("Failed to add user: %s", err), http.StatusInternalServerError)
 		return
 	}
@@ -76,13 +157,16 @@ func getRole(user User) string {
 	}
 }
 
-func generateToken(user User) (token string, err error) {
-	secret := []byte(os.Getenv("JWT_SECRET"))
-	// TODO: is this correct?
+func getSecret() (secret []byte) {
+	secret = []byte(os.Getenv("JWT_SECRET"))
 	if secret == nil {
 		panic("JWT_SECRET not set")
 	}
+	return secret
+}
 
+func generateToken(user User) (token string, err error) {
+	secret := getSecret()
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": user.Email,                       // Subject (user identifier)
 		"iss": "tunetree",                       // Issuer
@@ -174,7 +258,7 @@ func server(wg *sync.WaitGroup, port int, tlsEnabled bool) (s *http.Server) {
 	})
 	m.HandleFunc("/login/", loginHandler)
 	m.HandleFunc("/signup/", signupHandler)
-	m.HandleFunc("/track/{artistname}", trackHandler)
+	m.HandleFunc("/track/{artistname}", jwtMiddleware(trackHandler))
 
 	go func() {
 		defer wg.Done()

@@ -102,6 +102,29 @@ func GetTrack(artistname string) (track Track, ok bool) {
 	return track, true
 }
 
+func PutTrack(artistname string, track Track) (err error) {
+	var artistId int
+	err = db.QueryRow("SELECT rowid FROM artists WHERE artistname = ?", artistname).Scan(&artistId)
+	if err != nil {
+		return err
+	}
+	res, err := db.Exec("INSERT INTO tracks VALUES (?, ?, ?, ?);", track.Name, track.Image, track.Message, artistId)
+	if err != nil {
+		return err
+	}
+	trackId, err := res.LastInsertId()
+	if err != nil {
+		return err
+	}
+	for _, link := range track.Links {
+		_, err := db.Exec("INSERT INTO tracks VALUES (?, ?, ?);", link.Name, link.Link, trackId)
+		if err != nil {
+			return err
+		}
+	}
+	return err
+}
+
 func GetUser(email string) (user User, ok bool) {
 	err := db.QueryRow("SELECT * FROM users WHERE email = ?;", email).Scan(&user.Email, &user.Password, &user.Email)
 	if err == sql.ErrNoRows {
@@ -113,7 +136,7 @@ func GetUser(email string) (user User, ok bool) {
 	return user, true
 }
 
-func AddUser(user *User) (err error) {
+func PutUser(user *User) (err error) {
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	if err != nil {
 		return fmt.Errorf("Failed to hash password: %e", err)
