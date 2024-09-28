@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
@@ -26,10 +27,10 @@ CREATE TABLE IF NOT EXISTS users(
 `
 
 type Track struct {
-	Name    string
-	Image   []byte
-	Links   []Link
-	Message string
+	Name    string `json: name`
+	Image   []byte `json: image`
+	Links   []Link `json: links`
+	Message string `json: message`
 }
 
 const TRACKTABLE = `
@@ -44,8 +45,8 @@ CREATE TABLE IF NOT EXISTS tracks(
 `
 
 type Link struct {
-	Name string
-	Link string
+	Name string `json: name`
+	Link string `json: link`
 }
 
 const LINKTABLE = `
@@ -126,7 +127,7 @@ func PutTrack(artistname string, track Track) (err error) {
 }
 
 func GetUser(email string) (user User, ok bool) {
-	err := db.QueryRow("SELECT * FROM users WHERE email = ?;", email).Scan(&user.Email, &user.Password, &user.Email)
+	err := db.QueryRow("SELECT * FROM users WHERE email = ?;", email).Scan(&user.Email, &user.Password, &user.Artist)
 	if err == sql.ErrNoRows {
 		return user, false
 	} else if err != nil {

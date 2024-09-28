@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -53,15 +52,16 @@ func jwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
 				http.Error(w, "invalid token", http.StatusUnauthorized)
 				return
 			}
-			expiration, err := strconv.ParseInt(claims["exp"].(string), 10, 64) // Expiration time
-			if err != nil || expiration > time.Now().Unix() {
+			expiration := int64(claims["exp"].(float64))
+			now := time.Now().Unix()
+			if expiration < now {
 				http.Error(w, "Expired token", http.StatusUnauthorized)
 				return
 			}
 			role := claims["aud"].(string)  // Audience (user role)
 			email := claims["sub"].(string) // Subject (user identifier)
 			ctx := context.WithValue(r.Context(), "role", role)
-			ctx = context.WithValue(r.Context(), "email", email)
+			ctx = context.WithValue(ctx, "email", email)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		} else {
 			http.Error(w, "invalid token", http.StatusUnauthorized)
@@ -98,6 +98,22 @@ func trackHandler(res http.ResponseWriter, req *http.Request) {
 	case "POST":
 		var track Track
 		// TODO: validate email = artistname etc here
+		email := req.Context().Value("email")
+		if email == nil {
+			http.Error(res, "invalid token", http.StatusUnauthorized)
+			return
+		}
+		role := req.Context().Value("role")
+		if role == nil || role == "USER" {
+			http.Error(res, "invalid token", http.StatusUnauthorized)
+			return
+		}
+		user, ok := GetUser(email.(string))
+		if !ok || user.Email != email.(string) {
+			http.Error(res, "wrong user?", http.StatusUnauthorized)
+			return
+		}
+
 		body, err := io.ReadAll(req.Body)
 		if err != nil {
 			http.Error(res, "Failed to read body of request", http.StatusInternalServerError)
@@ -215,7 +231,7 @@ func loginHandler(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// Shake dat ass jwt-y
-	token, err := generateToken(user)
+	token, err := generateToken(user2)
 	if err != nil {
 		http.Error(res, fmt.Sprintf("Failed to generate token"), http.StatusInternalServerError)
 	}
