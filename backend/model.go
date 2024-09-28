@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
@@ -27,10 +26,10 @@ CREATE TABLE IF NOT EXISTS users(
 `
 
 type Track struct {
-	Name    string `json: name`
-	Image   []byte `json: image`
-	Links   []Link `json: links`
-	Message string `json: message`
+	Name    string            `json:"name"`
+	Image   []byte            `json:"image"`
+	Links   map[string]string `json:"links"`
+	Message string            `json:"message"`
 }
 
 const TRACKTABLE = `
@@ -43,11 +42,6 @@ CREATE TABLE IF NOT EXISTS tracks(
 		REFERENCES users (rowid)
 );
 `
-
-type Link struct {
-	Name string `json: name`
-	Link string `json: link`
-}
 
 const LINKTABLE = `
 CREATE TABLE IF NOT EXISTS links(
@@ -89,15 +83,16 @@ func GetTrack(artistname string) (track Track, ok bool) {
 
 	rows, _ := db.Query("SELECT t.name, t.image, t.message, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.artist = ?;", artistname)
 	for rows.Next() {
-		var link Link
-		err := rows.Scan(&link.Name, &link.Link)
+		var name string
+		var link string
+		err := rows.Scan(&name, &link)
 		if err == sql.ErrNoRows {
 			return track, false
 		} else if err != nil {
 			// TODO: deal with this
 			panic(err)
 		}
-		track.Links = append(track.Links, link)
+		track.Links[name] = link
 	}
 
 	return track, true
@@ -105,7 +100,7 @@ func GetTrack(artistname string) (track Track, ok bool) {
 
 func PutTrack(artistname string, track Track) (err error) {
 	var artistId int
-	err = db.QueryRow("SELECT rowid FROM artists WHERE artistname = ?", artistname).Scan(&artistId)
+	err = db.QueryRow("SELECT rowid FROM users WHERE artist = ?", artistname).Scan(&artistId)
 	if err != nil {
 		return err
 	}
@@ -117,8 +112,8 @@ func PutTrack(artistname string, track Track) (err error) {
 	if err != nil {
 		return err
 	}
-	for _, link := range track.Links {
-		_, err := db.Exec("INSERT INTO tracks VALUES (?, ?, ?);", link.Name, link.Link, trackId)
+	for name, link := range track.Links {
+		_, err := db.Exec("INSERT INTO links VALUES (?, ?, ?);", name, link, trackId)
 		if err != nil {
 			return err
 		}

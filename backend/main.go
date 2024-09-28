@@ -123,10 +123,9 @@ func trackHandler(res http.ResponseWriter, req *http.Request) {
 			http.Error(res, "Malformed data", http.StatusInternalServerError)
 			return
 		}
-		err = PutTrack(artistname, track)
-		if err != nil {
+		if err = PutTrack(artistname, track); err != nil {
 			// TODO: error handling?
-			http.Error(res, "Failed to save track", http.StatusInternalServerError)
+			http.Error(res, fmt.Sprintf("Failed to save track: %s", err), http.StatusInternalServerError)
 			return
 		}
 	default:
