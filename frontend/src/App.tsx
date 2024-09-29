@@ -7,7 +7,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
-import TrackPage from './routes/track';
+import TrackPage, { loader as trackLoader } from './routes/track';
 import Home from './routes/home';
 import Login from './routes/login';
 import Signup from './routes/signup';
@@ -65,8 +65,9 @@ const router = createBrowserRouter([
     errorElement: <div> uh-oh, error!</div>,
   },
   {
-    path: "/track",
+    path: "/track/:artistName",
     element: <TrackPage/>,
+    loader: trackLoader,
     errorElement: <div> uh-oh, error!</div>,
   },
   {

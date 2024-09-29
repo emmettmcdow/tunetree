@@ -1,6 +1,8 @@
 # TODO
 - Render links dynamically
-- Render trackinfo dynamically
+- Add images for each platform
+X Render trackinfo dynamically
+- Store images as filepaths
 - Pull in trackinfo from backend
 - Make sure I'm avoiding sql-injection
 - Make sure I'm avoiding all the cors shit

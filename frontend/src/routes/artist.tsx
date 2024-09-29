@@ -125,11 +125,13 @@ function getHeader(mode: Mode) {
 
 export default function Artist() {
   const [mode, changeMode] = useState(Mode.Standby);
+  // TODO: obvi
+  const todo = {}
   return (
     <div className="h-screen flex flex-col p-5">
       <p className="text-2xl rainbow-text">{getHeader(mode)}</p>
       <div className="flex w-3/4 mx-auto rounded-lg">
-        <SongInfo/>
+        <SongInfo trackInfo={todo}/>
       </div>
       <EditPanel mode={mode} changeMode={changeMode}/>
     </div>

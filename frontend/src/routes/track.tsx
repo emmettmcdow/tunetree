@@ -1,20 +1,17 @@
 import { useState } from 'react';
+import { useLoaderData } from 'react-router-dom';
 import placeholderSquare from "../placeholder-square.png";
 
-export function SongInfo() {
-  let artist = "Honestus";
-  let song = "Work That Back Boy";
-  let art = placeholderSquare;
-
+export function SongInfo({trackInfo}: {trackInfo: any}) {
   return (
     <div className="flex flex-col items-center mx-auto">
-      <p className="text-4xl"><b>{artist}</b></p>
-      <img alt="album-art" src={art} className="w-52 my-2"/>
-      <p className="text-2xl">{song}</p>
+      <p className="text-4xl"><b>{trackInfo.artist}</b></p>
+      <img alt="album-art" src={trackInfo.image} className="w-52 my-2"/>
+      <p className="text-2xl">{trackInfo.name}</p>
     </div>
   );
 }
-function ButtonBox({togglePrompt}: {togglePrompt: Function}) {
+function ButtonBox({trackInfo, togglePrompt}: {trackInfo: any, togglePrompt: Function}) {
   // TODO: fix display for <3 items
   let providers = ["spotify", "applemusic", "youtube", "bandcamp", "deezer", "pandora"];
   let buttons = providers.map((provider, index) => <IconLink n={index} m={providers.length} provider={provider} key={provider} togglePrompt={togglePrompt}/> );
@@ -49,12 +46,11 @@ function IconLink({ n, m, provider, togglePrompt }: { n: number, m: number, prov
   );
 }
 
-function SubscriptionPrompt({visible, toggle}: {visible: boolean, toggle: Function}) {
-  let artist = "Honestus";
+function SubscriptionPrompt({trackInfo, visible, toggle}: {trackInfo: any, visible: boolean, toggle: Function}) {
   if (visible) {
     return (
       <div className="z-50 absolute w-3/4 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  bg-indigo-200 p-5">
-        <p>wanna be notified when {artist} drops? (it's free)</p>
+        <p>wanna be notified when {trackInfo.artist} drops? (it's free)</p>
         <form className="my-2">
           <input className="w-1/2" name="email"/>
           <button onClick={(_) => toggle(false)} className="mx-2 bg-emerald-500 rounded-lg"><span className="p-4 py-2 text-white">yes</span></button>
@@ -67,21 +63,58 @@ function SubscriptionPrompt({visible, toggle}: {visible: boolean, toggle: Functi
   }
 }
 
-function TrackInfo({togglePrompt}: {togglePrompt: Function}) {
-  return (
-      <div className="flex flex-col justify-evenly p-5 min-h-screen">
-        <SongInfo />
-        <ButtonBox togglePrompt={togglePrompt}/>
-      </div>
-  );
+// TODO: fix this any?
+function TrackInfo({trackInfo, togglePrompt}: {trackInfo: any, togglePrompt: Function}) {
+  if (trackInfo) {
+    return (
+        <div className="flex flex-col justify-evenly p-5 min-h-screen">
+          <SongInfo trackInfo={trackInfo} />
+          <ButtonBox trackInfo={trackInfo} togglePrompt={togglePrompt}/>
+        </div>
+
+    );
+  } else {
+    return (<></>);
+  }
+}
+
+async function getTrackInfo(artist: string) {  
+  try {
+    // TODO: switch to https
+    // TODO: switch away from localhost
+    const response = await fetch('http://localhost:81/track/' + artist + '/', {
+      method: 'GET'
+    });
+
+    if (response.ok && response.body) {
+      const body = await response.json()
+      return body
+    } else {
+      console.error('Failed to GET: ' + response.body);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+  return ""
+}
+
+export async function loader({ params }: { params: any }) {
+  const artistName = params.artistName;
+  const trackInfo = await getTrackInfo(artistName)
+  const merged = {...trackInfo, "artist": artistName}
+  return merged;
 }
 
 export default function TrackPage() {
+  const tInfo = useLoaderData();
+  
   const [visibleSubsPrompt, togglePrompt] = useState(false);
+  const [trackInfo, setTrackInfo] = useState(tInfo)
+  
   return (
       <>
-        <TrackInfo togglePrompt={togglePrompt}/>
-        <SubscriptionPrompt visible={visibleSubsPrompt} toggle={togglePrompt}/>
+        <TrackInfo trackInfo={trackInfo} togglePrompt={togglePrompt}/>
+        <SubscriptionPrompt trackInfo={trackInfo} visible={visibleSubsPrompt} toggle={togglePrompt}/>
       </>
   );
 }

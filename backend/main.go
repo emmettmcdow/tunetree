@@ -97,6 +97,7 @@ func extractToken(r *http.Request) string {
 }
 
 func trackHandler(res http.ResponseWriter, req *http.Request) {
+	fmt.Println("Got one baby")
 	artistname := req.PathValue("artistname")
 	if artistname == "" {
 		http.Error(res, "No artist name specified", http.StatusNotFound)
@@ -293,7 +294,7 @@ func server(wg *sync.WaitGroup, port int, tlsEnabled bool) (s *http.Server) {
 	})
 	m.HandleFunc("/login/", corsHandler(loginHandler))
 	m.HandleFunc("/signup/", corsHandler(signupHandler))
-	m.HandleFunc("/track/{artistname}", corsHandler(jwtMiddleware(trackHandler)))
+	m.HandleFunc("/track/{artistname}/", corsHandler(jwtMiddleware(trackHandler)))
 
 	go func() {
 		defer wg.Done()
