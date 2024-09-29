@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
-import placeholderSquare from "../placeholder-square.png";
+import { iconForService } from '../util';
 
 export function SongInfo({trackInfo}: {trackInfo: any}) {
   return (
@@ -13,7 +13,7 @@ export function SongInfo({trackInfo}: {trackInfo: any}) {
 }
 function ButtonBox({trackInfo, togglePrompt}: {trackInfo: any, togglePrompt: Function}) {
   // TODO: fix display for <3 items
-  let providers = ["spotify", "applemusic", "youtube", "bandcamp", "deezer", "pandora"];
+  let providers = ["spotify", "apple", "youtube", "bandcamp", "amazon", "tidal"];
   let buttons = providers.map((provider, index) => <IconLink n={index} m={providers.length} provider={provider} key={provider} togglePrompt={togglePrompt}/> );
   const tan = Math.tan(Math.PI/providers.length);
   let offset = 1;
@@ -41,7 +41,7 @@ function IconLink({ n, m, provider, togglePrompt }: { n: number, m: number, prov
   } as React.CSSProperties;
   return (
     <button className=""  style={style} onClick={(_) => {togglePrompt(true); console.log("prompt toggled");} }>
-      <img  alt={alt} src={placeholderSquare} />
+      <img  alt={alt} src={iconForService(provider)} />
     </button>
   );
 }

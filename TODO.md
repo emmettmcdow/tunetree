@@ -1,6 +1,6 @@
 # TODO
 - Render links dynamically
-- Add images for each platform
+X Add images for each platform
 X Render trackinfo dynamically
 - Store images as filepaths
 - Pull in trackinfo from backend
