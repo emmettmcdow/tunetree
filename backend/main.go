@@ -21,8 +21,8 @@ func corsHandler(next http.HandlerFunc) http.HandlerFunc {
 	// TODO: I have no idea whether this is secure or not
 	return func(w http.ResponseWriter, r *http.Request) {
 		headers := w.Header()
-		headers.Add("Access-Control-Allow-Origin", "*")
-		headers.Add("Vary", "Origin")
+		headers.Add("Access-Control-Allow-Origin", "http://localhost:3000")
+		headers.Add("Access-Control-Allow-Credentials", "true")
 		headers.Add("Vary", "Access-Control-Request-Method")
 		headers.Add("Vary", "Access-Control-Request-Headers")
 		headers.Add("Access-Control-Allow-Headers", "Content-Type, Origin, Accept, token")
@@ -252,6 +252,7 @@ func loginHandler(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		http.Error(res, fmt.Sprintf("Failed to generate token"), http.StatusInternalServerError)
 	}
+	// TODO: switch secure to true if(and only if) doing TLS
 	tokenCookie := http.Cookie{
 		Name:     "token",
 		Value:    token,
@@ -259,9 +260,10 @@ func loginHandler(res http.ResponseWriter, req *http.Request) {
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteNoneMode,
 	}
 	http.SetCookie(res, &tokenCookie)
+	res.Header().Set("Access-Control-Expose-Headers", "Set-Cookie")
 
 	return
 }

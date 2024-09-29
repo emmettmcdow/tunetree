@@ -3,13 +3,13 @@ import { useState } from 'react';
 import { Password } from './login'
 
 export default function Signup() {
-  const [password, setPassword] = useState("");
-  const [cPassword, setCPassword] = useState("");
   const [message, setMessage] = useState("");
 
   const [formData, setFormData] = useState({
     artist: '',
-    email: ''
+    email: '',
+    password: '',
+    cpassword: ''
   });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,6 +23,7 @@ export default function Signup() {
     event.preventDefault();
 
     // Convert form data to JSON
+    
     const jsonData = JSON.stringify(formData);
 
     try {
@@ -76,8 +77,8 @@ export default function Signup() {
                  placeholder="e-mail address"
                  value={formData.email}
                  onChange={handleChange}/>
-          <Password password={password} setPassword={setPassword} name="password"/>
-          <Password password={cPassword} setPassword={setCPassword} name="confirm-password"/>
+          <Password password={formData.password} setPassword={handleChange} name="password"/>
+          <Password password={formData.cpassword} setPassword={handleChange} name="cpassword"/>
           <input className="w-full bg-emerald-500 rounded-lg text-white" type="submit"/>
         </form>
       </div>
