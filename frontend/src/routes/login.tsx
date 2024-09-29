@@ -64,7 +64,7 @@ export default function Login() {
       if (response.ok) {
         // TODO: show this to users better
         console.log('Form submitted successfully');
-        window.location.href = "/"
+        window.location.href = "/artist/"
       } else {
         console.error('Form submission failed');
         // TODO: better message, highlight problem
