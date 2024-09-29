@@ -17,6 +17,25 @@ import (
 	"time"
 )
 
+func corsHandler(next http.HandlerFunc) http.HandlerFunc {
+	// TODO: I have no idea whether this is secure or not
+	return func(w http.ResponseWriter, r *http.Request) {
+		headers := w.Header()
+		headers.Add("Access-Control-Allow-Origin", "*")
+		headers.Add("Vary", "Origin")
+		headers.Add("Vary", "Access-Control-Request-Method")
+		headers.Add("Vary", "Access-Control-Request-Headers")
+		headers.Add("Access-Control-Allow-Headers", "Content-Type, Origin, Accept, token")
+		headers.Add("Access-Control-Allow-Methods", "GET, POST,OPTIONS")
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		} else {
+			next.ServeHTTP(w, r)
+		}
+	}
+}
+
 func jwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Extract the token from the Authorization header
@@ -270,9 +289,9 @@ func server(wg *sync.WaitGroup, port int, tlsEnabled bool) (s *http.Server) {
 			fmt.Printf("Failed to write response: %s", err)
 		}
 	})
-	m.HandleFunc("/login/", loginHandler)
-	m.HandleFunc("/signup/", signupHandler)
-	m.HandleFunc("/track/{artistname}", jwtMiddleware(trackHandler))
+	m.HandleFunc("/login/", corsHandler(loginHandler))
+	m.HandleFunc("/signup/", corsHandler(signupHandler))
+	m.HandleFunc("/track/{artistname}", corsHandler(jwtMiddleware(trackHandler)))
 
 	go func() {
 		defer wg.Done()
@@ -302,7 +321,7 @@ func server(wg *sync.WaitGroup, port int, tlsEnabled bool) (s *http.Server) {
 func main() {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
-	server := server(wg, 80, false)
+	server := server(wg, 81, false)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
