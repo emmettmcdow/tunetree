@@ -23,7 +23,7 @@ func jwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		tokenString := extractToken(r)
 
 		if tokenString == "" {
-			http.Error(w, "Missing authorization token", http.StatusUnauthorized)
+			next.ServeHTTP(w, r)
 			return
 		}
 
@@ -39,7 +39,7 @@ func jwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		})
 
 		if err != nil {
-			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			next.ServeHTTP(w, r)
 			return
 		}
 
@@ -49,13 +49,13 @@ func jwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			// For example: userID := claims["user_id"].(string)
 			issuer := claims["iss"].(string) // Issuer
 			if issuer != "tunetree" {
-				http.Error(w, "invalid token", http.StatusUnauthorized)
+				next.ServeHTTP(w, r)
 				return
 			}
 			expiration := int64(claims["exp"].(float64))
 			now := time.Now().Unix()
 			if expiration < now {
-				http.Error(w, "Expired token", http.StatusUnauthorized)
+				next.ServeHTTP(w, r)
 				return
 			}
 			role := claims["aud"].(string)  // Audience (user role)
@@ -63,8 +63,7 @@ func jwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			ctx := context.WithValue(r.Context(), "role", role)
 			ctx = context.WithValue(ctx, "email", email)
 			next.ServeHTTP(w, r.WithContext(ctx))
-		} else {
-			http.Error(w, "invalid token", http.StatusUnauthorized)
+			return
 		}
 	}
 }

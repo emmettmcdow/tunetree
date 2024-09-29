@@ -37,8 +37,8 @@ CREATE TABLE IF NOT EXISTS tracks(
 	name TEXT NOT NULL,
 	image TEXT NOT NULL,
 	message TEXT,
-	artist_id INTEGER NOT NULL,
-	FOREIGN KEY (artist_id)
+	user_id INTEGER NOT NULL,
+	FOREIGN KEY (user_id)
 		REFERENCES users (rowid)
 );
 `
@@ -73,7 +73,7 @@ func InitDB() {
 
 func GetTrack(artistname string) (track Track, ok bool) {
 	var trackid int
-	err := db.QueryRow("SELECT t.name, t.image, t.message, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.artist = ?;", artistname).Scan(&track.Name, &track.Image, &track.Message, trackid)
+	err := db.QueryRow("SELECT t.name, t.image, t.message, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.artist = ?;", artistname).Scan(&track.Name, &track.Image, &track.Message, &trackid)
 	if err == sql.ErrNoRows {
 		return track, false
 	} else if err != nil {
@@ -81,7 +81,11 @@ func GetTrack(artistname string) (track Track, ok bool) {
 		panic(err)
 	}
 
-	rows, _ := db.Query("SELECT t.name, t.image, t.message, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.artist = ?;", artistname)
+	track.Links = map[string]string{}
+	rows, err := db.Query("SELECT l.name, l.link FROM links l WHERE l.track_id = ?;", trackid)
+	if err != nil {
+		panic(err)
+	}
 	for rows.Next() {
 		var name string
 		var link string
