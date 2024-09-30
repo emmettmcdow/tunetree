@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { Password } from './login'
+import { spotifySearch } from '../util'
 
 export default function Signup() {
   const [message, setMessage] = useState("");
@@ -9,14 +10,20 @@ export default function Signup() {
     artist: '',
     email: '',
     password: '',
-    cpassword: ''
+    cpassword: '',
+    spotifyId: ''
   });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
+    let spotifyId = formData['spotifyId']
+    if (name == "artist") {
+      spotifyId = await spotifySearch(value, "artist")
+    }
     setFormData(prevState => ({
       ...prevState,
-      [name]: value
+      [name]: value,
+      'spotifyId': spotifyId
     }));
   };
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, setMessage: Function) => {

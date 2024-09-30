@@ -12,16 +12,18 @@ const DBFILE string = "backend.db"
 var db *sql.DB
 
 type User struct {
-	Email    string
-	Password string
-	Artist   string
+	Email     string
+	Password  string
+	Artist    string
+	SpotifyId string
 }
 
 const USERTABLE = `
 CREATE TABLE IF NOT EXISTS users(
 	email TEXT NOT NULL UNIQUE,
 	password TEXT NOT NULL,
-	artist TEXT UNIQUE
+	artist TEXT UNIQUE,
+	spotifyId TEXT UNIQUE
 );
 `
 
@@ -126,7 +128,7 @@ func PutTrack(artistname string, track Track) (err error) {
 }
 
 func GetUser(email string) (user User, ok bool) {
-	err := db.QueryRow("SELECT * FROM users WHERE email = ?;", email).Scan(&user.Email, &user.Password, &user.Artist)
+	err := db.QueryRow("SELECT * FROM users WHERE email = ?;", email).Scan(&user.Email, &user.Password, &user.Artist, &user.SpotifyId)
 	if err == sql.ErrNoRows {
 		return user, false
 	} else if err != nil {
@@ -142,9 +144,9 @@ func PutUser(user *User) (err error) {
 		return fmt.Errorf("Failed to hash password: %e", err)
 	}
 	if user.Artist == "" {
-		_, err = db.Exec("INSERT INTO users VALUES (?,?,NULL);", user.Email, hashedPass)
+		_, err = db.Exec("INSERT INTO users VALUES (?,?,NULL,NULL);", user.Email, hashedPass)
 	} else {
-		_, err = db.Exec("INSERT INTO users VALUES (?,?,?);", user.Email, hashedPass, user.Artist)
+		_, err = db.Exec("INSERT INTO users VALUES (?,?,?,?);", user.Email, hashedPass, user.Artist, user.SpotifyId)
 	}
 	return err
 }
