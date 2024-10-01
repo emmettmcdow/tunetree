@@ -265,7 +265,7 @@ func loginHandler(res http.ResponseWriter, req *http.Request) {
 	}
 	http.SetCookie(res, &tokenCookie)
 	res.Header().Set("Access-Control-Expose-Headers", "Set-Cookie")
-
+	json.NewEncoder(res).Encode(user2)
 	return
 }
 

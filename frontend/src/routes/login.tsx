@@ -2,6 +2,7 @@ import {Icon} from 'react-icons-kit';
 import {eyeOff} from 'react-icons-kit/feather/eyeOff';
 import {eye} from 'react-icons-kit/feather/eye';
 import { useState } from 'react';
+import { setAuthenticatedUser } from '../util';
 
 export function Password({name, password, setPassword}: {name: string, password: string, setPassword: Function}) {
   const [type, setType] = useState('password');
@@ -61,9 +62,12 @@ export default function Login() {
         credentials: "include"
       });
 
-      if (response.ok) {
+      if (response.ok && response.body) {
         // TODO: show this to users better
         console.log('Form submitted successfully');
+        const body = await response.json()
+        console.log(body)
+        setAuthenticatedUser(body)
         window.location.href = "/artist/"
       } else {
         console.error('Form submission failed');

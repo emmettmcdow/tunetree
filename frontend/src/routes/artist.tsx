@@ -3,8 +3,7 @@ import {Icon} from 'react-icons-kit';
 import {x} from 'react-icons-kit/feather/x';
 import { useState } from 'react';
 
-import placeholderSquare from "../placeholder-square.png";
-import { iconForService } from "../util"
+import { getAuthenticatedArtist, iconForService } from "../util"
 
 // TODO: lets get rid of 'h{n}' tags
 // TODO: wait does that hurt accessibility
@@ -76,7 +75,7 @@ function Editor({changeMode}: {changeMode: Function}) {
   }
   const [formData, setFormData] = useState({
     'message': '',
-    'name': '',
+    'name': getAuthenticatedArtist(),
     'links': {
       'apple': '',
       "spotify": '',
@@ -88,7 +87,7 @@ function Editor({changeMode}: {changeMode: Function}) {
   });
   const [selected, setSelected] = useState(initialState);
   const [message, setMessage] = useState("");
-  const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = async (event: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     if (name == "name" || name == "message") {
       setFormData(prevState => ({
@@ -154,7 +153,7 @@ function Editor({changeMode}: {changeMode: Function}) {
       <form onSubmit={(e) => handleSubmit(e, setMessage)}>
         <ServiceSelectorBar selected={selected} setSelected={setSelected}/>
         <ServiceURLs formData={formData} setFormData={handleChange} selected={selected} setSelected={setSelected}/>
-        <textarea  className="w-full rounded-lg p-1 mb-2" name="message" placeholder="A message to your fans"/>
+        <textarea  className="w-full rounded-lg p-1 mb-2" value={formData["message"]} onChange={(e) => handleChange(e)} name="message" placeholder="A message to your fans"/>
         <button className="text-xl w-full bg-rose-500 rounded-lg" onClick={(_) => {
           changeMode(Mode.Standby);
         }}>
