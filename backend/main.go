@@ -25,7 +25,7 @@ func corsHandler(next http.HandlerFunc) http.HandlerFunc {
 		headers.Add("Access-Control-Allow-Credentials", "true")
 		headers.Add("Vary", "Access-Control-Request-Method")
 		headers.Add("Vary", "Access-Control-Request-Headers")
-		headers.Add("Access-Control-Allow-Headers", "Content-Type, Origin, Accept, token")
+		headers.Add("Access-Control-Allow-Headers", "Content-Type, Origin, Accept, Authorization")
 		headers.Add("Access-Control-Allow-Methods", "GET, POST,OPTIONS")
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
@@ -93,7 +93,14 @@ func extractToken(r *http.Request) string {
 	if len(strArr) == 2 {
 		return strArr[1]
 	}
-	return ""
+
+	// If we got here, it wasn't set as a header.
+	token, err := r.Cookie("token")
+	if err != nil {
+		return ""
+	}
+
+	return token.Value
 }
 
 func trackHandler(res http.ResponseWriter, req *http.Request) {
@@ -253,19 +260,8 @@ func loginHandler(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		http.Error(res, fmt.Sprintf("Failed to generate token"), http.StatusInternalServerError)
 	}
-	// TODO: switch secure to true if(and only if) doing TLS
-	tokenCookie := http.Cookie{
-		Name:     "token",
-		Value:    token,
-		Expires:  time.Now().Add(time.Hour),
-		Path:     "/",
-		HttpOnly: true,
-		Secure:   true,
-		SameSite: http.SameSiteNoneMode,
-	}
-	http.SetCookie(res, &tokenCookie)
-	res.Header().Set("Access-Control-Expose-Headers", "Set-Cookie")
-	json.NewEncoder(res).Encode(user2)
+	responseBody := map[string]string{"token": token, "Artist": user2.Artist, "Email": user2.Email, "SpotifyId": user2.SpotifyId}
+	json.NewEncoder(res).Encode(responseBody)
 	return
 }
 

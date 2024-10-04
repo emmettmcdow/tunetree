@@ -25,10 +25,15 @@ export function iconForService(service: string) {
   }
 }
 
-export function setAuthenticatedUser(user: any) {
-  document.cookie = "artist=" + user["Artist"];
-  document.cookie = "email=" + user["Email"];
-  document.cookie = "spotify_id=" + user["SpotifyId"];
+export function setAuthenticatedUser(body: any) {
+  document.cookie = "token=" + body["token"];
+  document.cookie = "artist=" + body["Artist"];
+  document.cookie = "email=" + body["Email"];
+  document.cookie = "spotify_id=" + body["SpotifyId"];
+}
+
+export function getAuthorizationHeader() {
+  return "Bearer " + getCookieValue("token");
 }
 
 export function getAuthenticatedArtist() {

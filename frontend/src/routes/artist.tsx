@@ -3,7 +3,7 @@ import {Icon} from 'react-icons-kit';
 import {x} from 'react-icons-kit/feather/x';
 import { useState } from 'react';
 
-import { getAuthenticatedArtist, iconForService } from "../util"
+import { getAuthenticatedArtist, getAuthorizationHeader, iconForService} from "../util"
 
 // TODO: lets get rid of 'h{n}' tags
 // TODO: wait does that hurt accessibility
@@ -119,8 +119,10 @@ function Editor({changeMode}: {changeMode: Function}) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          "Authorization": getAuthorizationHeader()
         },
-        body: jsonData
+        body: jsonData,
+        credentials: "include"
       });
 
       if (response.ok) {
