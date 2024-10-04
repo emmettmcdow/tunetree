@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS users(
 
 type Track struct {
 	Name    string            `json:"name"`
-	Image   []byte            `json:"image"`
+	Image   string            `json:"image"`
 	Links   map[string]string `json:"links"`
 	Message string            `json:"message"`
 }
@@ -104,9 +104,9 @@ func GetTrack(artistname string) (track Track, ok bool) {
 	return track, true
 }
 
-func PutTrack(artistname string, track Track) (err error) {
+func PutTrack(email string, track Track) (err error) {
 	var artistId int
-	err = db.QueryRow("SELECT rowid FROM users WHERE artist = ?", artistname).Scan(&artistId)
+	err = db.QueryRow("SELECT rowid FROM users WHERE email = ?", email).Scan(&artistId)
 	if err != nil {
 		return err
 	}

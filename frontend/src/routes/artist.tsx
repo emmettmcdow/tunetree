@@ -76,6 +76,7 @@ function Editor({changeMode}: {changeMode: Function}) {
   const [formData, setFormData] = useState({
     'message': '',
     'name': getAuthenticatedArtist(),
+    'image': '/set/me',
     'links': {
       'apple': '',
       "spotify": '',
