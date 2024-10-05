@@ -2,7 +2,7 @@
 - Render links dynamically
 X Add images for each platform
 X Render trackinfo dynamically
-- Store images as filepaths
+X Store images as filepaths
 X Pull in trackinfo from backend
 - Make sure I'm avoiding sql-injection
 - Make sure I'm avoiding all the cors shit
@@ -23,9 +23,15 @@ X Add frontend code for getting current user from jwt
   - Return multiple values
   - Display selected artist
   X Add artist id to user table
-  - Pull in album art from Spotify
+  X Pull in album art from Spotify
 - Make newsletter table in DB
 - hook up analytics
 - hook up logging
 - Figure out how the fuck to deploy to prod?
 - Rotate icons slightly. Pointy side up.
+- Only render icons of non-null links
+- Error/redirect on `track/{artist}` pages that do not exist
+- Kick to login page upon being un-authenticated
+- Check for authentication expiry
+- Automatically refresh spotify token
+

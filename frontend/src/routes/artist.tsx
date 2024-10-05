@@ -77,7 +77,7 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
   const [message, setMessage] = useState("");
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
     const { name, value } = event.target;
-    if (name == "name" || name == "message") {
+    if (name == "message") {
       setFormData(prevState => ({
         ...prevState,
         [name]: value,
@@ -85,10 +85,11 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
     } else if (name == "spotify"){
       const plainURL= value.split("?")[0];
       const albumID = plainURL.substring(plainURL.lastIndexOf("/") + 1);
-      const albumURL = await spotifyGetArt(albumID);
+      const [ albumURL, albumName ] = await spotifyGetArt(albumID);
       setFormData(prevState => ({
         ...prevState,
         'image': albumURL,
+        'name': albumName,
         "links": {
           ...prevState["links"],
           [name]: value,
@@ -115,7 +116,7 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
     try {
       // TODO: switch to https
       // TODO: switch away from localhost
-      const response = await fetch('http://127.0.0.1:81/track/honestus/', {
+      const response = await fetch('http://127.0.0.1:81/track/' + formData.artist.replaceAll(" ", "+") + '/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -202,6 +203,7 @@ function getHeader(mode: Mode) {
 type FormData = {
   message: string,
   name: string,
+  artist: string,
   image: string,
   links: {
     apple: string
@@ -217,8 +219,9 @@ export default function Artist() {
   const [mode, changeMode] = useState(Mode.Standby);
   const [formData, setFormData] = useState<FormData>({
     'message': '',
-    'name': getAuthenticatedArtist(),
-    'image': '/set/me',
+    'artist': getAuthenticatedArtist(),
+    'name': '',
+    'image': '',
     'links': {
       'apple': '',
       "spotify": '',

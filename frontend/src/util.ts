@@ -80,20 +80,22 @@ export async function spotifyGetArt(albumId: string){
       result = await response.json()
     } else {
       console.error(response.body)
-      return ""
+      return ["", ""]
     }
   } catch(error) {
     console.error(error)
-    return ""
+    return ["", ""]
   }
   let imageUrl = "";
+  let name = '';
   try{  
     imageUrl = result['albums'][0]['images'][0]['url'];
+    name = result['albums'][0]['name']
   } catch(error) {
     console.error(error)
   }
   console.log(imageUrl);
-  return imageUrl;
+  return [imageUrl, name];
 }
 
 export async function spotifySearch(term: string, type: string) {
