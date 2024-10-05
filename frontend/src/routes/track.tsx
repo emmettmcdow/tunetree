@@ -78,11 +78,11 @@ function TrackInfo({trackInfo, togglePrompt}: {trackInfo: any, togglePrompt: Fun
   }
 }
 
-async function getTrackInfo(artist: string) {  
+export async function getTrackInfo(artist: string) {  
   try {
     // TODO: switch to https
     // TODO: switch away from localhost
-    const response = await fetch('http://localhost:81/track/' + artist + '/', {
+    const response = await fetch('http://localhost:81/track/' + artist.replaceAll(" ", "+") + '/', {
       method: 'GET'
     });
 
@@ -95,13 +95,15 @@ async function getTrackInfo(artist: string) {
   } catch (error) {
     console.error('Error:', error);
   }
-  window.location.href = "/404"
   return ""
 }
 
 export async function loader({ params }: { params: any }) {
   const artistName = params.artistName;
   const trackInfo = await getTrackInfo(artistName)
+  if (trackInfo == "") {
+    window.localStorage.href = "/404";
+  }
   const merged = {...trackInfo, "artist": artistName}
   return merged;
 }

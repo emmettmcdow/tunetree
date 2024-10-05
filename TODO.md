@@ -30,6 +30,7 @@ X Add frontend code for getting current user from jwt
 - Figure out how the fuck to deploy to prod?
 - Rotate icons slightly. Pointy side up.
 - Only render icons of non-null links
+- Add soundcloud support
 - Automatically refresh spotify token
 - update field names for forms (fugly)
 - TODAY - 10/05/2024
@@ -37,6 +38,9 @@ X Add frontend code for getting current user from jwt
   X Verify posts to `track/{artist}` have equal params and token
   X Error/redirect on `track/{artist}` pages that do not exist
   X Kick to login page upon being un-authenticated
+  X Don't blow tf up the signup page
+  X Handle a users first track gracefully (shouldn't give a 404 at first)
+  X Get only the latest track
   - Populate artist page
   - Check for authentication expiry
   - Hide login/signup for auth'd users

@@ -1,7 +1,7 @@
-import { SongInfo } from './track';
+import { SongInfo, getTrackInfo } from './track';
 import {Icon} from 'react-icons-kit';
 import {x} from 'react-icons-kit/feather/x';
-import { useState, Dispatch, SetStateAction } from 'react';
+import { useState, Dispatch, SetStateAction, useEffect } from 'react';
 
 import { getAuthenticatedArtist, getAuthorizationHeader, iconForService, spotifyGetArt} from "../util"
 
@@ -215,26 +215,50 @@ type FormData = {
   }
 }
 
+
 export default function Artist() {
   const [mode, changeMode] = useState(Mode.Standby);
   const [formData, setFormData] = useState<FormData>({
-    'message': '',
-    'artist': getAuthenticatedArtist(),
-    'name': '',
-    'image': '',
-    'links': {
-      'apple': '',
-      "spotify": '',
-      "youtube": '',
-      "tidal": '',
-      "amazon": '',
-      "bandcamp": ''
-    }
+      'message': '',
+      'artist': '',
+      'name': '',
+      'image': '',
+      'links': {
+        'apple': '',
+        "spotify": '',
+        "youtube": '',
+        "tidal": '',
+        "amazon": '',
+        "bandcamp": ''
+      }
   });
-  const authenticated = getAuthenticatedArtist();
-  if (!authenticated) {
-    window.location.href = "/login"
-  }
+  useEffect(() => {
+    async function populateForm(artist: string) {
+      const ti = await getTrackInfo(artist)
+      const fd = {
+        'message': ti['message'],
+        'artist': artist,
+        'name': ti['name'],
+        'image': ti['image'],
+        'links': {
+          'apple': ti['apple'],
+          "spotify": ti['spotify'],
+          "youtube": ti['youtube'],
+          "tidal": ti['tidal'],
+          "amazon": ti['amazon'],
+          "bandcamp": ti['bandcamp']
+        }
+      }
+      setFormData(fd);
+    }
+    if (!formData.artist) {
+      const artist = getAuthenticatedArtist();
+      if (!artist) {
+        window.location.href = "/login"
+      }
+      populateForm(artist)
+    }
+  })
   // TODO: obvi
   return (
     <div className="h-screen flex flex-col p-5">

@@ -3,9 +3,9 @@ package main
 import (
 	"database/sql"
 	"fmt"
-
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
+	"time"
 )
 
 const DBFILE string = "backend.db"
@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS tracks(
 	name TEXT NOT NULL,
 	image TEXT NOT NULL,
 	message TEXT,
+	created INTEGER NOT NULL,
 	user_id INTEGER NOT NULL,
 	FOREIGN KEY (user_id)
 		REFERENCES users (rowid)
@@ -77,7 +78,7 @@ func InitDB() {
 
 func GetTrack(artistname string) (track Track, ok bool) {
 	var trackid int
-	err := db.QueryRow("SELECT t.name, t.image, t.message, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.artist = ?;", artistname).Scan(&track.Name, &track.Image, &track.Message, &trackid)
+	err := db.QueryRow("SELECT t.name, t.image, t.message, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.artist = ? ORDER BY created DESC LIMIT 1;", artistname).Scan(&track.Name, &track.Image, &track.Message, &trackid)
 	if err == sql.ErrNoRows {
 		return track, false
 	} else if err != nil {
@@ -107,7 +108,7 @@ func GetTrack(artistname string) (track Track, ok bool) {
 }
 
 func PutTrack(userId int64, track Track) (err error) {
-	res, err := db.Exec("INSERT INTO tracks VALUES (?, ?, ?, ?);", track.Name, track.Image, track.Message, userId)
+	res, err := db.Exec("INSERT INTO tracks VALUES (?, ?, ?, ?, ?);", track.Name, track.Image, track.Message, time.Now().Unix(), userId)
 	if err != nil {
 		return err
 	}

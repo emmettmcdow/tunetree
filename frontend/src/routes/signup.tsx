@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 
 import { Password } from './login'
 import { spotifySearch } from '../util'
@@ -16,14 +16,9 @@ export default function Signup() {
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    let spotifyId = formData['spotifyId']
-    if (name == "artist") {
-      spotifyId = await spotifySearch(value, "artist")
-    }
     setFormData(prevState => ({
       ...prevState,
-      [name]: value,
-      'spotifyId': spotifyId
+      [name]: value
     }));
   };
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, setMessage: Function) => {
@@ -65,6 +60,18 @@ export default function Signup() {
       <div>{message} </div>
     );
   }
+
+  useEffect(() => {
+    const timeOutId = setTimeout(() => {
+      spotifySearch(formData['artist'], "artist").then( (spotifyId) => {
+        setFormData(prevState => ({
+          ...prevState,
+          'spotifyId': spotifyId
+        }));
+      })
+    }, 500);
+    return () => clearTimeout(timeOutId);
+  }, [formData['artist']])
 
   return (
     <div className="h-screen flex flex-col">
