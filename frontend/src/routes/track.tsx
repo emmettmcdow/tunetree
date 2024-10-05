@@ -95,6 +95,7 @@ async function getTrackInfo(artist: string) {
   } catch (error) {
     console.error('Error:', error);
   }
+  window.location.href = "/404"
   return ""
 }
 
