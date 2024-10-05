@@ -77,10 +77,10 @@ func jwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
 				next.ServeHTTP(w, r)
 				return
 			}
-			role := claims["aud"].(string)  // Audience (user role)
-			email := claims["sub"].(string) // Subject (user identifier)
+			role := claims["aud"].(string)       // Audience (user role)
+			id := int64(claims["sub"].(float64)) // Subject (user identifier)
 			ctx := context.WithValue(r.Context(), "role", role)
-			ctx = context.WithValue(ctx, "email", email)
+			ctx = context.WithValue(ctx, "id", id)
 			next.ServeHTTP(w, r.WithContext(ctx))
 			return
 		}
@@ -104,8 +104,7 @@ func extractToken(r *http.Request) string {
 }
 
 func trackHandler(res http.ResponseWriter, req *http.Request) {
-	fmt.Println("Got one baby")
-	artistname := req.PathValue("artistname")
+	artistname := strings.ReplaceAll(req.PathValue("artistname"), "+", " ")
 	if artistname == "" {
 		http.Error(res, "No artist name specified", http.StatusNotFound)
 		return
@@ -123,10 +122,16 @@ func trackHandler(res http.ResponseWriter, req *http.Request) {
 		json.NewEncoder(res).Encode(track)
 	case "POST":
 		var track Track
+		fmt.Printf("We are so back")
 		// TODO: validate email = artistname etc here
-		email := req.Context().Value("email")
-		if email == nil {
+		id, ok := req.Context().Value("id").(int64)
+		if !ok {
 			http.Error(res, "invalid token", http.StatusUnauthorized)
+			return
+		}
+		user, ok := GetUser(id)
+		if !ok {
+			http.Error(res, "Failed to read body of request", http.StatusNotFound)
 			return
 		}
 		role := req.Context().Value("role")
@@ -134,9 +139,9 @@ func trackHandler(res http.ResponseWriter, req *http.Request) {
 			http.Error(res, "invalid token", http.StatusUnauthorized)
 			return
 		}
-		user, ok := GetUser(email.(string))
-		if !ok || user.Email != email.(string) {
-			http.Error(res, "wrong user?", http.StatusUnauthorized)
+		if getRole(user) != "ARTIST" ||
+			user.Artist != artistname {
+			http.Error(res, "Logged in user != requested user", http.StatusUnauthorized)
 			return
 		}
 
@@ -149,7 +154,7 @@ func trackHandler(res http.ResponseWriter, req *http.Request) {
 			http.Error(res, "Malformed data", http.StatusInternalServerError)
 			return
 		}
-		if err = PutTrack(user.Email, track); err != nil {
+		if err = PutTrack(id, track); err != nil {
 			// TODO: error handling?
 			http.Error(res, fmt.Sprintf("Failed to save track: %s", err), http.StatusInternalServerError)
 			return
@@ -209,7 +214,7 @@ func getSecret() (secret []byte) {
 func generateToken(user User) (token string, err error) {
 	secret := getSecret()
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": user.Email,                       // Subject (user identifier)
+		"sub": user.Id,                          // Subject (user identifier)
 		"iss": "tunetree",                       // Issuer
 		"aud": getRole(user),                    // Audience (user role)
 		"exp": time.Now().Add(time.Hour).Unix(), // Expiration time
@@ -243,7 +248,7 @@ func loginHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user2, ok := GetUser(user.Email)
+	user2, ok := GetUserFromEmail(user.Email)
 	if !ok {
 		// TODO: is this the case for DB failures?
 		http.Error(res, fmt.Sprintf("Username/Password incorrect"), http.StatusUnauthorized)

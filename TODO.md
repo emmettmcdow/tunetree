@@ -30,8 +30,13 @@ X Add frontend code for getting current user from jwt
 - Figure out how the fuck to deploy to prod?
 - Rotate icons slightly. Pointy side up.
 - Only render icons of non-null links
-- Error/redirect on `track/{artist}` pages that do not exist
-- Kick to login page upon being un-authenticated
-- Check for authentication expiry
 - Automatically refresh spotify token
-
+- update field names for forms (fugly)
+- TODAY - 10/05/2024
+  X Query using ID
+  X Verify posts to `track/{artist}` have equal params and token
+  - Error/redirect on `track/{artist}` pages that do not exist
+  - Kick to login page upon being un-authenticated
+  - Check for authentication expiry
+  - Hide login/signup for auth'd users
+  - Handle 404s on the backend with something on the frontend

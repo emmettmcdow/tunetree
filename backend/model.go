@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -12,6 +13,7 @@ const DBFILE string = "backend.db"
 var db *sql.DB
 
 type User struct {
+	Id        int64
 	Email     string
 	Password  string
 	Artist    string
@@ -104,13 +106,8 @@ func GetTrack(artistname string) (track Track, ok bool) {
 	return track, true
 }
 
-func PutTrack(email string, track Track) (err error) {
-	var artistId int
-	err = db.QueryRow("SELECT rowid FROM users WHERE email = ?", email).Scan(&artistId)
-	if err != nil {
-		return err
-	}
-	res, err := db.Exec("INSERT INTO tracks VALUES (?, ?, ?, ?);", track.Name, track.Image, track.Message, artistId)
+func PutTrack(userId int64, track Track) (err error) {
+	res, err := db.Exec("INSERT INTO tracks VALUES (?, ?, ?, ?);", track.Name, track.Image, track.Message, userId)
 	if err != nil {
 		return err
 	}
@@ -127,8 +124,20 @@ func PutTrack(email string, track Track) (err error) {
 	return err
 }
 
-func GetUser(email string) (user User, ok bool) {
-	err := db.QueryRow("SELECT * FROM users WHERE email = ?;", email).Scan(&user.Email, &user.Password, &user.Artist, &user.SpotifyId)
+func GetUser(id int64) (user User, ok bool) {
+	user.Id = id
+	err := db.QueryRow("SELECT *FROM users WHERE rowid = ?;", id).Scan(&user.Email, &user.Password, &user.Artist, &user.SpotifyId)
+	if err == sql.ErrNoRows {
+		return user, false
+	} else if err != nil {
+		// TODO: deal with this
+		panic(err)
+	}
+	return user, true
+}
+
+func GetUserFromEmail(email string) (user User, ok bool) {
+	err := db.QueryRow("SELECT *, rowid FROM users WHERE email = ?;", email).Scan(&user.Email, &user.Password, &user.Artist, &user.SpotifyId, &user.Id)
 	if err == sql.ErrNoRows {
 		return user, false
 	} else if err != nil {
