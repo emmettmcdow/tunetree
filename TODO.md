@@ -36,7 +36,8 @@ X Add frontend code for getting current user from jwt
   X Query using ID
   X Verify posts to `track/{artist}` have equal params and token
   X Error/redirect on `track/{artist}` pages that do not exist
-  - Kick to login page upon being un-authenticated
+  X Kick to login page upon being un-authenticated
+  - Populate artist page
   - Check for authentication expiry
   - Hide login/signup for auth'd users
   - Handle 404s on the backend with something on the frontend

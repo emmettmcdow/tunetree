@@ -231,6 +231,10 @@ export default function Artist() {
       "bandcamp": ''
     }
   });
+  const authenticated = getAuthenticatedArtist();
+  if (!authenticated) {
+    window.location.href = "/login"
+  }
   // TODO: obvi
   return (
     <div className="h-screen flex flex-col p-5">
