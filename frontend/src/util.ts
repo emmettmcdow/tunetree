@@ -63,6 +63,39 @@ function parseJwt (token: string) {
     return JSON.parse(jsonPayload);
 }
 
+export async function spotifyGetArt(albumId: string){
+  const params = new URLSearchParams()
+  params.append("ids", albumId)
+  params.append("market", "US")
+  const url = `https://api.spotify.com/v1/albums?${params.toString()}`
+
+  let result = null;
+  try{
+    const response = await fetch(url, {
+          method: "GET",
+          headers: { Authorization: `Bearer ${process.env.REACT_APP_SPOTIFY_API_KEY}` }
+    });
+
+    if (response.ok) {
+      result = await response.json()
+    } else {
+      console.error(response.body)
+      return ""
+    }
+  } catch(error) {
+    console.error(error)
+    return ""
+  }
+  let imageUrl = "";
+  try{  
+    imageUrl = result['albums'][0]['images'][0]['url'];
+  } catch(error) {
+    console.error(error)
+  }
+  console.log(imageUrl);
+  return imageUrl;
+}
+
 export async function spotifySearch(term: string, type: string) {
   // Type: album, artist, track
   const params = new URLSearchParams()

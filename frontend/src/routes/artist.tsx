@@ -1,9 +1,9 @@
 import { SongInfo } from './track';
 import {Icon} from 'react-icons-kit';
 import {x} from 'react-icons-kit/feather/x';
-import { useState } from 'react';
+import { useState, Dispatch, SetStateAction } from 'react';
 
-import { getAuthenticatedArtist, getAuthorizationHeader, iconForService} from "../util"
+import { getAuthenticatedArtist, getAuthorizationHeader, iconForService, spotifyGetArt} from "../util"
 
 // TODO: lets get rid of 'h{n}' tags
 // TODO: wait does that hurt accessibility
@@ -63,7 +63,7 @@ function ServiceURLs({formData, setFormData, selected, setSelected}: {formData: 
 }
 
 
-function Editor({changeMode}: {changeMode: Function}) {
+function Editor({changeMode, formData, setFormData}: {changeMode: Function, formData: FormData, setFormData: Dispatch<SetStateAction<FormData>>}) {
   // Honestly fuck typescript
   const initialState: any = {
     "apple": false,
@@ -73,19 +73,6 @@ function Editor({changeMode}: {changeMode: Function}) {
     "amazon": false,
     "bandcamp": false
   }
-  const [formData, setFormData] = useState({
-    'message': '',
-    'name': getAuthenticatedArtist(),
-    'image': '/set/me',
-    'links': {
-      'apple': '',
-      "spotify": '',
-      "youtube": '',
-      "tidal": '',
-      "amazon": '',
-      "bandcamp": ''
-    }
-  });
   const [selected, setSelected] = useState(initialState);
   const [message, setMessage] = useState("");
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
@@ -94,6 +81,18 @@ function Editor({changeMode}: {changeMode: Function}) {
       setFormData(prevState => ({
         ...prevState,
         [name]: value,
+      }));
+    } else if (name == "spotify"){
+      const plainURL= value.split("?")[0];
+      const albumID = plainURL.substring(plainURL.lastIndexOf("/") + 1);
+      const albumURL = await spotifyGetArt(albumID);
+      setFormData(prevState => ({
+        ...prevState,
+        'image': albumURL,
+        "links": {
+          ...prevState["links"],
+          [name]: value,
+        }
       }));
     } else {
       setFormData(prevState => ({
@@ -173,7 +172,7 @@ enum Mode {
   New,
 }
 
-function EditPanel({mode, changeMode}: {mode: Mode, changeMode: Function}) {
+function EditPanel({mode, changeMode, formData, setFormData}: {mode: Mode, changeMode: Function, formData: FormData, setFormData: any}) {
   switch(mode) {
     case Mode.Standby:
       return (
@@ -183,9 +182,9 @@ function EditPanel({mode, changeMode}: {mode: Mode, changeMode: Function}) {
         </div>
       );
     case Mode.Edit:
-      return <Editor changeMode={changeMode}/>;
+      return <Editor changeMode={changeMode} formData={formData} setFormData={setFormData} />;
     case Mode.New:
-      return <Editor changeMode={changeMode}/>;
+      return <Editor changeMode={changeMode} formData={formData} setFormData={setFormData} />;
   }
 }
 
@@ -200,17 +199,43 @@ function getHeader(mode: Mode) {
     }
 }
 
+type FormData = {
+  message: string,
+  name: string,
+  image: string,
+  links: {
+    apple: string
+    spotify: string
+    youtube: string
+    tidal: string
+    amazon: string
+    bandcamp: string
+  }
+}
+
 export default function Artist() {
   const [mode, changeMode] = useState(Mode.Standby);
+  const [formData, setFormData] = useState<FormData>({
+    'message': '',
+    'name': getAuthenticatedArtist(),
+    'image': '/set/me',
+    'links': {
+      'apple': '',
+      "spotify": '',
+      "youtube": '',
+      "tidal": '',
+      "amazon": '',
+      "bandcamp": ''
+    }
+  });
   // TODO: obvi
-  const todo = {}
   return (
     <div className="h-screen flex flex-col p-5">
       <p className="text-2xl rainbow-text">{getHeader(mode)}</p>
       <div className="flex w-3/4 mx-auto rounded-lg">
-        <SongInfo trackInfo={todo}/>
+        <SongInfo trackInfo={formData}/>
       </div>
-      <EditPanel mode={mode} changeMode={changeMode}/>
+      <EditPanel mode={mode} changeMode={changeMode} formData={formData} setFormData={setFormData}/>
     </div>
   );
 }

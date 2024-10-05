@@ -8,7 +8,7 @@ X Pull in trackinfo from backend
 - Make sure I'm avoiding all the cors shit
 - Add cool webgl backgrounds
 - add sticker buy prompt
-- Add frontend code for getting current user from jwt
+X Add frontend code for getting current user from jwt
 - Validate passwords actually
 - make rules for passwords
 - validate email
@@ -23,6 +23,7 @@ X Pull in trackinfo from backend
   - Return multiple values
   - Display selected artist
   X Add artist id to user table
+  - Pull in album art from Spotify
 - Make newsletter table in DB
 - hook up analytics
 - hook up logging
