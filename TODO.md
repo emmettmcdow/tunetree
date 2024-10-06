@@ -18,7 +18,8 @@ X 10/05/2024
   - Make sure I'm avoiding sql-injection
   - validate email
   - Make sure I'm avoiding all the cors shit
-  - Validate passwords actually
+  X Validate passwords actually
+  - Validate email and passwords on backend
   - Validate links
   - Automatically refresh spotify token
 

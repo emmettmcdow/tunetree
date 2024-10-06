@@ -24,11 +24,15 @@ export default function Signup() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, setMessage: Function) => {
     event.preventDefault();
     
+    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    if (!formData.email.match(emailRegex)) {
+      setMessage("Not a valid email");
+      return
+    }
     if (!validPassword(formData.password)) {
       setMessage("Invalid password. Password must have between 8-64 characters, with one number, one special character, and one capital letter");
       return
     }
-
     if (formData.password != formData.cpassword) {
       setMessage("Passwords do not match")
       return
