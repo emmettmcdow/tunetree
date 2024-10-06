@@ -1,7 +1,8 @@
 import { useState, useEffect} from 'react';
 
 import { Password } from './login'
-import { spotifySearch, validPassword} from '../util'
+import { validPassword } from '../util'
+import { spotifySearch } from '../spotify';
 
 export default function Signup() {
   const [message, setMessage] = useState("");

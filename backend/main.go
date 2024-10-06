@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 	"io"
 	"net/http"
@@ -18,23 +20,43 @@ import (
 	"time"
 )
 
-func corsHandler(next http.HandlerFunc) http.HandlerFunc {
-	// TODO: I have no idea whether this is secure or not
-	return func(w http.ResponseWriter, r *http.Request) {
-		headers := w.Header()
-		headers.Add("Access-Control-Allow-Origin", "http://localhost:3000")
-		headers.Add("Access-Control-Allow-Credentials", "true")
-		headers.Add("Vary", "Access-Control-Request-Method")
-		headers.Add("Vary", "Access-Control-Request-Headers")
-		headers.Add("Access-Control-Allow-Headers", "Content-Type, Origin, Accept, Authorization")
-		headers.Add("Access-Control-Allow-Methods", "GET, POST,OPTIONS")
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		} else {
-			next.ServeHTTP(w, r)
-		}
+type RateLimiter struct {
+	handler http.Handler
+}
+
+// TODO
+func (r RateLimiter) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	fmt.Println("Got rate limiter")
+	r.handler.ServeHTTP(res, req)
+}
+
+func NewRateLimiter(handler http.Handler) http.Handler {
+	return &RateLimiter{handler}
+}
+
+type Cors struct {
+	handler http.Handler
+}
+
+func (r Cors) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	fmt.Println("Got cors handler")
+	headers := res.Header()
+	headers.Add("Access-Control-Allow-Origin", "http://localhost:3000")
+	headers.Add("Access-Control-Allow-Credentials", "true")
+	headers.Add("Vary", "Access-Control-Request-Method")
+	headers.Add("Vary", "Access-Control-Request-Headers")
+	headers.Add("Access-Control-Allow-Headers", "Content-Type, Origin, Accept, Authorization")
+	headers.Add("Access-Control-Allow-Methods", "GET, POST,OPTIONS")
+	if req.Method == "OPTIONS" {
+		res.WriteHeader(http.StatusOK)
+		return
+	} else {
+		r.handler.ServeHTTP(res, req)
 	}
+}
+
+func NewCors(handler http.Handler) http.Handler {
+	return &Cors{handler}
 }
 
 func jwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
@@ -320,6 +342,190 @@ func loginHandler(res http.ResponseWriter, req *http.Request) {
 	return
 }
 
+type SpotifyHandler struct {
+	clientId string
+	secret   string
+	apiKey   string
+	expiry   time.Time
+}
+
+func getEnv(key string) (value string) {
+	dotenv, err := godotenv.Read(".env")
+	if err != nil {
+		panic(err)
+	}
+
+	value = os.Getenv(key)
+	if value == "" {
+		value = dotenv[key]
+	}
+	return value
+}
+
+// TODO turn the dotenv into a helper function
+func GetSpotifyHandler() (s SpotifyHandler) {
+	clientId := getEnv("SPOTIFY_CLIENT_ID")
+	secret := getEnv("SPOTIFY_SECRET")
+	if secret == "" || clientId == "" {
+		panic("SPOTIFY_CLIENT_ID or SPOTIFY_SECRET unset")
+	}
+
+	s = SpotifyHandler{clientId: clientId, secret: secret}
+	s.ApiKey()
+
+	return s
+}
+
+type KeyResponse struct {
+	AccessToken string `json:"access_token"`
+	ExpiresIn   int    `json:"expires_in"`
+}
+
+func (s *SpotifyHandler) ApiKey() string {
+	if s.expiry.Unix() > time.Now().Unix() {
+		return s.apiKey
+	}
+	url := "https://accounts.spotify.com/api/token"
+	body := []byte(fmt.Sprintf(`grant_type=client_credentials&client_id=%s&client_secret=%s`, s.clientId, s.secret))
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
+	if err != nil {
+		panic(err)
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		bodyBytes, _ := io.ReadAll(res.Body)
+		fmt.Println(string(bodyBytes))
+		panic("API KEY NOT SUCCESSFUL")
+	}
+
+	resJson := &KeyResponse{}
+	err = json.NewDecoder(res.Body).Decode(resJson)
+	if err != nil {
+		panic(err)
+	}
+	s.apiKey = resJson.AccessToken
+	s.expiry = time.Now().Add(time.Duration(resJson.ExpiresIn) * time.Second)
+
+	return s.apiKey
+
+}
+
+type SpotifySearchHandler struct {
+	parent SpotifyHandler
+}
+
+var ALLOWED_TYPES = map[string]bool{"artist": true}
+
+func (s SpotifySearchHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	fmt.Println("Got search handler spotify")
+	// Check if it is GET
+	if req.Method != "GET" {
+		http.Error(res, fmt.Sprintf("%s on /external/search not allowed", req.Method), http.StatusMethodNotAllowed)
+		return
+	}
+
+	term := req.URL.Query().Get("term")
+	rtype := req.URL.Query().Get("type")
+	if term == "" || rtype == "" {
+		http.Error(res, "term or type not specified", http.StatusBadRequest)
+		return
+	}
+	if _, ok := ALLOWED_TYPES[rtype]; !ok {
+		http.Error(res, fmt.Sprintf("%s not a valid search type", rtype), http.StatusBadRequest)
+		return
+	}
+
+	key := s.parent.ApiKey()
+	url := "https://api.spotify.com/v1/search"
+	req, err := http.NewRequest("GET", url, http.NoBody)
+	if err != nil {
+		panic(err)
+	}
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", key))
+	q := req.URL.Query()
+	q.Add("q", term)
+	q.Add("type", rtype)
+	q.Add("market", "US")
+	q.Add("limit", "1")
+	req.URL.RawQuery = q.Encode()
+
+	client := &http.Client{}
+	spotifyResponse, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer spotifyResponse.Body.Close()
+
+	if spotifyResponse.StatusCode != 200 {
+		bodyBytes, _ := io.ReadAll(spotifyResponse.Body)
+		http.Error(res, string(bodyBytes), http.StatusNotFound)
+	}
+
+	io.Copy(res, spotifyResponse.Body)
+}
+
+type SpotifyAlbumHandler struct {
+	parent SpotifyHandler
+}
+
+func (s SpotifyAlbumHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	fmt.Println("Got album handler spotify")
+	// Check if it is GET
+	if req.Method != "GET" {
+		http.Error(res, fmt.Sprintf("%s on /external/search not allowed", req.Method), http.StatusMethodNotAllowed)
+		return
+	}
+
+	albumId := req.URL.Query().Get("albumId")
+	if albumId == "" {
+		http.Error(res, "albumId not specified", http.StatusBadRequest)
+		return
+	}
+
+	key := s.parent.ApiKey()
+	url := "https://api.spotify.com/v1/albums"
+	req, err := http.NewRequest("GET", url, http.NoBody)
+	if err != nil {
+		panic(err)
+	}
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", key))
+	q := req.URL.Query()
+	q.Add("ids", albumId)
+	q.Add("market", "US")
+	req.URL.RawQuery = q.Encode()
+	client := &http.Client{}
+	spotifyResponse, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer spotifyResponse.Body.Close()
+
+	if spotifyResponse.StatusCode != 200 {
+		panic("API KEY NOT SUCCESSFUL")
+	}
+
+	io.Copy(res, spotifyResponse.Body)
+}
+
+func (s SpotifyHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	fmt.Println("Got spotify handler")
+	m := http.NewServeMux()
+	m.Handle("/external/search", SpotifySearchHandler{parent: s})
+	m.Handle("/external/albums", SpotifyAlbumHandler{parent: s})
+
+	rateLimitedMux := NewRateLimiter(m)
+
+	rateLimitedMux.ServeHTTP(res, req)
+}
+
 func server(wg *sync.WaitGroup, port int, tlsEnabled bool) (s *http.Server) {
 	var config *tls.Config
 
@@ -335,18 +541,18 @@ func server(wg *sync.WaitGroup, port int, tlsEnabled bool) (s *http.Server) {
 	}
 
 	address := fmt.Sprintf(":%d", port)
-	s = &http.Server{Addr: address, Handler: m, TLSConfig: config}
-
 	m.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write([]byte("healthy"))
 		if err != nil {
 			fmt.Printf("Failed to write response: %s", err)
 		}
 	})
-	m.HandleFunc("/login/", corsHandler(loginHandler))
-	m.HandleFunc("/signup/", corsHandler(signupHandler))
-	m.HandleFunc("/track/{artistname}/", corsHandler(jwtMiddleware(trackHandler)))
+	m.HandleFunc("/login/", loginHandler)
+	m.HandleFunc("/signup/", signupHandler)
+	m.HandleFunc("/track/{artistname}/", jwtMiddleware(trackHandler))
+	m.Handle("/external/", GetSpotifyHandler())
 
+	s = &http.Server{Addr: address, Handler: NewCors(m), TLSConfig: config}
 	go func() {
 		defer wg.Done()
 		if err := s.ListenAndServe(); err != http.ErrServerClosed {

@@ -3,7 +3,8 @@ import {Icon} from 'react-icons-kit';
 import {x} from 'react-icons-kit/feather/x';
 import { useState, Dispatch, SetStateAction, useEffect } from 'react';
 
-import { getAuthenticatedArtist, getAuthorizationHeader, iconForService, spotifyGetArt} from "../util"
+import { getAuthenticatedArtist, getAuthorizationHeader, iconForService } from "../util"
+import { spotifyGetArt } from '../spotify';
 
 // TODO: lets get rid of 'h{n}' tags
 // TODO: wait does that hurt accessibility

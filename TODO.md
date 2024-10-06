@@ -15,14 +15,15 @@ X 10/05/2024
   X Add Shader background
   X Render links dynamically
 - 10/06/2024
-  - Make sure I'm avoiding sql-injection
+  X Make sure I'm avoiding sql-injection (GO parameterization does this by default)
   X validate email
+  X Move spotify to backend
   - Make sure I'm avoiding all the cors shit
   X Validate passwords actually
   X Validate email and passwords on backend
   X Validate user/artist is not null on frontend and backend
   - Validate links
-  - Automatically refresh spotify token
+  X Automatically refresh spotify token
 - add sticker buy prompt
 - Add banned passsword list
 - make rules for passwords
@@ -55,4 +56,5 @@ X 10/05/2024
 - Check for authentication expiry
 - Hide login/signup for auth'd users
 - Handle 404s on the backend with something on the frontend
+- Rate limit backend requests to external services
 
