@@ -6,6 +6,40 @@ import tidal from "./tidal.png"
 import bandcamp from "./bandcamp.png"
 import amazon from "./amazon.png"
 
+export function validPassword(password: string) {
+  /* Rules:
+   *   - All characters must be between 33 and 126 ascii inclusive
+   *   - Password must be between 8-64 characters
+   *   - One number
+   *   - One Special
+   *   - One Caps
+   */
+
+  let caps = false;
+  let special = false;
+  let number = false;
+
+  if (password.length < 8 || password.length > 64) {
+    return false;
+  }
+  for (let i = 0; i < password.length; i++) {
+    let code = password.charCodeAt(i);
+    if (code < 33 || code > 126) {
+      return false
+    }
+    if (code > 47 && code < 58) {
+      number = true;
+    }
+    if ((code > 32 && code < 48) || (code > 57 && code < 65) || (code > 90 && code < 97) || (code > 122 && code < 127)) {
+      special = true;
+    }
+    if (code > 64 && code < 91) {
+      caps = true;
+    }
+  }
+  return caps && special && number;
+}
+
 export function iconForService(service: string) {
   switch(service) {
   case "spotify":

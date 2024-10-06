@@ -152,7 +152,7 @@ export default function TrackPage() {
       <>
         <TrackInfo trackInfo={trackInfo} setLink={setLink}/>
         <SubscriptionPrompt trackInfo={trackInfo} link={link} toggle={setLink}/>
-        <WebGLBackground/>
+        // <WebGLBackground/>
       </>
   );
 }

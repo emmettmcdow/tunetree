@@ -1,19 +1,31 @@
 # TODO
-- Render links dynamically
 X Add images for each platform
 X Render trackinfo dynamically
 X Store images as filepaths
 X Pull in trackinfo from backend
-- Make sure I'm avoiding sql-injection
-- Make sure I'm avoiding all the cors shit
-- Add cool webgl backgrounds
-- add sticker buy prompt
 X Add frontend code for getting current user from jwt
-- Validate passwords actually
+X 10/05/2024
+  X Query using ID
+  X Verify posts to `track/{artist}` have equal params and token
+  X Error/redirect on `track/{artist}` pages that do not exist
+  X Kick to login page upon being un-authenticated
+  X Don't blow tf up the signup page
+  X Handle a users first track gracefully (shouldn't give a 404 at first)
+  X Get only the latest track
+  X Add Shader background
+  X Render links dynamically
+- 10/06/2024
+  - Make sure I'm avoiding sql-injection
+  - validate email
+  - Make sure I'm avoiding all the cors shit
+  - Validate passwords actually
+  - Validate links
+  - Automatically refresh spotify token
+
+- add sticker buy prompt
+- Add banned passsword list
 - make rules for passwords
-- validate email
 - Make failure in login and signup sexy
-- deploy
 - micro adjust desktop
 - dark mode?
 - Put my logo guy in there?
@@ -29,21 +41,12 @@ X Add frontend code for getting current user from jwt
 - hook up logging
 - Figure out how the fuck to deploy to prod?
 - Rotate icons slightly. Pointy side up.
-- Only render icons of non-null links
 - Add soundcloud support
-- Automatically refresh spotify token
 - update field names for forms (fugly)
-- TODAY - 10/05/2024
-  X Query using ID
-  X Verify posts to `track/{artist}` have equal params and token
-  X Error/redirect on `track/{artist}` pages that do not exist
-  X Kick to login page upon being un-authenticated
-  X Don't blow tf up the signup page
-  X Handle a users first track gracefully (shouldn't give a 404 at first)
-  X Get only the latest track
-  X Add Shader background
-  - Fix only 1 link bug
-  - Populate artist page
-  - Check for authentication expiry
-  - Hide login/signup for auth'd users
-  - Handle 404s on the backend with something on the frontend
+- improve shader performance
+- Fix only 1 link bug
+- Don't render in background
+- Check for authentication expiry
+- Hide login/signup for auth'd users
+- Handle 404s on the backend with something on the frontend
+

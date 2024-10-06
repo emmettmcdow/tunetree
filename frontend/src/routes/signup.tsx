@@ -1,7 +1,7 @@
 import { useState, useEffect} from 'react';
 
 import { Password } from './login'
-import { spotifySearch } from '../util'
+import { spotifySearch, validPassword} from '../util'
 
 export default function Signup() {
   const [message, setMessage] = useState("");
@@ -23,9 +23,18 @@ export default function Signup() {
   };
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, setMessage: Function) => {
     event.preventDefault();
-
-    // Convert form data to JSON
     
+    if (!validPassword(formData.password)) {
+      setMessage("Invalid password. Password must have between 8-64 characters, with one number, one special character, and one capital letter");
+      return
+    }
+
+    if (formData.password != formData.cpassword) {
+      setMessage("Passwords do not match")
+      return
+    }
+
+    // Convert form data to JSON    
     const jsonData = JSON.stringify(formData);
 
     try {
