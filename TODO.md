@@ -41,6 +41,8 @@ X Add frontend code for getting current user from jwt
   X Don't blow tf up the signup page
   X Handle a users first track gracefully (shouldn't give a 404 at first)
   X Get only the latest track
+  X Add Shader background
+  - Fix only 1 link bug
   - Populate artist page
   - Check for authentication expiry
   - Hide login/signup for auth'd users

@@ -63,7 +63,7 @@ function ServiceURLs({formData, setFormData, selected, setSelected}: {formData: 
 }
 
 
-function Editor({changeMode, formData, setFormData}: {changeMode: Function, formData: FormData, setFormData: Dispatch<SetStateAction<FormData>>}) {
+function Editor({changeMode, formData, setFormData}: {changeMode: Function, formData: Track, setFormData: Dispatch<SetStateAction<Track>>}) {
   // Honestly fuck typescript
   const initialState: any = {
     "apple": false,
@@ -173,7 +173,7 @@ enum Mode {
   New,
 }
 
-function EditPanel({mode, changeMode, formData, setFormData}: {mode: Mode, changeMode: Function, formData: FormData, setFormData: any}) {
+function EditPanel({mode, changeMode, formData, setFormData}: {mode: Mode, changeMode: Function, formData: Track, setFormData: any}) {
   switch(mode) {
     case Mode.Standby:
       return (
@@ -200,7 +200,7 @@ function getHeader(mode: Mode) {
     }
 }
 
-type FormData = {
+export type Track = {
   message: string,
   name: string,
   artist: string,
@@ -218,7 +218,7 @@ type FormData = {
 
 export default function Artist() {
   const [mode, changeMode] = useState(Mode.Standby);
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<Track>({
       'message': '',
       'artist': '',
       'name': '',
