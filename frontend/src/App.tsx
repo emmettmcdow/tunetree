@@ -13,40 +13,6 @@ import Login from './routes/login';
 import Signup from './routes/signup';
 import Artist from './routes/artist';
 
-export function initGLCanvas(canvas: HTMLCanvasElement) {
-  // Initialize the GL context
-  const gl = canvas.getContext("webgl");
-
-  // Only continue if WebGL is available and working
-  if (gl === null) {
-    alert(
-      "Unable to initialize WebGL. Your browser or machine may not support it.",
-    );
-    return;
-  }
-
-  // Set clear color to black, fully opaque
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  // Clear the color buffer with specified clear color
-  gl.clear(gl.COLOR_BUFFER_BIT);
-}
-
-function WebGLBackground() {
-  let height = 100;
-  let width = 100;
-  const canvasRef = useRef(null)
-  useEffect(() => {
-    if (canvasRef != null && canvasRef.current != null) {
-      initGLCanvas(canvasRef.current);
-    } else {
-      console.log("canvas not initialized!")
-    }
-  });
-  return (
-      <canvas id="glcanvas" ref={canvasRef} width={width} height={height}/>
-  );
-}
-
 function Footer() {
   return (
     <div className="flex flex-col text-center bg-indigo-200 py-4">
