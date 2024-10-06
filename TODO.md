@@ -16,13 +16,13 @@ X 10/05/2024
   X Render links dynamically
 - 10/06/2024
   - Make sure I'm avoiding sql-injection
-  - validate email
+  X validate email
   - Make sure I'm avoiding all the cors shit
   X Validate passwords actually
-  - Validate email and passwords on backend
+  X Validate email and passwords on backend
+  X Validate user/artist is not null on frontend and backend
   - Validate links
   - Automatically refresh spotify token
-
 - add sticker buy prompt
 - Add banned passsword list
 - make rules for passwords
@@ -30,14 +30,19 @@ X 10/05/2024
 - micro adjust desktop
 - dark mode?
 - Put my logo guy in there?
+- Specify if new artist signup failed due to duplicate user
+  - Display special text saying if you think this is a mistake, contact XYZ
 - Hook up email backend
+  - Make newsletter table in DB
+  - Hook up mailgun
+  - Hook up support email that redirects to emmett.mcdow@gmail.com
+  - Hook up form for support
 - Hook up Spotify API
   - Make it more robust, if ambiguous, present to user and have them select
   - Return multiple values
   - Display selected artist
   X Add artist id to user table
   X Pull in album art from Spotify
-- Make newsletter table in DB
 - hook up analytics
 - hook up logging
 - Figure out how the fuck to deploy to prod?

@@ -23,7 +23,8 @@ export default function Signup() {
   };
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, setMessage: Function) => {
     event.preventDefault();
-    
+
+    // MAKE SURE TO UPDATE THIS ON BACKEND IF YOU CHANGE THIS
     const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     if (!formData.email.match(emailRegex)) {
       setMessage("Not a valid email");
@@ -35,6 +36,10 @@ export default function Signup() {
     }
     if (formData.password != formData.cpassword) {
       setMessage("Passwords do not match")
+      return
+    }
+    if (formData.artist == "") {
+      setMessage("Invalid artist")
       return
     }
 

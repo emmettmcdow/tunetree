@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"regexp"
 	"strings"
 	"sync"
 	"syscall"
@@ -184,8 +185,24 @@ func signupHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// TODO: Check if username is valid
-	// TODO: Check if password is valid
+	// MAKE SURE TO UPDATE THIS ON FRONTEND IF YOU CHANGE THIS
+	if !validPassword(user.Password) {
+		http.Error(res, "Password invalid", http.StatusBadRequest)
+		return
+	}
+	emailRegex := `^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`
+	if match, err := regexp.Match(emailRegex, []byte(user.Email)); err == nil && !match {
+		http.Error(res, "Email invalid", http.StatusBadRequest)
+		return
+	} else if err != nil {
+		http.Error(res, fmt.Sprintf("Failed to parse email: %s", err), http.StatusInternalServerError)
+		return
+	}
+	if user.Artist == "" {
+		http.Error(res, "Artist name invalid", http.StatusBadRequest)
+		return
+	}
+
 	// Add to DB
 	if err := PutUser(&user); err != nil {
 		http.Error(res, fmt.Sprintf("Failed to add user: %s", err), http.StatusInternalServerError)
@@ -193,6 +210,39 @@ func signupHandler(res http.ResponseWriter, req *http.Request) {
 	}
 
 	return
+}
+
+func validPassword(password string) bool {
+	/* Rules:
+	 *   - All characters must be between 33 and 126 ascii inclusive
+	 *   - Password must be between 8-64 characters
+	 *   - One number
+	 *   - One Special
+	 *   - One Caps
+	 */
+
+	caps := false
+	special := false
+	number := false
+
+	if len(password) < 8 || len(password) > 64 {
+		return false
+	}
+	for _, code := range password {
+		if code < 33 || code > 126 {
+			return false
+		}
+		if code > 47 && code < 58 {
+			number = true
+		}
+		if (code > 32 && code < 48) || (code > 57 && code < 65) || (code > 90 && code < 97) || (code > 122 && code < 127) {
+			special = true
+		}
+		if code > 64 && code < 91 {
+			caps = true
+		}
+	}
+	return caps && special && number
 }
 
 func getRole(user User) string {
