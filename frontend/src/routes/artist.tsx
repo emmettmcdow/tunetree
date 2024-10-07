@@ -180,7 +180,7 @@ function EditPanel({mode, changeMode, formData, setFormData}: {mode: Mode, chang
       return (
         <div className="flex h-1/4 items-center">
           <button onClick={() => {changeMode(Mode.Edit)}} className="text-xl w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg"><span className="p-4 py-2 text-white">edit</span></button>
-          <button onClick={() => {changeMode(Mode.New)}} className="text-xl w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg"><span className="p-4 py-2 text-white">new</span></button>
+          <button onClick={() => {setFormData({}); changeMode(Mode.New)}} className="text-xl w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg"><span className="p-4 py-2 text-white">new</span></button>
         </div>
       );
     case Mode.Edit:

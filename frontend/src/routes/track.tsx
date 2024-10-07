@@ -3,18 +3,27 @@ import { useLoaderData } from 'react-router-dom';
 
 import { Track } from './artist';
 import { iconForService } from '../util';
-import ShaderCanvas, { shader }from '../shader';
+import ShaderCanvas, { shader } from '../shader';
 
 function WebGLBackground() {
   const canvasRef = useRef(null)
   let shaderCanvas: ShaderCanvas | null = null;
-  let time = 0;
 
+  
+  const fpsLimit = 30;
+  let previousDelta = 0;
   function animate(time: number): void {
-    if (shaderCanvas) {
-      shaderCanvas.render(time);
-      requestAnimationFrame(animate);
+    // We know shaderCanvas isn't null
+    requestAnimationFrame(animate);
+
+    var delta = time - previousDelta;
+
+    if (fpsLimit && delta < 1000 / fpsLimit) {
+        return;
     }
+    /* your code here */
+    shaderCanvas!.render(time);
+    previousDelta = time;
   }
 
   useEffect(() => {
@@ -22,7 +31,9 @@ function WebGLBackground() {
       if (shaderCanvas == null) {
         shaderCanvas = new ShaderCanvas(canvasRef.current, shader);
       }
-      animate(time);
+      if (shaderCanvas) {
+        animate(0);
+      }
     } else {
       console.log("canvas not initialized!")
     }
@@ -51,7 +62,10 @@ function ButtonBox({trackInfo, setLink}: {trackInfo: Track, setLink: Function}) 
   
   const tan = Math.tan(Math.PI/providers.length);
   let offset = 1;
-  if (providers.length < 4) {
+  let className = "w-52 img-circle mx-auto z-50"
+  if (providers.length < 3) {
+    className = "w-52 z-50 flex justify-center mx-auto";
+  } else if (providers.length < 4) {
     offset = 3;
   } else if (providers.length > 5) {
     offset = 0.5;
@@ -61,7 +75,7 @@ function ButtonBox({trackInfo, setLink}: {trackInfo: Track, setLink: Function}) 
     "--rel": offset
   } as React.CSSProperties;
   return (
-    <div id="button-box" style={style} className="w-52 img-circle mx-auto z-50" >
+    <div id="button-box" style={style} className={className} >
       {buttons}
     </div>
   );
@@ -73,8 +87,12 @@ function IconLink({ n, m, provider, link, setLink }: { n: number, m: number, pro
     "--i": String(n),
     "--m": String(m)
   } as React.CSSProperties;
+  let className = "";
+  if (m < 3) {
+    className = "w-24 m-5";
+  }
   return (
-    <button className=""  style={style} onClick={(_) => {setLink(link); console.log("prompt toggled");} }>
+    <button className={className}  style={style} onClick={(_) => {setLink(link); console.log("prompt toggled");} }>
       <img  alt={alt} src={iconForService(provider)} />
     </button>
   );
@@ -152,7 +170,7 @@ export default function TrackPage() {
       <>
         <TrackInfo trackInfo={trackInfo} setLink={setLink}/>
         <SubscriptionPrompt trackInfo={trackInfo} link={link} toggle={setLink}/>
-        // <WebGLBackground/>
+        <WebGLBackground/>
       </>
   );
 }

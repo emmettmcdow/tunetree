@@ -18,14 +18,16 @@ X 10/05/2024
   X Make sure I'm avoiding sql-injection (GO parameterization does this by default)
   X validate email
   X Move spotify to backend
-  - Make sure I'm avoiding all the cors shit
   X Validate passwords actually
-  X Validate email and passwords on backend
   X Validate user/artist is not null on frontend and backend
-  - Validate links
+  X Validate email and passwords on backend
   X Automatically refresh spotify token
+  X hook up logging
+  - Fix only 1 link bug
+  - Validate links
 - add sticker buy prompt
 - Add banned passsword list
+- Make sure I'm avoiding all the cors shit
 - make rules for passwords
 - Make failure in login and signup sexy
 - micro adjust desktop
@@ -45,16 +47,15 @@ X 10/05/2024
   X Add artist id to user table
   X Pull in album art from Spotify
 - hook up analytics
-- hook up logging
 - Figure out how the fuck to deploy to prod?
 - Rotate icons slightly. Pointy side up.
 - Add soundcloud support
 - update field names for forms (fugly)
 - improve shader performance
-- Fix only 1 link bug
 - Don't render in background
 - Check for authentication expiry
 - Hide login/signup for auth'd users
 - Handle 404s on the backend with something on the frontend
 - Rate limit backend requests to external services
-
+- Get color palette from album art
+  - https://dev.to/producthackers/creating-a-color-palette-with-javascript-44ip

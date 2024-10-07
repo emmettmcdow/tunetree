@@ -7,9 +7,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 	"io"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -26,7 +28,6 @@ type RateLimiter struct {
 
 // TODO
 func (r RateLimiter) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	fmt.Println("Got rate limiter")
 	r.handler.ServeHTTP(res, req)
 }
 
@@ -39,7 +40,6 @@ type Cors struct {
 }
 
 func (r Cors) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	fmt.Println("Got cors handler")
 	headers := res.Header()
 	headers.Add("Access-Control-Allow-Origin", "http://localhost:3000")
 	headers.Add("Access-Control-Allow-Credentials", "true")
@@ -57,6 +57,44 @@ func (r Cors) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 func NewCors(handler http.Handler) http.Handler {
 	return &Cors{handler}
+}
+
+type loggingResponseWriter struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func NewLoggingResponseWriter(w http.ResponseWriter) *loggingResponseWriter {
+	// WriteHeader(int) is not called if our response implicitly returns 200 OK, so
+	// we default to that status code.
+	return &loggingResponseWriter{w, http.StatusOK}
+}
+
+func (lrw *loggingResponseWriter) WriteHeader(code int) {
+	lrw.statusCode = code
+	lrw.ResponseWriter.WriteHeader(code)
+}
+
+type Logger struct {
+	handler http.Handler
+	log     *slog.Logger
+}
+
+func (l Logger) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	ctxId := uuid.New().String()
+	ctx := context.WithValue(req.Context(), "ctxId", ctxId)
+
+	lrw := NewLoggingResponseWriter(res)
+
+	l.log.Info("Request", "method", req.Method, "endpoint", req.URL.Path, "ctxId", ctxId)
+	l.handler.ServeHTTP(lrw, req.WithContext(ctx))
+	l.log.Info("Response", "status", lrw.statusCode, "ctxId", ctxId)
+}
+
+func NewLogger(handler http.Handler) http.Handler {
+	jsonHandler := slog.NewJSONHandler(os.Stderr, nil)
+	log := slog.New(jsonHandler)
+	return &Logger{handler: handler, log: log}
 }
 
 func jwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
@@ -145,7 +183,6 @@ func trackHandler(res http.ResponseWriter, req *http.Request) {
 		json.NewEncoder(res).Encode(track)
 	case "POST":
 		var track Track
-		fmt.Printf("We are so back")
 		// TODO: validate email = artistname etc here
 		id, ok := req.Context().Value("id").(int64)
 		if !ok {
@@ -425,7 +462,6 @@ type SpotifySearchHandler struct {
 var ALLOWED_TYPES = map[string]bool{"artist": true}
 
 func (s SpotifySearchHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	fmt.Println("Got search handler spotify")
 	// Check if it is GET
 	if req.Method != "GET" {
 		http.Error(res, fmt.Sprintf("%s on /external/search not allowed", req.Method), http.StatusMethodNotAllowed)
@@ -477,7 +513,6 @@ type SpotifyAlbumHandler struct {
 }
 
 func (s SpotifyAlbumHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	fmt.Println("Got album handler spotify")
 	// Check if it is GET
 	if req.Method != "GET" {
 		http.Error(res, fmt.Sprintf("%s on /external/search not allowed", req.Method), http.StatusMethodNotAllowed)
@@ -516,7 +551,6 @@ func (s SpotifyAlbumHandler) ServeHTTP(res http.ResponseWriter, req *http.Reques
 }
 
 func (s SpotifyHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	fmt.Println("Got spotify handler")
 	m := http.NewServeMux()
 	m.Handle("/external/search", SpotifySearchHandler{parent: s})
 	m.Handle("/external/albums", SpotifyAlbumHandler{parent: s})
@@ -552,7 +586,7 @@ func server(wg *sync.WaitGroup, port int, tlsEnabled bool) (s *http.Server) {
 	m.HandleFunc("/track/{artistname}/", jwtMiddleware(trackHandler))
 	m.Handle("/external/", GetSpotifyHandler())
 
-	s = &http.Server{Addr: address, Handler: NewCors(m), TLSConfig: config}
+	s = &http.Server{Addr: address, Handler: NewLogger(NewCors(m)), TLSConfig: config}
 	go func() {
 		defer wg.Done()
 		if err := s.ListenAndServe(); err != http.ErrServerClosed {
