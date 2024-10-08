@@ -23,7 +23,8 @@ X 10/05/2024
   X Validate email and passwords on backend
   X Automatically refresh spotify token
   X hook up logging
-  - Fix only 1 link bug
+  X Fix only 1 link bug
+  X Fix form submit bug
   - Validate links
 - add sticker buy prompt
 - Add banned passsword list

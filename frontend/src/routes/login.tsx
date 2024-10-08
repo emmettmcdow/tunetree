@@ -1,6 +1,7 @@
 import {Icon} from 'react-icons-kit';
 import {eyeOff} from 'react-icons-kit/feather/eyeOff';
 import {eye} from 'react-icons-kit/feather/eye';
+import {alertCircle} from 'react-icons-kit/feather/alertCircle';
 import { useState } from 'react';
 import { setAuthenticatedUser } from '../util';
 
@@ -24,6 +25,19 @@ export function Password({name, password, setPassword}: {name: string, password:
       <span className="flex justify-around items-center" onClick={handleToggle}>
         <Icon className="absolute mr-10" icon={icon} size={15}/>
       </span>
+    </div>
+  );
+}
+
+export function Message({content}: {content: string}) {
+  if (!content) {
+    return <></>
+  }
+
+  return (
+    <div className="rounded-lg outline outline-offset-1 outline-red-400 bg-red-200 p-2 my-2">
+      <Icon className="mr-2 text-red-600" icon={alertCircle} size={25}/>
+      <span className="text-red-700">{content}</span>
     </div>
   );
 }
@@ -91,7 +105,7 @@ export default function Login() {
     <div className="h-screen flex flex-col">
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-indigo-200 w-3/4 p-4 rounded-lg">
         <h1 className="text-2xl mb-2">Login</h1>
-        {renderedMessage}
+        <Message content={message}/>
         <form className="flex flex-col mb-2" onSubmit={(e) => handleSubmit(e, setMessage)}>
           <input className="w-full rounded-lg p-1 mb-2"
                  type="text"
