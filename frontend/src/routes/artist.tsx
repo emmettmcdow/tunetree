@@ -1,10 +1,11 @@
-import { SongInfo, getTrackInfo } from './track';
 import {Icon} from 'react-icons-kit';
 import {x} from 'react-icons-kit/feather/x';
 import { useState, Dispatch, SetStateAction, useEffect } from 'react';
 
 import { getAuthenticatedArtist, getAuthorizationHeader, iconForService } from "../util"
 import { spotifyGetArt } from '../spotify';
+import { SongInfo, getTrackInfo } from './track';
+import { Message } from './login';
 
 // TODO: lets get rid of 'h{n}' tags
 // TODO: wait does that hurt accessibility
@@ -144,16 +145,9 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
     }
   };
 
-  let renderedMessage = (<></>)
-  if (message != "") {
-    renderedMessage = (
-      <div>{message} </div>
-    );
-  }
-
   return (
     <div className="flex flex-col w-3/4 p-4 rounded-lg mx-auto">
-      {renderedMessage}
+      <Message content={message}/>
       <form onSubmit={(e) => handleSubmit(e, setMessage)}>
         <ServiceSelectorBar selected={selected} setSelected={setSelected}/>
         <ServiceURLs formData={formData} setFormData={handleChange} selected={selected} setSelected={setSelected}/>

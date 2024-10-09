@@ -94,12 +94,6 @@ export default function Login() {
       setMessage("Uh oh, failed to submit: " + error)
     }
   };
-  let renderedMessage = (<></>)
-  if (message != "") {
-    renderedMessage = (
-      <div>{message}</div>
-    );
-  }
 
   return (
     <div className="h-screen flex flex-col">

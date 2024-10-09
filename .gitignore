@@ -2,5 +2,5 @@ design/*
 .DS_Store
 node_modules
 *.db
-backend
+backend/backend
 .env

@@ -1,6 +1,6 @@
 import { useState, useEffect} from 'react';
 
-import { Password } from './login'
+import { Password, Message } from './login'
 import { validPassword } from '../util'
 import { spotifySearch } from '../spotify';
 
@@ -73,12 +73,6 @@ export default function Signup() {
       setMessage("Uh oh, failed to submit: " + error)
     }
   };
-  let renderedMessage = (<></>)
-  if (message != "") {
-    renderedMessage = (
-      <div>{message} </div>
-    );
-  }
 
   useEffect(() => {
     const timeOutId = setTimeout(() => {
@@ -96,7 +90,7 @@ export default function Signup() {
     <div className="h-screen flex flex-col">
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-indigo-200 w-3/4 p-4 rounded-lg">
         <p className="text-2xl mb-2">Sign Up</p>
-        {renderedMessage}
+        <Message content={message}/>
         <form onSubmit={(e) => handleSubmit(e, setMessage)}>
           <input className="w-full rounded-lg p-1 mb-2"
                  type="text"
