@@ -96,3 +96,10 @@ function parseJwt (token: string) {
 
     return JSON.parse(jsonPayload);
 }
+
+export function encodeArtistLink (name: string) {
+  return name.replaceAll(" ", "-")  // Spaces to dashes
+             .replaceAll(/[^a-zA-Z0-9-_.~]/g, "")  // Remove not allowed characters
+             .toLowerCase()
+}
+  

@@ -1,7 +1,7 @@
 import { useState, useEffect} from 'react';
 
 import { Password, Message } from './login'
-import { validPassword } from '../util'
+import { validPassword, encodeArtistLink } from '../util'
 import { spotifySearch } from '../spotify';
 
 export default function Signup() {
@@ -9,6 +9,7 @@ export default function Signup() {
 
   const [formData, setFormData] = useState({
     artist: '',
+    link: '',
     email: '',
     password: '',
     cpassword: '',
@@ -17,6 +18,12 @@ export default function Signup() {
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
+    if (name == "artist") {
+      setFormData(prevState => ({
+        ...prevState,
+        "link": encodeArtistLink(value)
+      }));
+    }
     setFormData(prevState => ({
       ...prevState,
       [name]: value
@@ -92,6 +99,7 @@ export default function Signup() {
         <p className="text-2xl mb-2">Sign Up</p>
         <Message content={message}/>
         <form onSubmit={(e) => handleSubmit(e, setMessage)}>
+          <div>Your link will look like: <br/>tunetree.xyz/track/{formData.link}</div>
           <input className="w-full rounded-lg p-1 mb-2"
                  type="text"
                  name="artist"

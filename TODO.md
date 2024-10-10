@@ -27,9 +27,12 @@ X 10/05/2024
   X Fix form submit bug
   - Validate links
 - add sticker buy prompt
+- Add `your url will be`
+  - Add button to change the url
+  - Add field in user designating the encoded url
 - Add banned passsword list
 - Make sure I'm avoiding all the cors shit
-- make rules for passwords
+X make rules for passwords
 - Make failure in login and signup sexy
 - micro adjust desktop
 - dark mode?
