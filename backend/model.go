@@ -17,6 +17,7 @@ type User struct {
 	Email     string
 	Password  string
 	Artist    string
+	Link      string
 	SpotifyId string
 }
 
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS users(
 	email TEXT NOT NULL UNIQUE,
 	password TEXT NOT NULL,
 	artist TEXT UNIQUE,
+	path TEXT UNIQUE,
 	spotifyId TEXT UNIQUE
 );
 `
@@ -76,9 +78,9 @@ func InitDB() {
 	}
 }
 
-func GetTrack(artistname string) (track Track, ok bool) {
+func GetTrack(artistlink string) (track Track, ok bool) {
 	var trackid int
-	err := db.QueryRow("SELECT t.name, t.image, t.message, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.artist = ? ORDER BY created DESC LIMIT 1;", artistname).Scan(&track.Name, &track.Image, &track.Message, &trackid)
+	err := db.QueryRow("SELECT t.name, t.image, t.message, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.path = ? ORDER BY created DESC LIMIT 1;", artistlink).Scan(&track.Name, &track.Image, &track.Message, &trackid)
 	if err == sql.ErrNoRows {
 		return track, false
 	} else if err != nil {
@@ -127,7 +129,7 @@ func PutTrack(userId int64, track Track) (err error) {
 
 func GetUser(id int64) (user User, ok bool) {
 	user.Id = id
-	err := db.QueryRow("SELECT *FROM users WHERE rowid = ?;", id).Scan(&user.Email, &user.Password, &user.Artist, &user.SpotifyId)
+	err := db.QueryRow("SELECT * FROM users WHERE rowid = ?;", id).Scan(&user.Email, &user.Password, &user.Artist, &user.Link, &user.SpotifyId)
 	if err == sql.ErrNoRows {
 		return user, false
 	} else if err != nil {
@@ -138,7 +140,7 @@ func GetUser(id int64) (user User, ok bool) {
 }
 
 func GetUserFromEmail(email string) (user User, ok bool) {
-	err := db.QueryRow("SELECT *, rowid FROM users WHERE email = ?;", email).Scan(&user.Email, &user.Password, &user.Artist, &user.SpotifyId, &user.Id)
+	err := db.QueryRow("SELECT *, rowid FROM users WHERE email = ?;", email).Scan(&user.Email, &user.Password, &user.Artist, &user.Link, &user.SpotifyId, &user.Id)
 	if err == sql.ErrNoRows {
 		return user, false
 	} else if err != nil {
@@ -156,7 +158,7 @@ func PutUser(user *User) (err error) {
 	if user.Artist == "" {
 		_, err = db.Exec("INSERT INTO users VALUES (?,?,NULL,NULL);", user.Email, hashedPass)
 	} else {
-		_, err = db.Exec("INSERT INTO users VALUES (?,?,?,?);", user.Email, hashedPass, user.Artist, user.SpotifyId)
+		_, err = db.Exec("INSERT INTO users VALUES (?,?,?,?,?);", user.Email, hashedPass, user.Artist, user.Link, user.SpotifyId)
 	}
 	return err
 }

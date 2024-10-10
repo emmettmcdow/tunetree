@@ -29,7 +29,9 @@ X 10/05/2024
 - add sticker buy prompt
 - Add `your url will be`
   - Add button to change the url
-  - Add field in user designating the encoded url
+  X Add field in user designating the encoded url
+  X Add backend ^
+- NO-track = off center in track edit page
 - Add banned passsword list
 - Make sure I'm avoiding all the cors shit
 X make rules for passwords

@@ -165,15 +165,15 @@ func extractToken(r *http.Request) string {
 }
 
 func trackHandler(res http.ResponseWriter, req *http.Request) {
-	artistname := strings.ReplaceAll(req.PathValue("artistname"), "+", " ")
-	if artistname == "" {
+	artistlink := req.PathValue("artistlink")
+	if artistlink == "" {
 		http.Error(res, "No artist name specified", http.StatusNotFound)
 		return
 	}
 
 	switch req.Method {
 	case "GET":
-		track, ok := GetTrack(artistname)
+		track, ok := GetTrack(artistlink)
 		if !ok {
 			http.Error(res, "No track associated with that artist", http.StatusNotFound)
 			return
@@ -199,8 +199,7 @@ func trackHandler(res http.ResponseWriter, req *http.Request) {
 			http.Error(res, "invalid token", http.StatusUnauthorized)
 			return
 		}
-		if getRole(user) != "ARTIST" ||
-			user.Artist != artistname {
+		if getRole(user) != "ARTIST" {
 			http.Error(res, "Logged in user != requested user", http.StatusUnauthorized)
 			return
 		}
@@ -583,7 +582,7 @@ func server(wg *sync.WaitGroup, port int, tlsEnabled bool) (s *http.Server) {
 	})
 	m.HandleFunc("/login/", loginHandler)
 	m.HandleFunc("/signup/", signupHandler)
-	m.HandleFunc("/track/{artistname}/", jwtMiddleware(trackHandler))
+	m.HandleFunc("/track/{artistlink}/", jwtMiddleware(trackHandler))
 	m.Handle("/external/", GetSpotifyHandler())
 
 	s = &http.Server{Addr: address, Handler: NewLogger(NewCors(m)), TLSConfig: config}
