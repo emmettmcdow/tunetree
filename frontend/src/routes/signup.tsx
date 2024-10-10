@@ -6,6 +6,7 @@ import { spotifySearch } from '../spotify';
 
 export default function Signup() {
   const [message, setMessage] = useState("");
+  const [separateLink, setSeparateLink] = useState(false);
 
   const [formData, setFormData] = useState({
     artist: '',
@@ -18,12 +19,6 @@ export default function Signup() {
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    if (name == "artist") {
-      setFormData(prevState => ({
-        ...prevState,
-        "link": encodeArtistLink(value)
-      }));
-    }
     setFormData(prevState => ({
       ...prevState,
       [name]: value
@@ -48,6 +43,14 @@ export default function Signup() {
     }
     if (formData.artist == "") {
       setMessage("Invalid artist")
+      return
+    }
+    const validUrlPath = /^[a-zA-Z0-9\-_\.~]+$/
+    const res = validUrlPath.test(formData.link);
+    console.log(formData.link)
+    console.log(res);
+    if (!res) {
+      setMessage("Invalid link");
       return
     }
 
@@ -99,13 +102,25 @@ export default function Signup() {
         <p className="text-2xl mb-2">Sign Up</p>
         <Message content={message}/>
         <form onSubmit={(e) => handleSubmit(e, setMessage)}>
-          <div>Your link will look like: <br/>tunetree.xyz/track/{formData.link}</div>
           <input className="w-full rounded-lg p-1 mb-2"
                  type="text"
                  name="artist"
                  placeholder="artist name"
                  value={formData.artist}
                  onChange={handleChange}/>
+          <div className="mb-2">Your link will look like:</div>
+          <span className="absolute">tunetree.xyz/track/</span>
+          <input className={separateLink ? "w-full rounded-lg mb-2 pl-36" : "w-full rounded-lg mb-2 pl-36 bg-slate-200"} name="link" type="text" value={separateLink ? formData.link : encodeArtistLink(formData.artist) } onChange={handleChange}/>
+          <button className="w-full bg-indigo-500 rounded-lg text-white mb-2" onClick={ (e) => {
+            e.preventDefault();
+            setSeparateLink(!separateLink);
+            if (!separateLink) {
+              setFormData(prevState => ({
+                ...prevState,
+                "link": encodeArtistLink(formData.artist)
+              }));
+            }
+          }}>{separateLink ? "I want the default link": "Want a separate link?"}</button>
           <input className="w-full rounded-lg p-1 mb-2" 
                  type="text"
                  name="email"

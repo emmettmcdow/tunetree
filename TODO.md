@@ -28,7 +28,9 @@ X 10/05/2024
   - Validate links
 - add sticker buy prompt
 - Add `your url will be`
-  - Add button to change the url
+  X Add button to change the url
+  - Un-fuglify it 
+  - Add validation for custom
   X Add field in user designating the encoded url
   X Add backend ^
 - NO-track = off center in track edit page
