@@ -51,6 +51,11 @@ const router = createBrowserRouter([
     element: <Artist/>,
     errorElement: <div> uh-oh, error!</div>,
   },
+  {
+    path: "/up",
+    element: <div>Frontend Healthy</div>,
+    errorElement: <div> uh-oh, error!</div>,
+  },
 ]);
 
 export default function App() {
