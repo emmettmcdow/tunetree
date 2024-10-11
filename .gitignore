@@ -4,3 +4,5 @@ node_modules
 *.db
 backend/backend
 .env
+id_*
+docker_password
