@@ -1,5 +1,5 @@
 # Name of your application. Used to uniquely configure containers.
-service: tunetree
+service: tunetree-back
 
 # Name of the container image.
 image: emmettmcdow/tunetree-back

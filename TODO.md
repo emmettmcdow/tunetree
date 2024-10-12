@@ -25,7 +25,11 @@ X 10/05/2024
   X hook up logging
   X Fix only 1 link bug
   X Fix form submit bug
-  - Validate links
+- 10/11/2024
+  - Dynamic config of backend host in frontend
+  - Change app name and icon
+  - Backend as volume
+- Validate links
 - add sticker buy prompt
 - Add `your url will be`
   X Add button to change the url
