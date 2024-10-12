@@ -15,8 +15,9 @@ servers:
 proxy: 
   ssl: true
   host: api.tunetree.xyz
+  health: /health
   # kamal-proxy connects to your container over port 80, use `app_port` to specify a different port.
-  # app_port: 3000
+  app_port: 81
 
 # Credentials for your image host.
 registry:
