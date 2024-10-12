@@ -388,7 +388,7 @@ type SpotifyHandler struct {
 func getEnv(key string) (value string) {
 	dotenv, err := godotenv.Read(".env")
 	if err != nil {
-		panic(err)
+		dotenv = map[string]string{}
 	}
 
 	value = os.Getenv(key)
