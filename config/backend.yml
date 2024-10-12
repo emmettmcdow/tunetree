@@ -38,12 +38,12 @@ ssh:
 
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 #
-env:
+# env:
 #   clear:
 #     DB_HOST: 192.168.0.2
-  secret:
-    - SPOTIFY_SECRET
-    - SPOTIFY_CLIENT_ID
+  # secret:
+  #   - SPOTIFY_SECRET
+  #   - SPOTIFY_CLIENT_ID
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.
@@ -53,8 +53,8 @@ env:
 
 # Use a persistent storage volume.
 #
-# volumes:
-#   - "app_storage:/app/storage"
+volumes:
+  - "/var/runtime/env:/.env"
 
 # Bridge fingerprinted assets, like JS and CSS, between versions to avoid
 # hitting 404 on in-flight requests. Combines all files from new and old
