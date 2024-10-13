@@ -6,6 +6,11 @@ const tidal = "/tidal.png"
 const bandcamp = "/bandcamp.png"
 const amazon = "/amazon.png"
 
+
+export function UIButton() {
+
+}
+
 export function validPassword(password: string) {
   /* Rules:
    *   - All characters must be between 33 and 126 ascii inclusive

@@ -144,3 +144,28 @@ img {
   left: -10px;
   border-right: 0;
 }
+
+/* bouncy selections */
+.bounce-button {
+  position: relative;
+}
+
+.bounce-text {
+  display: inline-block;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.bounce-button:hover .bounce-text {
+  animation: textBounce 0.5s ease infinite alternate;
+}
+
+@keyframes textBounce {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-5px);
+  }
+}

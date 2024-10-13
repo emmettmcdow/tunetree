@@ -4,11 +4,12 @@ import {eye} from 'react-icons-kit/feather/eye';
 import {alertCircle} from 'react-icons-kit/feather/alertCircle';
 import { useState } from 'react';
 import { setAuthenticatedUser } from '../util';
+import { UIButton } from './home';
 
 export function Header({msg}: {msg: string}) {
-return (
-    <span className="text-2xl rainbow-text"><img src="favicon.ico" alt="tunetree logo" className="w-12 mx-auto inline mr-2"/>{msg}</span>
-)
+  return (
+      <span className="text-2xl rainbow-text"><img src="/favicon.ico" alt="tunetree logo" className="w-12 mx-auto inline mr-2"/>{msg}</span>
+  )
 }
 
 export function Password({name, password, setPassword}: {name: string, password: string, setPassword: Function}) {
@@ -109,7 +110,7 @@ export default function Login() {
                  value={formData.email}
                  onChange={handleChange}/>
           <Password password={formData.password} setPassword={handleChange} name="password"/>
-          <input className="w-full bg-emerald-500 rounded-lg text-white cursor-pointer" type="Submit" value="Login"/>
+          <UIButton type="confirm" content="Login" submit={true} handle={() => {}}/>
         </form>
         <p><a href="/signup">Forgot your password?</a></p>
         <p>Or create an account<a href="/signup"> here</a></p>

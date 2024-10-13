@@ -1,3 +1,33 @@
+export function UIButton({type, content, handle, submit}: {type: string, content: string, handle: Function, submit: boolean}) {
+  /*
+    - type: confirm, deny, neutral
+    - content: what the button says
+    - handle: what ot do on click
+  */
+  let color = "";
+  switch(type) {
+  case "confirm":
+      color = " bg-emerald-500 ";
+      break;
+  case "deny":
+      color = " bg-rose-500 ";
+      break;
+  case "neutral":
+      color = " bg-indigo-500 ";
+      break;
+  }
+  let actiontype: "submit" | "button" = "button";
+  if (submit) {
+    actiontype = "submit";
+  }
+
+  let buttonClass = "mx-2 rounded-lg cursor-pointer bounce-button" + color;
+  let textClass = "text-xl p-6 text-white bounce-text";
+  return (
+    <button className={buttonClass} onClick={(e) => handle(e)} type={actiontype}><span className={textClass}>{content}</span></button>
+  );  
+}
+
 export default function Home() {
   return (
     <>
@@ -6,8 +36,8 @@ export default function Home() {
         <h1 className="text-7xl rainbow-text">tunetree</h1>
         <h2 className="text-2xl my-2">Join the music revolution</h2>
         <div className="mx-auto my-4">
-          <a href="/login"><button className="mx-2 bg-indigo-500 rounded-lg cursor-pointer"><span className="text-xl p-6 text-white">login</span></button></a>
-          <a href="/signup"><button className="mx-2 bg-indigo-500 rounded-lg cursor-pointer"><span className="text-xl p-6 text-white">sign-up</span></button></a>
+          <a href="/login"><UIButton type="neutral" content="Login" handle={() => {}} submit={false}/></a>
+          <a href="/signup"><UIButton type="neutral" content="Signup" handle={() => {}} submit={false}/></a>
         </div>
       </div>
     </>

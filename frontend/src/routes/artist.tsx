@@ -6,6 +6,7 @@ import { getAuthenticatedArtistLink, getAuthorizationHeader, iconForService } fr
 import { spotifyGetArt } from '../spotify';
 import { SongInfo, getTrackInfo } from './track';
 import { Header, Message } from './login';
+import { UIButton } from './home';
 
 // TODO: lets get rid of 'h{n}' tags
 // TODO: wait does that hurt accessibility
@@ -17,18 +18,18 @@ function ServiceSelectorBar({selected, setSelected}: {selected: any, setSelected
     if (!state) {    
       let alt = provider + "-icon";
       buttons.push(
-        <button className="text-xl cursor-pointer" key={provider} onClick={(_) => {
+        <button className="text-xl cursor-pointer bounce-button mx-2" key={provider} onClick={(_) => {
           const newSelected = {...selected};
           newSelected[provider] = true;
           setSelected(newSelected);
         }}>
-          <img className="w-8" alt={alt} src={iconForService(provider)} />
+          <img className="w-8 bounce-text" alt={alt} src={iconForService(provider)} />
         </button>
       );
     }
   }
   return (
-    <div className="flex">
+    <div className="flex my-2">
       <div className="flex justify-start w-1/4 items-center">
         <p className="text-xl"> Add: </p>
       </div>
@@ -139,18 +140,16 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
   };
 
   return (
-    <div className="flex flex-col w-3/4 p-4 rounded-lg mx-auto">
+    <div className="flex flex-col mx-auto">
       <Message content={message}/>
-      <form onSubmit={(e) => handleSubmit(e, setMessage)}>
+      <form onSubmit={(e) => handleSubmit(e, setMessage)} className="flex-col items-center">
         <ServiceSelectorBar selected={selected} setSelected={setSelected}/>
         <ServiceURLs formData={formData} setFormData={handleChange} selected={selected} setSelected={setSelected}/>
-        <textarea  className="w-full rounded-lg p-1 mb-2" value={formData["message"]} onChange={(e) => handleChange(e)} name="message" placeholder="A message to your fans"/>
-        <button className="text-xl w-full bg-rose-500 rounded-lg cursor-pointer" onClick={(_) => {
-          changeMode(Mode.Standby);
-        }}>
-          <span className="p-4 py-2 text-white">Cancel</span>
-        </button>
-        <input className="text-xl w-full bg-emerald-500 rounded-lg text-white cursor-pointer" type="Submit"/>
+        <textarea  className="w-full rounded-lg p-1 my-2" value={formData["message"]} onChange={(e) => handleChange(e)} name="message" placeholder="A message to your fans"/>
+        <div className="flex justify-center">
+          <UIButton type="deny" content="Cancel" handle={() => {}} submit={true}/>
+          <UIButton type="confirm" content="Submit" handle={() => {}} submit={true}/>
+        </div>
       </form>
     </div>
   );
@@ -165,9 +164,9 @@ function EditPanel({mode, changeMode, formData, setFormData}: {mode: Mode, chang
   switch(mode) {
     case Mode.Standby:
       return (
-        <div className="flex h-1/4 items-center">
-          <button onClick={() => {changeMode(Mode.Edit)}} className="text-xl w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">Edit</span></button>
-          <button onClick={() => {setFormData({}); changeMode(Mode.New)}} className="text-xl w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">New</span></button>
+        <div className="flex items-center mx-auto">
+          <UIButton type="neutral" content="Edit" handle={(_: any) => {changeMode(Mode.Edit)}} submit={false}/>
+          <UIButton type="neutral" content="New" handle={(_: any) => {setFormData({}); changeMode(Mode.New)}} submit={false}/>
         </div>
       );
     case Mode.Edit:
@@ -270,7 +269,7 @@ export default function Artist() {
   return (
     <div className="h-screen flex flex-col p-5">
       <Header msg={getHeader(mode)}/>
-      <div className="flex w-3/4 mx-auto rounded-lg">
+      <div className="flex w-3/4 mx-auto my-2 rounded-lg">
         <SongInfo trackInfo={formData}/>
       </div>
       <EditPanel mode={mode} changeMode={changeMode} formData={formData} setFormData={setFormData}/>

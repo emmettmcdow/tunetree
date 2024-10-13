@@ -83,13 +83,13 @@ function IconLink({ n, m, provider, link, setLink }: { n: number, m: number, pro
     "--i": String(n),
     "--m": String(m)
   } as React.CSSProperties;
-  let className = "cursor-pointer";
+  let className = "cursor-pointer bounce-button";
   if (m < 3) {
-    className = "w-24 m-5 cursor-pointer";
+    className = "w-24 m-5 cursor-pointer bounce-button";
   }
   return (
     <button className={className}  style={style} onClick={(_) => {setLink(link);} }>
-      <img  alt={alt} src={iconForService(provider)} />
+      <img  alt={alt} src={iconForService(provider)} className="bounce-text"/>
     </button>
   );
 }
@@ -101,9 +101,9 @@ function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: any, link: st
         <p>wanna be notified when {trackInfo.artist} drops? (it's free)</p>
         <form className="my-2">
           <input className="w-1/2" name="email"/>
-          <a href={link}><button onClick={(_) => toggle("")} className="mx-2 bg-emerald-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">Yes</span></button></a>
+          <a href={link}><button onClick={(_) => toggle("")} className="mx-2 bg-emerald-500 rounded-lg cursor-pointer bounce-button"><span className="p-4 py-2 text-white bounce-text">Yes</span></button></a>
         </form>
-        <a href={link}><button onClick={(_) => toggle("")} className="mx-2 bg-indigo-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">I just wanna rock(no)</span></button></a>
+        <a href={link}><button onClick={(_) => toggle("")} className="mx-2 bg-indigo-500 rounded-lg cursor-pointer bounce-button"><span className="p-4 py-2 text-white bounce-text">I just wanna rock(no)</span></button></a>
       </div>
     );
   } else {
