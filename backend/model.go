@@ -78,9 +78,20 @@ func InitDB() {
 	}
 }
 
-func GetTrack(artistlink string) (track Track, ok bool) {
+func GetUserFromLink(artistlink string) (user User, ok bool) {
+	err := db.QueryRow("SELECT *, rowid FROM users u WHERE u.path = ?;", artistlink).Scan(&user.Email, &user.Password, &user.Artist, &user.Link, &user.SpotifyId, &user.Id)
+	if err == sql.ErrNoRows {
+		return user, false
+	} else if err != nil {
+		// TODO: deal with this
+		panic(err)
+	}
+	return user, true
+}
+
+func GetTrack(user User) (track Track, ok bool) {
 	var trackid int
-	err := db.QueryRow("SELECT t.name, t.image, t.message, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.path = ? ORDER BY created DESC LIMIT 1;", artistlink).Scan(&track.Name, &track.Image, &track.Message, &trackid)
+	err := db.QueryRow("SELECT t.name, t.image, t.message, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.rowid = ? ORDER BY created DESC LIMIT 1;", user.Id).Scan(&track.Name, &track.Image, &track.Message, &trackid)
 	if err == sql.ErrNoRows {
 		return track, false
 	} else if err != nil {

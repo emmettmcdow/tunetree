@@ -1,10 +1,10 @@
 import placeholderSquare from "./placeholder-square.png";
-import spotify from "./spotify.png"
-import youtube from "./youtube.png"
-import apple from "./apple.png"
-import tidal from "./tidal.png"
-import bandcamp from "./bandcamp.png"
-import amazon from "./amazon.png"
+const spotify = "/spotify.png"
+const youtube = "/youtube.png"
+const apple = "/apple.png"
+const tidal = "/tidal.png"
+const bandcamp = "/bandcamp.png"
+const amazon = "/amazon.png"
 
 export function validPassword(password: string) {
   /* Rules:
@@ -64,6 +64,7 @@ export function setAuthenticatedUser(body: any) {
   document.cookie = "artist=" + body["Artist"];
   document.cookie = "email=" + body["Email"];
   document.cookie = "spotify_id=" + body["SpotifyId"];
+  document.cookie = "link=" + body["Link"]
 }
 
 export function getAuthorizationHeader() {
@@ -72,6 +73,10 @@ export function getAuthorizationHeader() {
 
 export function getAuthenticatedArtist() {
   return getCookieValue("artist")
+}
+
+export function getAuthenticatedArtistLink() {
+  return getCookieValue("link");
 }
 
 export function getAuthenticatedUser() {

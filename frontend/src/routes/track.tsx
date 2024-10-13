@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useLoaderData } from 'react-router-dom';
 
 import { Track } from './artist';
-import { iconForService } from '../util';
+import { getAuthenticatedArtistLink, iconForService } from '../util';
 import ShaderCanvas, { shader } from '../shader';
 
 function WebGLBackground() {
@@ -44,7 +44,7 @@ function WebGLBackground() {
 }
 
 
-export function SongInfo({trackInfo}: {trackInfo: any}) {
+export function SongInfo({trackInfo}: {trackInfo: Track}) {
   return (
     <div className="flex flex-col items-center mx-auto z-50">
       <p className="text-4xl"><b>{trackInfo.artist}</b></p>
@@ -54,8 +54,6 @@ export function SongInfo({trackInfo}: {trackInfo: any}) {
   );
 }
 function ButtonBox({trackInfo, setLink}: {trackInfo: Track, setLink: Function}) {
-  // TODO: fix display for <3 items
-  console.log(trackInfo);
   const providers = Object.entries(trackInfo.links).filter(([_, value]) => value != "")
   
   let buttons = providers.map((provider, index) => <IconLink n={index} m={providers.length} provider={provider[0]} key={provider[0]} setLink={setLink} link={provider[1]} /> );
@@ -123,22 +121,28 @@ function TrackInfo({trackInfo, setLink}: {trackInfo: any, setLink: Function}) {
           <SongInfo trackInfo={trackInfo} />
           <ButtonBox trackInfo={trackInfo} setLink={setLink}/>
         </div>
-
     );
   } else {
     return (<></>);
   }
 }
 
-export async function getTrackInfo(artist: string) {  
+export async function getTrackInfo(artistLink: string|null) {  
   try {
-    const response = await fetch(process.env.REACT_APP_API_URL + 'track/' + artist.replaceAll(" ", "+") + '/', {
-      method: 'GET'
-    });
+    var response = null
+    if (!artistLink) {
+      response = await fetch(process.env.REACT_APP_API_URL + 'track/' + getAuthenticatedArtistLink(), {
+        method: 'GET'
+      });
+    } else {
+      response = await fetch(process.env.REACT_APP_API_URL + 'track/' + artistLink, {
+        method: 'GET'
+      });
+    }
 
     if (response.ok && response.body) {
       const body = await response.json()
-      return body
+      return new Track(body)
     } else {
       console.error('Failed to GET: ' + response.body);
     }
@@ -149,13 +153,13 @@ export async function getTrackInfo(artist: string) {
 }
 
 export async function loader({ params }: { params: any }) {
-  const artistName = params.artistName.replaceAll("+", " ");
-  const trackInfo = await getTrackInfo(artistName)
+  const trackInfo = await getTrackInfo(params.artistName)
   if (trackInfo == "") {
     window.localStorage.href = "/404";
+    console.log(404);
   }
-  const merged = {...trackInfo, "artist": artistName}
-  return merged;
+  console.log(trackInfo);
+  return trackInfo;
 }
 
 export default function TrackPage() {

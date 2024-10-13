@@ -2,7 +2,7 @@ import {Icon} from 'react-icons-kit';
 import {x} from 'react-icons-kit/feather/x';
 import { useState, Dispatch, SetStateAction, useEffect } from 'react';
 
-import { getAuthenticatedArtist, getAuthorizationHeader, iconForService } from "../util"
+import { getAuthenticatedArtistLink, getAuthorizationHeader, iconForService } from "../util"
 import { spotifyGetArt } from '../spotify';
 import { SongInfo, getTrackInfo } from './track';
 import { Message } from './login';
@@ -116,7 +116,7 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
     console.log(jsonData);
 
     try {
-      const response = await fetch(process.env.REACT_APP_API_URL + 'track/' + formData.artist.replaceAll(" ", "+") + '/', {
+      const response = await fetch(process.env.REACT_APP_API_URL + 'track/' + getAuthenticatedArtistLink() + "/", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -193,11 +193,27 @@ function getHeader(mode: Mode) {
     }
 }
 
-export type Track = {
-  message: string,
-  name: string,
-  artist: string,
-  image: string,
+// export type Track = {
+//   message: string,
+//   name: string,
+//   artist: string,
+//   image: string,
+//   links: {
+//     apple: string
+//     spotify: string
+//     youtube: string
+//     tidal: string
+//     amazon: string
+//     bandcamp: string
+//   }
+// }
+
+export class Track{
+
+  message: string
+  name: string
+  artist: string
+  image: string
   links: {
     apple: string
     spotify: string
@@ -206,50 +222,53 @@ export type Track = {
     amazon: string
     bandcamp: string
   }
+  constructor(data: any) {
+    this.artist = data['artistName'];
+    if (Object.hasOwn(data, "track")) {
+      this.name = data['track']['name'];
+      this.message = data['track']['message'];
+      this.image = data['track']['image'];
+      this.links = {
+        apple: data['track']['links']['apple'] || "",
+        spotify: data['track']['links']['spotify'] || "",
+        youtube: data['track']['links']['youtube'] || "",
+        tidal: data['track']['links']['tidal'] || "",
+        amazon: data['track']['links']['amazon'] || "",
+        bandcamp: data['track']['links']['bandcamp'] || "",
+      }
+    } else { 
+      this.name = "";
+      this.message = "";
+      this.image = "";
+      this.links = {
+        apple: "",
+        spotify: "",
+        youtube: "",
+        tidal: "",
+        amazon: "",
+        bandcamp: ""
+      }
+    }
+  }
 }
 
 
 export default function Artist() {
   const [mode, changeMode] = useState(Mode.Standby);
-  const [formData, setFormData] = useState<Track>({
-      'message': '',
-      'artist': '',
-      'name': '',
-      'image': '',
-      'links': {
-        'apple': '',
-        "spotify": '',
-        "youtube": '',
-        "tidal": '',
-        "amazon": '',
-        "bandcamp": ''
-      }
-  });
+  const [formData, setFormData] = useState<Track>(new Track({}));
   useEffect(() => {
-    async function populateForm(artist: string) {
-      const ti = await getTrackInfo(artist)
-      const fd = {
-        'message': ti['message'],
-        'artist': artist,
-        'name': ti['name'],
-        'image': ti['image'],
-        'links': {
-          'apple': ti['apple'],
-          "spotify": ti['spotify'],
-          "youtube": ti['youtube'],
-          "tidal": ti['tidal'],
-          "amazon": ti['amazon'],
-          "bandcamp": ti['bandcamp']
-        }
+    async function populateForm(artistLink: string) {
+      const ti = await getTrackInfo(artistLink)
+      if (ti != "") { 
+        setFormData(ti);
       }
-      setFormData(fd);
     }
     if (!formData.artist) {
-      const artist = getAuthenticatedArtist();
-      if (!artist) {
+      const artistLink = getAuthenticatedArtistLink();
+      if (!artistLink) {
         window.location.href = "/login"
       }
-      populateForm(artist)
+      populateForm(artistLink)
     }
   })
   // TODO: obvi

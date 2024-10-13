@@ -166,6 +166,11 @@ func extractToken(r *http.Request) string {
 	return token.Value
 }
 
+type thPayload struct {
+	Track      Track  `json:"track"`
+	ArtistName string `json:"artistName"`
+}
+
 func trackHandler(res http.ResponseWriter, req *http.Request) {
 	artistlink := req.PathValue("artistlink")
 	if artistlink == "" {
@@ -175,14 +180,20 @@ func trackHandler(res http.ResponseWriter, req *http.Request) {
 
 	switch req.Method {
 	case "GET":
-		track, ok := GetTrack(artistlink)
+		artist, ok := GetUserFromLink(artistlink)
+		if !ok {
+			http.Error(res, "No artist associated with that link", http.StatusNotFound)
+			return
+		}
+		track, ok := GetTrack(artist)
 		if !ok {
 			http.Error(res, "No track associated with that artist", http.StatusNotFound)
 			return
 		}
 
 		res.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(res).Encode(track)
+		payload := thPayload{Track: track, ArtistName: artist.Artist}
+		json.NewEncoder(res).Encode(payload)
 	case "POST":
 		var track Track
 		// TODO: validate email = artistname etc here
@@ -375,7 +386,7 @@ func loginHandler(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		http.Error(res, fmt.Sprintf("Failed to generate token"), http.StatusInternalServerError)
 	}
-	responseBody := map[string]string{"token": token, "Artist": user2.Artist, "Email": user2.Email, "SpotifyId": user2.SpotifyId}
+	responseBody := map[string]string{"token": token, "Artist": user2.Artist, "Email": user2.Email, "SpotifyId": user2.SpotifyId, "Link": user2.Link}
 	json.NewEncoder(res).Encode(responseBody)
 	return
 }

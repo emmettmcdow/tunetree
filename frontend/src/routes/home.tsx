@@ -2,6 +2,7 @@ export default function Home() {
   return (
     <>
       <div className="h-screen flex-col content-center text-center">
+        <img src="favicon.ico" alt="tunetree logo" className="w-36 mx-auto"/>
         <h1 className="text-7xl rainbow-text">tunetree</h1>
         <h2 className="text-2xl my-2">Join the music revolution</h2>
         <div className="mx-auto my-4">

@@ -27,10 +27,13 @@ X 10/05/2024
   X Fix form submit bug
 - 10/12/2024
   X Dynamic config of backend host in frontend
-    X Same for backend
-  - Change app name and icon
-  - Backend as volume
+  X Same for backend
+  X Change app name and icon
+  X Don't display link name, display artist name
+- Make buttons "selectable"
+- Backend as volume
 - Validate links
+- Change links away from track/...
 - add sticker buy prompt
 - Add `your url will be`
   X Add button to change the url
