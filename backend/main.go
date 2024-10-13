@@ -22,6 +22,8 @@ import (
 	"time"
 )
 
+var FRONTEND_URL = ""
+
 type RateLimiter struct {
 	handler http.Handler
 }
@@ -41,7 +43,7 @@ type Cors struct {
 
 func (r Cors) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	headers := res.Header()
-	headers.Add("Access-Control-Allow-Origin", "http://localhost:3000")
+	headers.Add("Access-Control-Allow-Origin", FRONTEND_URL)
 	headers.Add("Access-Control-Allow-Credentials", "true")
 	headers.Add("Vary", "Access-Control-Request-Method")
 	headers.Add("Vary", "Access-Control-Request-Headers")
@@ -612,6 +614,12 @@ func server(wg *sync.WaitGroup, port int, tlsEnabled bool) (s *http.Server) {
 }
 
 func main() {
+
+	FRONTEND_URL = getEnv("FRONTEND_URL")
+	if FRONTEND_URL == "" {
+		FRONTEND_URL = "http://localhost:3000/"
+	}
+
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	server := server(wg, 81, false)

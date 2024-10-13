@@ -6,7 +6,7 @@ RUN npm ci
 COPY frontend/ .
 RUN npm run build
 
-FROM nginx:1.21-alpine as frontend
+FROM nginx:1.21-alpine AS frontend
 COPY --from=frontend-build /frontend/build /usr/share/nginx/html
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
@@ -15,18 +15,18 @@ CMD ["nginx", "-g", "daemon off;"]
 
 
 # **************************************************************** Backend
-FROM golang:1.23-bookworm as backend-build
+FROM golang:1.23-bookworm AS backend-build
 WORKDIR /backend
 COPY backend/* ./
 RUN apt update \
  && DEBIAN_FRONTEND=noninteractive \
-    apt-get install --no-install-recommends --assume-yes \
+    apt-get install --no-install-recommends --ASsume-yes \
       build-essential \
       libsqlite3-dev
 ENV CGO_ENABLED=1
 RUN go build .
 
-FROM scratch as backend
+FROM scratch AS backend
 COPY --from=backend-build /backend/backend /backend
 COPY --from=backend-build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=backend-build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6

@@ -26,8 +26,8 @@ X 10/05/2024
   X Fix only 1 link bug
   X Fix form submit bug
 - 10/12/2024
-  - Dynamic config of backend host in frontend
-    - Same for backend
+  X Dynamic config of backend host in frontend
+    X Same for backend
   - Change app name and icon
   - Backend as volume
 - Validate links

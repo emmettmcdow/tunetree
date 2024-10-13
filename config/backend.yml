@@ -40,9 +40,9 @@ ssh:
 
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 #
-# env:
-#   clear:
-#     DB_HOST: 192.168.0.2
+env:
+  clear:
+    FRONTEND_URL: https://tunetree.xyz/
   # secret:
   #   - SPOTIFY_SECRET
   #   - SPOTIFY_CLIENT_ID

@@ -116,8 +116,6 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
     console.log(jsonData);
 
     try {
-      // TODO: switch to https
-      // TODO: switch away from localhost
       const response = await fetch(process.env.REACT_APP_API_URL + 'track/' + formData.artist.replaceAll(" ", "+") + '/', {
         method: 'POST',
         headers: {
