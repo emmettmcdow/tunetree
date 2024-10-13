@@ -1,6 +1,6 @@
 import { useState, useEffect} from 'react';
 
-import { Password, Message } from './login'
+import { Password, Message, Header } from './login'
 import { validPassword, encodeArtistLink } from '../util'
 import { spotifySearch } from '../spotify';
 
@@ -99,6 +99,7 @@ export default function Signup() {
 
   return (
     <div className="h-screen flex flex-col">
+      <Header msg="Signing up..."/>
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-indigo-200 w-3/4 p-4 rounded-lg">
         <p className="text-2xl mb-2">Sign Up</p>
         <Message content={message}/>

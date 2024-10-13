@@ -5,7 +5,7 @@ import { useState, Dispatch, SetStateAction, useEffect } from 'react';
 import { getAuthenticatedArtistLink, getAuthorizationHeader, iconForService } from "../util"
 import { spotifyGetArt } from '../spotify';
 import { SongInfo, getTrackInfo } from './track';
-import { Message } from './login';
+import { Header, Message } from './login';
 
 // TODO: lets get rid of 'h{n}' tags
 // TODO: wait does that hurt accessibility
@@ -148,9 +148,9 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
         <button className="text-xl w-full bg-rose-500 rounded-lg cursor-pointer" onClick={(_) => {
           changeMode(Mode.Standby);
         }}>
-          <span className="p-4 py-2 text-white">cancel</span>
+          <span className="p-4 py-2 text-white">Cancel</span>
         </button>
-        <input className="text-xl w-full bg-emerald-500 rounded-lg text-white cursor-pointer" type="submit"/>
+        <input className="text-xl w-full bg-emerald-500 rounded-lg text-white cursor-pointer" type="Submit"/>
       </form>
     </div>
   );
@@ -166,8 +166,8 @@ function EditPanel({mode, changeMode, formData, setFormData}: {mode: Mode, chang
     case Mode.Standby:
       return (
         <div className="flex h-1/4 items-center">
-          <button onClick={() => {changeMode(Mode.Edit)}} className="text-xl w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">edit</span></button>
-          <button onClick={() => {setFormData({}); changeMode(Mode.New)}} className="text-xl w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">new</span></button>
+          <button onClick={() => {changeMode(Mode.Edit)}} className="text-xl w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">Edit</span></button>
+          <button onClick={() => {setFormData({}); changeMode(Mode.New)}} className="text-xl w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">New</span></button>
         </div>
       );
     case Mode.Edit:
@@ -269,7 +269,7 @@ export default function Artist() {
   // TODO: obvi
   return (
     <div className="h-screen flex flex-col p-5">
-      <p className="text-2xl rainbow-text">{getHeader(mode)}</p>
+      <Header msg={getHeader(mode)}/>
       <div className="flex w-3/4 mx-auto rounded-lg">
         <SongInfo trackInfo={formData}/>
       </div>

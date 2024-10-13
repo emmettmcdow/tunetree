@@ -31,8 +31,11 @@ X 10/05/2024
   X Fix webgl error - Seems like this goes away when we don't log?
   X Backend as volume
   X hook up analytics
-  - Make buttons "selectable"
-  - update field names for forms (fugly)
+  X Make buttons "selectable"
+  X update field names for forms (fugly)
+  X Add title/logo to each page
+  - Make logo on home rainbow
+  - Make selection text bouncy on selection
 X Add images for each platform
 X Render trackinfo dynamically
 X Store images as filepaths

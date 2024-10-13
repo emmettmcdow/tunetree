@@ -101,9 +101,9 @@ function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: any, link: st
         <p>wanna be notified when {trackInfo.artist} drops? (it's free)</p>
         <form className="my-2">
           <input className="w-1/2" name="email"/>
-          <a href={link}><button onClick={(_) => toggle("")} className="mx-2 bg-emerald-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">yes</span></button></a>
+          <a href={link}><button onClick={(_) => toggle("")} className="mx-2 bg-emerald-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">Yes</span></button></a>
         </form>
-        <a href={link}><button onClick={(_) => toggle("")} className="mx-2 bg-indigo-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">i just wanna rock(no)</span></button></a>
+        <a href={link}><button onClick={(_) => toggle("")} className="mx-2 bg-indigo-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">I just wanna rock(no)</span></button></a>
       </div>
     );
   } else {
