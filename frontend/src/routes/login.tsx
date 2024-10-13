@@ -76,9 +76,7 @@ export default function Login() {
 
       if (response.ok && response.body) {
         // TODO: show this to users better
-        console.log('Form submitted successfully');
         const body = await response.json()
-        console.log(body)
         setAuthenticatedUser(body)
         window.location.href = "/artist/"
       } else {

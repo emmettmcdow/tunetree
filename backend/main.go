@@ -22,6 +22,7 @@ import (
 	"time"
 )
 
+var RUNTIME = "./"
 var FRONTEND_URL = ""
 
 type RateLimiter struct {
@@ -399,13 +400,12 @@ type SpotifyHandler struct {
 }
 
 func getEnv(key string) (value string) {
-	dotenv, err := godotenv.Read(".env")
-	if err != nil {
-		dotenv = map[string]string{}
-	}
-
 	value = os.Getenv(key)
 	if value == "" {
+		dotenv, err := godotenv.Read(RUNTIME + ".env")
+		if err != nil {
+			dotenv = map[string]string{}
+		}
 		value = dotenv[key]
 	}
 	return value
@@ -572,10 +572,10 @@ func (s SpotifyHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	rateLimitedMux.ServeHTTP(res, req)
 }
 
-func server(wg *sync.WaitGroup, port int, tlsEnabled bool) (s *http.Server) {
+func server(wg *sync.WaitGroup, port int, tlsEnabled bool, runtime string) (s *http.Server) {
 	var config *tls.Config
 
-	InitDB()
+	InitDB(runtime)
 
 	m := http.NewServeMux()
 	if tlsEnabled {
@@ -626,6 +626,10 @@ func server(wg *sync.WaitGroup, port int, tlsEnabled bool) (s *http.Server) {
 
 func main() {
 
+	RUNTIME = getEnv("RUNTIME")
+	if RUNTIME == "" {
+		RUNTIME = "./"
+	}
 	FRONTEND_URL = getEnv("FRONTEND_URL")
 	if FRONTEND_URL == "" {
 		FRONTEND_URL = "http://localhost:3000"
@@ -633,7 +637,7 @@ func main() {
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
-	server := server(wg, 81, false)
+	server := server(wg, 81, false, RUNTIME)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)

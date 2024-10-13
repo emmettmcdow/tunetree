@@ -34,8 +34,6 @@ function WebGLBackground() {
       if (shaderCanvas) {
         animate(0);
       }
-    } else {
-      console.log("canvas not initialized!")
     }
   });
   return (
@@ -90,7 +88,7 @@ function IconLink({ n, m, provider, link, setLink }: { n: number, m: number, pro
     className = "w-24 m-5";
   }
   return (
-    <button className={className}  style={style} onClick={(_) => {setLink(link); console.log("prompt toggled");} }>
+    <button className={className}  style={style} onClick={(_) => {setLink(link);} }>
       <img  alt={alt} src={iconForService(provider)} />
     </button>
   );
@@ -143,8 +141,6 @@ export async function getTrackInfo(artistLink: string|null) {
     if (response.ok && response.body) {
       const body = await response.json()
       return new Track(body)
-    } else {
-      console.error('Failed to GET: ' + response.body);
     }
   } catch (error) {
     console.error('Error:', error);
@@ -158,7 +154,6 @@ export async function loader({ params }: { params: any }) {
     window.localStorage.href = "/404";
     console.log(404);
   }
-  console.log(trackInfo);
   return trackInfo;
 }
 

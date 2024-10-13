@@ -8,8 +8,6 @@ import (
 	"time"
 )
 
-const DBFILE string = "backend.db"
-
 var db *sql.DB
 
 type User struct {
@@ -60,9 +58,14 @@ CREATE TABLE IF NOT EXISTS links(
 );
 `
 
-func InitDB() {
+func InitDB(runtime string) {
 	var err error
-	db, err = sql.Open("sqlite3", DBFILE)
+	var dbpath = "./backend.db"
+	if runtime != "" {
+		dbpath = runtime + "backend.db"
+	}
+
+	db, err = sql.Open("sqlite3", dbpath)
 	if err != nil {
 		panic(err)
 	}

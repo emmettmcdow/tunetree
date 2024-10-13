@@ -1,9 +1,4 @@
 # TODO
-X Add images for each platform
-X Render trackinfo dynamically
-X Store images as filepaths
-X Pull in trackinfo from backend
-X Add frontend code for getting current user from jwt
 X 10/05/2024
   X Query using ID
   X Verify posts to `track/{artist}` have equal params and token
@@ -30,7 +25,20 @@ X 10/05/2024
   X Same for backend
   X Change app name and icon
   X Don't display link name, display artist name
-- Make buttons "selectable"
+  X Put my logo guy in there?
+- 10/13/2024
+  X Remove console logs
+  X Fix webgl error - Seems like this goes away when we don't log?
+  - Backend as volume
+  - Make buttons "selectable"
+  - hook up analytics
+  - update field names for forms (fugly)
+X Add images for each platform
+X Render trackinfo dynamically
+X Store images as filepaths
+X Pull in trackinfo from backend
+X Add frontend code for getting current user from jwt
+X Figure out how the fuck to deploy to prod?
 - Backend as volume
 - Validate links
 - Change links away from track/...
@@ -48,7 +56,6 @@ X make rules for passwords
 - Make failure in login and signup sexy
 - micro adjust desktop
 - dark mode?
-- Put my logo guy in there?
 - Specify if new artist signup failed due to duplicate user
   - Display special text saying if you think this is a mistake, contact XYZ
 - Hook up email backend
@@ -62,11 +69,8 @@ X make rules for passwords
   - Display selected artist
   X Add artist id to user table
   X Pull in album art from Spotify
-- hook up analytics
-- Figure out how the fuck to deploy to prod?
 - Rotate icons slightly. Pointy side up.
 - Add soundcloud support
-- update field names for forms (fugly)
 - improve shader performance
 - Don't render in background
 - Check for authentication expiry
