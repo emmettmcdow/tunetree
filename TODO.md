@@ -30,8 +30,8 @@ X 10/05/2024
   X Remove console logs
   X Fix webgl error - Seems like this goes away when we don't log?
   X Backend as volume
+  X hook up analytics
   - Make buttons "selectable"
-  - hook up analytics
   - update field names for forms (fugly)
 X Add images for each platform
 X Render trackinfo dynamically

@@ -83,9 +83,9 @@ function IconLink({ n, m, provider, link, setLink }: { n: number, m: number, pro
     "--i": String(n),
     "--m": String(m)
   } as React.CSSProperties;
-  let className = "";
+  let className = "cursor-pointer";
   if (m < 3) {
-    className = "w-24 m-5";
+    className = "w-24 m-5 cursor-pointer";
   }
   return (
     <button className={className}  style={style} onClick={(_) => {setLink(link);} }>
@@ -101,9 +101,9 @@ function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: any, link: st
         <p>wanna be notified when {trackInfo.artist} drops? (it's free)</p>
         <form className="my-2">
           <input className="w-1/2" name="email"/>
-          <a href={link}><button onClick={(_) => toggle("")} className="mx-2 bg-emerald-500 rounded-lg"><span className="p-4 py-2 text-white">yes</span></button></a>
+          <a href={link}><button onClick={(_) => toggle("")} className="mx-2 bg-emerald-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">yes</span></button></a>
         </form>
-        <a href={link}><button onClick={(_) => toggle("")} className="mx-2 bg-indigo-500 rounded-lg"><span className="p-4 py-2 text-white">i just wanna rock(no)</span></button></a>
+        <a href={link}><button onClick={(_) => toggle("")} className="mx-2 bg-indigo-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">i just wanna rock(no)</span></button></a>
       </div>
     );
   } else {

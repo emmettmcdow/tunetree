@@ -22,7 +22,7 @@ export function Password({name, password, setPassword}: {name: string, password:
     <div className="flex mb-2">
       {/* TODO: why tf is the password in the url */}
       <input className="w-full rounded-lg p-1" type={type} name={name} placeholder={name} value={password} onChange={(e) =>setPassword(e)}/>
-      <span className="flex justify-around items-center" onClick={handleToggle}>
+      <span className="flex justify-around items-center cursor-pointer" onClick={handleToggle}>
         <Icon className="absolute mr-10" icon={icon} size={15}/>
       </span>
     </div>
@@ -80,12 +80,10 @@ export default function Login() {
         setAuthenticatedUser(body)
         window.location.href = "/artist/"
       } else {
-        console.error('Form submission failed');
         // TODO: better message, highlight problem
         setMessage("Uh oh, failed to submit: " + response.body)
       }
     } catch (error) {
-      console.error('Error:', error);
       // Handle network or other errors
       setMessage("Uh oh, failed to submit: " + error)
     }
@@ -104,7 +102,7 @@ export default function Login() {
                  value={formData.email}
                  onChange={handleChange}/>
           <Password password={formData.password} setPassword={handleChange} name="password"/>
-          <input className="w-full bg-emerald-500 rounded-lg text-white" type="submit" value="login"/>
+          <input className="w-full bg-emerald-500 rounded-lg text-white cursor-pointer" type="submit" value="login"/>
         </form>
         <p><a href="/signup">Forgot your password?</a></p>
         <p>Or create an account<a href="/signup"> here</a></p>

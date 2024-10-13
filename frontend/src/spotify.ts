@@ -27,7 +27,6 @@ export async function spotifyGetArt(albumId: string){
   } catch(error) {
     console.error(error)
   }
-  console.log(imageUrl);
   return [imageUrl, name];
 }
 
@@ -47,11 +46,9 @@ export async function spotifySearch(term: string, type: string) {
     if (response.ok) {
       result = await response.json()
     } else {
-      console.error(response.body)
       return ""
     }
   } catch(error) {
-    console.error(error)
     return ""
   }
 

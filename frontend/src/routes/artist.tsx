@@ -17,7 +17,7 @@ function ServiceSelectorBar({selected, setSelected}: {selected: any, setSelected
     if (!state) {    
       let alt = provider + "-icon";
       buttons.push(
-        <button className="text-xl" key={provider} onClick={(_) => {
+        <button className="text-xl cursor-pointer" key={provider} onClick={(_) => {
           const newSelected = {...selected};
           newSelected[provider] = true;
           setSelected(newSelected);
@@ -46,7 +46,7 @@ function ServiceURLs({formData, setFormData, selected, setSelected}: {formData: 
       serviceURLs.push(
         <div className="flex mb-2" key={provider}>
           <input className="w-full rounded-lg p-1" type="text" name={provider}  value={formData[provider]} onChange={setFormData} placeholder={provider.charAt(0).toUpperCase() + provider.slice(1) + " URL"}/>
-          <span className="flex justify-around items-center" onClick={(_) => {
+          <span className="flex justify-around items-center cursor-pointer" onClick={(_) => {
             const newSelected: any = {...selected};
             newSelected[provider] = false;
             setSelected(newSelected);
@@ -113,8 +113,6 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
     // Convert form data to JSON
     
     const jsonData = JSON.stringify(formData);
-    console.log(jsonData);
-
     try {
       const response = await fetch(process.env.REACT_APP_API_URL + 'track/' + getAuthenticatedArtistLink() + "/", {
         method: 'POST',
@@ -128,16 +126,13 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
 
       if (response.ok) {
         // TODO: show this to users better
-        console.log('Form submitted successfully');
         changeMode(Mode.Standby);
         // window.location.href = "/artist"
       } else {
-        console.error('Form submission failed');
         // TODO: better message, highlight problem
         setMessage("Uh oh, failed to submit: " + response.body)
       }
     } catch (error) {
-      console.error('Error:', error);
       // Handle network or other errors
       setMessage("Uh oh, failed to submit: " + error)
     }
@@ -150,12 +145,12 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
         <ServiceSelectorBar selected={selected} setSelected={setSelected}/>
         <ServiceURLs formData={formData} setFormData={handleChange} selected={selected} setSelected={setSelected}/>
         <textarea  className="w-full rounded-lg p-1 mb-2" value={formData["message"]} onChange={(e) => handleChange(e)} name="message" placeholder="A message to your fans"/>
-        <button className="text-xl w-full bg-rose-500 rounded-lg" onClick={(_) => {
+        <button className="text-xl w-full bg-rose-500 rounded-lg cursor-pointer" onClick={(_) => {
           changeMode(Mode.Standby);
         }}>
           <span className="p-4 py-2 text-white">cancel</span>
         </button>
-        <input className="text-xl w-full bg-emerald-500 rounded-lg text-white" type="submit"/>
+        <input className="text-xl w-full bg-emerald-500 rounded-lg text-white cursor-pointer" type="submit"/>
       </form>
     </div>
   );
@@ -171,8 +166,8 @@ function EditPanel({mode, changeMode, formData, setFormData}: {mode: Mode, chang
     case Mode.Standby:
       return (
         <div className="flex h-1/4 items-center">
-          <button onClick={() => {changeMode(Mode.Edit)}} className="text-xl w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg"><span className="p-4 py-2 text-white">edit</span></button>
-          <button onClick={() => {setFormData({}); changeMode(Mode.New)}} className="text-xl w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg"><span className="p-4 py-2 text-white">new</span></button>
+          <button onClick={() => {changeMode(Mode.Edit)}} className="text-xl w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">edit</span></button>
+          <button onClick={() => {setFormData({}); changeMode(Mode.New)}} className="text-xl w-1/2 h-1/2 m-1 bg-emerald-500 rounded-lg cursor-pointer"><span className="p-4 py-2 text-white">new</span></button>
         </div>
       );
     case Mode.Edit:

@@ -55,8 +55,6 @@ export default function Signup() {
     }
     const validUrlPath = /^[a-zA-Z0-9\-_\.~]+$/
     const res = validUrlPath.test(formData.link);
-    console.log(formData.link)
-    console.log(res);
     if (!res) {
       setMessage("Invalid link");
       return
@@ -76,15 +74,12 @@ export default function Signup() {
 
       if (response.ok) {
         // TODO: show this to users better
-        console.log('Form submitted successfully');
         window.location.href = "/login"
       } else {
-        console.error('Form submission failed');
         // TODO: better message, highlight problem
         setMessage("Uh oh, failed to submit: " + response.body)
       }
     } catch (error) {
-      console.error('Error:', error);
       // Handle network or other errors
       setMessage("Uh oh, failed to submit: " + error)
     }
@@ -117,11 +112,11 @@ export default function Signup() {
           <div className="mb-2">Your link will look like:</div>
           <span className="absolute">tunetree.xyz/track/</span>
           <input name="link" type="text" 
-                 className={separateLink ? "w-full rounded-lg mb-2 pl-36" : "w-full rounded-lg mb-2 pl-36 bg-slate-200"}
+                 className={separateLink ? "w-full rounded-lg mb-2 pl-36" : "w-full rounded-lg mb-2 pl-36 bg-slate-200 cursor-not-allowed"}
                  value={formData.link}
                  onChange={handleChange}
                  readOnly={!separateLink}/>
-          <button className="w-full bg-indigo-500 rounded-lg text-white mb-2" onClick={ (e) => {
+          <button className="w-full bg-indigo-500 rounded-lg text-white mb-2 cursor-pointer" onClick={ (e) => {
             e.preventDefault();
             setSeparateLink(!separateLink);
             if (!separateLink) {
@@ -139,7 +134,7 @@ export default function Signup() {
                  onChange={handleChange}/>
           <Password password={formData.password} setPassword={handleChange} name="password"/>
           <Password password={formData.cpassword} setPassword={handleChange} name="cpassword"/>
-          <input className="w-full bg-emerald-500 rounded-lg text-white" type="submit"/>
+          <input className="w-full bg-emerald-500 rounded-lg text-white cursor-pointer" type="submit"/>
         </form>
       </div>
     </div>
