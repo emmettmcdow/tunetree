@@ -19,10 +19,18 @@ export default function Signup() {
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
+    if (name == "artist" && !separateLink) {
+      setFormData(prevState => ({
+        ...prevState,
+        [name]: value,
+        "link": encodeArtistLink(value)
+      }));
+    } else {
+      setFormData(prevState => ({
+        ...prevState,
+        [name]: value
+      }));
+    }
   };
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, setMessage: Function) => {
     event.preventDefault();
@@ -58,9 +66,7 @@ export default function Signup() {
     const jsonData = JSON.stringify(formData);
 
     try {
-      // TODO: switch to https
-      // TODO: switch away from localhost
-      const response = await fetch('http://127.0.0.1:81/signup/', {
+      const response = await fetch(process.env.REACT_APP_API_URL + 'signup/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +116,11 @@ export default function Signup() {
                  onChange={handleChange}/>
           <div className="mb-2">Your link will look like:</div>
           <span className="absolute">tunetree.xyz/track/</span>
-          <input className={separateLink ? "w-full rounded-lg mb-2 pl-36" : "w-full rounded-lg mb-2 pl-36 bg-slate-200"} name="link" type="text" value={separateLink ? formData.link : encodeArtistLink(formData.artist) } onChange={handleChange}/>
+          <input name="link" type="text" 
+                 className={separateLink ? "w-full rounded-lg mb-2 pl-36" : "w-full rounded-lg mb-2 pl-36 bg-slate-200"}
+                 value={formData.link}
+                 onChange={handleChange}
+                 readOnly={!separateLink}/>
           <button className="w-full bg-indigo-500 rounded-lg text-white mb-2" onClick={ (e) => {
             e.preventDefault();
             setSeparateLink(!separateLink);

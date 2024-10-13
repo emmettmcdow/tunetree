@@ -1,7 +1,7 @@
 export async function spotifyGetArt(albumId: string){
   const params = new URLSearchParams()
   params.append("albumId", albumId)
-  const url = `http://localhost:81/external/albums?${params.toString()}`
+  const url = process.env.REACT_APP_API_URL + `external/albums?${params.toString()}`
 
   let result = null;
   try{
@@ -36,7 +36,7 @@ export async function spotifySearch(term: string, type: string) {
   const params = new URLSearchParams()
   params.append("term", term)
   params.append("type", type)
-  const url = `http://localhost:81/external/search?${params.toString()}`
+  const url = process.env.REACT_APP_API_URL + `external/search?${params.toString()}`
 
   let result = null;
   try{

@@ -132,9 +132,7 @@ function TrackInfo({trackInfo, setLink}: {trackInfo: any, setLink: Function}) {
 
 export async function getTrackInfo(artist: string) {  
   try {
-    // TODO: switch to https
-    // TODO: switch away from localhost
-    const response = await fetch('http://localhost:81/track/' + artist.replaceAll(" ", "+") + '/', {
+    const response = await fetch(process.env.REACT_APP_API_URL + 'track/' + artist.replaceAll(" ", "+") + '/', {
       method: 'GET'
     });
 

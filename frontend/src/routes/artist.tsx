@@ -118,7 +118,7 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
     try {
       // TODO: switch to https
       // TODO: switch away from localhost
-      const response = await fetch('http://127.0.0.1:81/track/' + formData.artist.replaceAll(" ", "+") + '/', {
+      const response = await fetch(process.env.REACT_APP_API_URL + 'track/' + formData.artist.replaceAll(" ", "+") + '/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
