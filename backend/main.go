@@ -227,6 +227,7 @@ func trackHandler(res http.ResponseWriter, req *http.Request) {
 			http.Error(res, "Malformed data", http.StatusInternalServerError)
 			return
 		}
+		track.Colors = strings.Join(getColorPalette(track.Image)[:], ";")
 		if err = PutTrack(id, track); err != nil {
 			// TODO: error handling?
 			http.Error(res, fmt.Sprintf("Failed to save track: %s", err), http.StatusInternalServerError)

@@ -208,6 +208,7 @@ export class Track{
   name: string
   artist: string
   image: string
+  colors: string
   links: {
     apple: string
     spotify: string
@@ -222,6 +223,7 @@ export class Track{
       this.name = data['track']['name'];
       this.message = data['track']['message'];
       this.image = data['track']['image'];
+      this.colors = data['track']['colors'];
       this.links = {
         apple: data['track']['links']['apple'] || "",
         spotify: data['track']['links']['spotify'] || "",
@@ -234,6 +236,7 @@ export class Track{
       this.name = "";
       this.message = "";
       this.image = "";
+      this.colors = "";
       this.links = {
         apple: "",
         spotify: "",

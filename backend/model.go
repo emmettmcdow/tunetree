@@ -34,6 +34,7 @@ type Track struct {
 	Image   string            `json:"image"`
 	Links   map[string]string `json:"links"`
 	Message string            `json:"message"`
+	Colors  string            `json:"colors"`
 }
 
 const TRACKTABLE = `
@@ -42,6 +43,7 @@ CREATE TABLE IF NOT EXISTS tracks(
 	image TEXT NOT NULL,
 	message TEXT,
 	created INTEGER NOT NULL,
+	colors TEXT,
 	user_id INTEGER NOT NULL,
 	FOREIGN KEY (user_id)
 		REFERENCES users (rowid)
@@ -94,7 +96,7 @@ func GetUserFromLink(artistlink string) (user User, ok bool) {
 
 func GetTrack(user User) (track Track, ok bool) {
 	var trackid int
-	err := db.QueryRow("SELECT t.name, t.image, t.message, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.rowid = ? ORDER BY created DESC LIMIT 1;", user.Id).Scan(&track.Name, &track.Image, &track.Message, &trackid)
+	err := db.QueryRow("SELECT t.name, t.image, t.message, t.colors, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.rowid = ? ORDER BY created DESC LIMIT 1;", user.Id).Scan(&track.Name, &track.Image, &track.Message, &track.Colors, &trackid)
 	if err == sql.ErrNoRows {
 		return track, false
 	} else if err != nil {
@@ -124,7 +126,7 @@ func GetTrack(user User) (track Track, ok bool) {
 }
 
 func PutTrack(userId int64, track Track) (err error) {
-	res, err := db.Exec("INSERT INTO tracks VALUES (?, ?, ?, ?, ?);", track.Name, track.Image, track.Message, time.Now().Unix(), userId)
+	res, err := db.Exec("INSERT INTO tracks VALUES (?, ?, ?, ?, ?, ?);", track.Name, track.Image, track.Message, time.Now().Unix(), track.Colors, userId)
 	if err != nil {
 		return err
 	}

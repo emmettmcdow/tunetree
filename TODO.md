@@ -34,17 +34,23 @@ X 10/05/2024
   X Make buttons "selectable"
   X update field names for forms (fugly)
   X Add title/logo to each page
+  X Make selection text bouncy on selection
+  X Standard buttons
+  - Get color palette from album art
+    X Backend storage
+    X Backend calculation
+    - Speed up compute
+    - Render on track page
+    - Render on artist page
+    - Render on GLSL
   - Make logo on home rainbow
-  - Make selection text bouncy on selection
 X Add images for each platform
 X Render trackinfo dynamically
 X Store images as filepaths
 X Pull in trackinfo from backend
 X Add frontend code for getting current user from jwt
 X Figure out how the fuck to deploy to prod?
-- Backend as volume
 - Validate links
-- Change links away from track/...
 - add sticker buy prompt
 - Add `your url will be`
   X Add button to change the url
@@ -80,5 +86,3 @@ X make rules for passwords
 - Hide login/signup for auth'd users
 - Handle 404s on the backend with something on the frontend
 - Rate limit backend requests to external services
-- Get color palette from album art
-  - https://dev.to/producthackers/creating-a-color-palette-with-javascript-44ip

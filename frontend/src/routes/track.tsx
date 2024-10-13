@@ -157,6 +157,61 @@ export async function loader({ params }: { params: any }) {
   return trackInfo;
 }
 
+interface Styles {
+  container: React.CSSProperties;
+  colorBox: React.CSSProperties;
+  square: React.CSSProperties;
+  colorCode: React.CSSProperties;
+}
+
+function ColorPalette({ trackInfo }: {trackInfo: any}){
+  if (!trackInfo) {
+    return (<></>);
+  }
+  // Split the input string into an array of color codes
+  const colors = trackInfo.colors.split(';').map((color: any) => color.trim());
+
+  // Styles for the component
+  const styles: Styles = {
+    container: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '20px',
+      justifyContent: 'center',
+    },
+    colorBox: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
+    square: {
+      width: '100px',
+      height: '100px',
+      border: '1px solid #ddd',
+    },
+    colorCode: {
+      marginTop: '5px',
+      fontSize: '14px',
+    },
+  };
+
+  return (
+    <div style={styles.container}>
+      {colors.map((color: any, index: any) => (
+        <div key={index} style={styles.colorBox}>
+          <div 
+            style={{
+              ...styles.square,
+              backgroundColor: color,
+            }}
+          />
+          <span style={styles.colorCode}>{color}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 export default function TrackPage() {
   const tInfo = useLoaderData();
   
@@ -167,6 +222,7 @@ export default function TrackPage() {
       <>
         <TrackInfo trackInfo={trackInfo} setLink={setLink}/>
         <SubscriptionPrompt trackInfo={trackInfo} link={link} toggle={setLink}/>
+        <ColorPalette trackInfo={trackInfo}/>
         <WebGLBackground/>
       </>
   );

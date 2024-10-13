@@ -7,9 +7,6 @@ const bandcamp = "/bandcamp.png"
 const amazon = "/amazon.png"
 
 
-export function UIButton() {
-
-}
 
 export function validPassword(password: string) {
   /* Rules:
