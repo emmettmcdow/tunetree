@@ -29,7 +29,7 @@ X 10/05/2024
 - 10/13/2024
   X Remove console logs
   X Fix webgl error - Seems like this goes away when we don't log?
-  - Backend as volume
+  X Backend as volume
   - Make buttons "selectable"
   - hook up analytics
   - update field names for forms (fugly)
