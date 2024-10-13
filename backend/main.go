@@ -617,7 +617,7 @@ func main() {
 
 	FRONTEND_URL = getEnv("FRONTEND_URL")
 	if FRONTEND_URL == "" {
-		FRONTEND_URL = "http://localhost:3000/"
+		FRONTEND_URL = "http://localhost:3000"
 	}
 
 	wg := &sync.WaitGroup{}

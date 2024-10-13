@@ -42,7 +42,7 @@ ssh:
 #
 env:
   clear:
-    FRONTEND_URL: https://tunetree.xyz/
+    FRONTEND_URL: https://tunetree.xyz
   # secret:
   #   - SPOTIFY_SECRET
   #   - SPOTIFY_CLIENT_ID
