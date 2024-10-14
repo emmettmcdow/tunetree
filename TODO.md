@@ -9,7 +9,7 @@ X 10/05/2024
   X Get only the latest track
   X Add Shader background
   X Render links dynamically
-- 10/06/2024
+X 10/06/2024
   X Make sure I'm avoiding sql-injection (GO parameterization does this by default)
   X validate email
   X Move spotify to backend
@@ -20,13 +20,13 @@ X 10/05/2024
   X hook up logging
   X Fix only 1 link bug
   X Fix form submit bug
-- 10/12/2024
+X 10/12/2024
   X Dynamic config of backend host in frontend
   X Same for backend
   X Change app name and icon
   X Don't display link name, display artist name
   X Put my logo guy in there?
-- 10/13/2024
+X 10/13/2024
   X Remove console logs
   X Fix webgl error - Seems like this goes away when we don't log?
   X Backend as volume
@@ -36,35 +36,44 @@ X 10/05/2024
   X Add title/logo to each page
   X Make selection text bouncy on selection
   X Standard buttons
-  - Get color palette from album art
-    X Backend storage
-    X Backend calculation
-    - Speed up compute
-    - Render on track page
-    - Render on artist page
-    - Render on GLSL
-  - Make logo on home rainbow
 - 10/14/2024
-  - Handle errors on the backend with something on the frontend
-  - Better error handling for Spotify
+  X Handle errors on the backend with something on the frontend
+  X Handle creation of existing user or artist
+  - Fix undefined track post
+  - Fix 404 on keypress in edit
+  - Remove track from FE path
 X Add images for each platform
 X Render trackinfo dynamically
 X Store images as filepaths
 X Pull in trackinfo from backend
 X Add frontend code for getting current user from jwt
 X Figure out how the fuck to deploy to prod?
-- Validate links
-- add sticker buy prompt
+X make rules for passwords
 - Add `your url will be`
   X Add button to change the url
   - Un-fuglify it 
   - Add validation for custom
   X Add field in user designating the encoded url
   X Add backend ^
+- Hook up Spotify API
+  - Better error handling for Spotify
+  - Make it more robust, if ambiguous, present to user and have them select
+  - Return multiple values
+  - Display selected artist
+  X Add artist id to user table
+  X Pull in album art from Spotify
+- Get color palette from album art
+  X Backend storage
+  X Backend calculation
+  - Speed up compute
+  - Render on track page
+  - Render on artist page
+  - Render on GLSL
 - NO-track = off center in track edit page
+- Validate links
+- add sticker buy prompt
 - Add banned passsword list
 - Make sure I'm avoiding all the cors shit
-X make rules for passwords
 - Make failure in login and signup sexy
 - micro adjust desktop
 - dark mode?
@@ -75,18 +84,13 @@ X make rules for passwords
   - Hook up mailgun
   - Hook up support email that redirects to emmett.mcdow@gmail.com
   - Hook up form for support
-- Hook up Spotify API
-  - Make it more robust, if ambiguous, present to user and have them select
-  - Return multiple values
-  - Display selected artist
-  X Add artist id to user table
-  X Pull in album art from Spotify
 - Rotate icons slightly. Pointy side up.
 - Add soundcloud support
 - improve shader performance
-- Don't render in background
+- Make logo on home rainbow
 - Check for authentication expiry
 - Hide login/signup for auth'd users
 - Rate limit backend requests to external services
 - Give message when user gets kicked to login for being un-authenticated.
 - Send message and log when *we* fuck something up.
+- Autofill messing up font?

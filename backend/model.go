@@ -3,9 +3,11 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
-	"golang.org/x/crypto/bcrypt"
+	"strings"
 	"time"
+
+	sqlite3 "github.com/mattn/go-sqlite3"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var db *sql.DB
@@ -24,7 +26,7 @@ CREATE TABLE IF NOT EXISTS users(
 	email TEXT NOT NULL UNIQUE,
 	password TEXT NOT NULL,
 	artist TEXT UNIQUE,
-	path TEXT UNIQUE,
+	link TEXT UNIQUE,
 	spotifyId TEXT UNIQUE
 );
 `
@@ -84,7 +86,8 @@ func InitDB(runtime string) {
 }
 
 func GetUserFromLink(artistlink string) (user User, ok bool) {
-	err := db.QueryRow("SELECT *, rowid FROM users u WHERE u.path = ?;", artistlink).Scan(&user.Email, &user.Password, &user.Artist, &user.Link, &user.SpotifyId, &user.Id)
+
+	err := db.QueryRow("SELECT *, rowid FROM users u WHERE u.link = ?;", artistlink).Scan(&user.Email, &user.Password, &user.Artist, &user.Link, &user.SpotifyId, &user.Id)
 	if err == sql.ErrNoRows {
 		return user, false
 	} else if err != nil {
@@ -177,4 +180,38 @@ func PutUser(user *User) (err error) {
 		_, err = db.Exec("INSERT INTO users VALUES (?,?,?,?,?);", user.Email, hashedPass, user.Artist, user.Link, user.SpotifyId)
 	}
 	return err
+}
+
+type DBErrType int
+
+const (
+	DbErrNotUnique DBErrType = iota
+	DbErrUncategorized
+)
+
+type DBErr struct {
+	Type    DBErrType
+	Field   string
+	Content error
+}
+
+func ParseDBError(err error) (dbErr DBErr) {
+	return sqlite3ParseDBError(err.(sqlite3.Error))
+}
+
+func sqlite3ParseDBError(err sqlite3.Error) (dbErr DBErr) {
+	dbErr.Content = err
+	switch err.ExtendedCode {
+	case sqlite3.ErrConstraintUnique:
+		dbErr.Type = DbErrNotUnique
+		errText := err.Error()
+		fieldStart := strings.LastIndex(errText, ".") + 1
+		if fieldStart == -1 {
+			panic("unexpected sqlite error: " + errText)
+		}
+		dbErr.Field = errText[fieldStart:]
+	default:
+		dbErr.Type = DbErrUncategorized
+	}
+	return dbErr
 }

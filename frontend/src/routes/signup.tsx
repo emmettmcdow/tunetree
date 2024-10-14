@@ -5,7 +5,6 @@ import { validPassword, encodeArtistLink } from '../util'
 import { spotifySearch } from '../spotify';
 import { UIButton } from './home';
 
-const prefix = "tunetree.xyz/";
 
 export default function Signup() {
   const [message, setMessage] = useState("");
@@ -13,7 +12,7 @@ export default function Signup() {
 
   const [formData, setFormData] = useState({
     artist: '',
-    link: 'tunetree.xyz/',
+    link: '',
     email: '',
     password: '',
     cpassword: '',
@@ -22,16 +21,11 @@ export default function Signup() {
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     var { name, value } = event.target;
-    if (name == "link" && separateLink) {
-      if (!value.startsWith(prefix)) {
-        value = prefix + value.slice(prefix.length);
-      }      
-    }
     if (name == "artist" && !separateLink) {
       setFormData(prevState => ({
         ...prevState,
         [name]: value,
-        "link": prefix + encodeArtistLink(value)
+        "link": encodeArtistLink(value)
       }));
     } else {
       setFormData(prevState => ({
@@ -62,7 +56,6 @@ export default function Signup() {
       return
     }
     const validUrlPath = /^[a-zA-Z0-9\-_\.~]+$/
-    formData.link = formData.link.substring(prefix.length);
     const res = validUrlPath.test(formData.link);
     if (!res) {
       setMessage("Invalid link");
@@ -133,21 +126,24 @@ export default function Signup() {
                  value={formData.artist}
                  onChange={handleChange}/>
           <div className="mb-2">Your link will look like:</div>
-          <input name="link" type="text" 
-                 className={separateLink ? "w-full rounded-lg mb-2 pl-2" : "w-full rounded-lg mb-2 pl-2 bg-slate-200 cursor-not-allowed"}
-                 value={formData.link}
-                 onChange={handleChange}
-                 readOnly={!separateLink}/>
+          <div className="flex">
+            <span className="w-fit rounded-l-lg mb-2 pl-2 bg-slate-200 cursor-not-allowed inline mx-0" >tunetree.xyz/</span>
+            <input name="link" type="text" 
+                   className={separateLink ? "w-full rounded-r-lg mb-2 mx-0 inline" : "w-full rounded-r-lg mb-2 mx-0 bg-slate-200 cursor-not-allowed inline"}
+                   value={formData.link}
+                   onChange={handleChange}
+                   readOnly={!separateLink}/>
+          </div>
           <UIButton type="neutral"
-                    content={separateLink ? "I want the default link": "Want a separate link?"}
+                    content={separateLink ? "Want a custom link?": "Want a separate link?"}
                     submit={false} 
                     handle={ (e: any) => {
                                 e.preventDefault();
                                 setSeparateLink(!separateLink);
-                                if (!separateLink) {
+                                if (separateLink) {
                                   setFormData(prevState => ({
                                     ...prevState,
-                                    "link": prefix + encodeArtistLink(formData.artist)
+                                    "link": encodeArtistLink(formData.artist)
                                   }));
                                 }
                               }

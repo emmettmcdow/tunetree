@@ -278,8 +278,13 @@ func signupHandler(res http.ResponseWriter, req *http.Request) {
 
 	// Add to DB
 	if err := PutUser(&user); err != nil {
-		http.Error(res, fmt.Sprintf("Failed to add user: %s", err), http.StatusInternalServerError)
-		return
+		dbErr := ParseDBError(err)
+		switch dbErr.Type {
+		case DbErrNotUnique:
+			http.Error(res, fmt.Sprintf("User with %s already exists", dbErr.Field), http.StatusBadRequest)
+		default:
+			http.Error(res, fmt.Sprintf("Something has gone critically wrong: %s", dbErr.Content), http.StatusInternalServerError)
+		}
 	}
 
 	return
