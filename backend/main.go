@@ -200,31 +200,31 @@ func trackHandler(res http.ResponseWriter, req *http.Request) {
 		// TODO: validate email = artistname etc here
 		id, ok := req.Context().Value("id").(int64)
 		if !ok {
-			http.Error(res, "invalid token", http.StatusUnauthorized)
+			http.Error(res, "Invalid token", http.StatusUnauthorized)
 			return
 		}
 		user, ok := GetUser(id)
 		if !ok {
-			http.Error(res, "Failed to read body of request", http.StatusNotFound)
+			http.Error(res, "User with ID not found", http.StatusUnauthorized)
 			return
 		}
 		role := req.Context().Value("role")
 		if role == nil || role == "USER" {
-			http.Error(res, "invalid token", http.StatusUnauthorized)
+			http.Error(res, "Invalid token", http.StatusUnauthorized)
 			return
 		}
 		if getRole(user) != "ARTIST" {
-			http.Error(res, "Logged in user != requested user", http.StatusUnauthorized)
+			http.Error(res, "Logged in user is not the requested user", http.StatusUnauthorized)
 			return
 		}
 
 		body, err := io.ReadAll(req.Body)
 		if err != nil {
-			http.Error(res, "Failed to read body of request", http.StatusInternalServerError)
+			http.Error(res, fmt.Sprintf("Failed to read body of request: %s", err), http.StatusInternalServerError)
 			return
 		}
 		if err := json.Unmarshal(body, &track); err != nil {
-			http.Error(res, "Malformed data", http.StatusInternalServerError)
+			http.Error(res, fmt.Sprintf("Malformed data: %s", err), http.StatusBadRequest)
 			return
 		}
 		track.Colors = strings.Join(getColorPalette(track.Image)[:], ";")
@@ -249,12 +249,12 @@ func signupHandler(res http.ResponseWriter, req *http.Request) {
 	}
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
-		http.Error(res, "Failed to read body of request", http.StatusInternalServerError)
+		http.Error(res, fmt.Sprintf("Failed to read body of request: %s", err), http.StatusInternalServerError)
 		return
 	}
 	// Check if there is a username and password
 	if err := json.Unmarshal(body, &user); err != nil {
-		http.Error(res, "Failed to parse body of request", http.StatusInternalServerError)
+		http.Error(res, fmt.Sprintf("Malformed data: %s", err), http.StatusBadRequest)
 		return
 	}
 
@@ -362,31 +362,30 @@ func loginHandler(res http.ResponseWriter, req *http.Request) {
 	}
 	body, err := io.ReadAll(req.Body)
 	if err != nil {
-		http.Error(res, "Failed to read body of request", http.StatusInternalServerError)
+		http.Error(res, fmt.Sprintf("Failed to read body of request: %s", err), http.StatusInternalServerError)
 		return
 	}
 	// Check if there is a username and password
 	if err := json.Unmarshal(body, &user); err != nil {
-		http.Error(res, "Failed to parse body of request", http.StatusInternalServerError)
+		http.Error(res, fmt.Sprintf("Malformed data: %s", err), http.StatusBadRequest)
 		return
 	}
 
 	user2, ok := GetUserFromEmail(user.Email)
 	if !ok {
-		// TODO: is this the case for DB failures?
-		http.Error(res, fmt.Sprintf("Username/Password incorrect"), http.StatusUnauthorized)
+		http.Error(res, "Username/Password incorrect", http.StatusUnauthorized)
 		return
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user2.Password), []byte(user.Password))
 	if err != nil {
-		http.Error(res, fmt.Sprintf("Username/Password incorrect"), http.StatusUnauthorized)
+		http.Error(res, "Username/Password incorrect", http.StatusUnauthorized)
 		return
 	}
 
 	// Shake dat ass jwt-y
 	token, err := generateToken(user2)
 	if err != nil {
-		http.Error(res, fmt.Sprintf("Failed to generate token"), http.StatusInternalServerError)
+		http.Error(res, fmt.Sprintf("Failed to generate token: %s", err), http.StatusInternalServerError)
 	}
 	responseBody := map[string]string{"token": token, "Artist": user2.Artist, "Email": user2.Email, "SpotifyId": user2.SpotifyId, "Link": user2.Link}
 	json.NewEncoder(res).Encode(responseBody)

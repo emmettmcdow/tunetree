@@ -70,7 +70,7 @@ export default function Login() {
 
     // Convert form data to JSON
     const jsonData = JSON.stringify(formData);
-
+    let responseBody = "";
     try {
       const response = await fetch(process.env.REACT_APP_API_URL + 'login/', {
         method: 'POST',
@@ -81,18 +81,34 @@ export default function Login() {
         credentials: "include"
       });
 
-      if (response.ok && response.body) {
+      responseBody = await response.text()
+      if (response.ok) {
         // TODO: show this to users better
-        const body = await response.json()
-        setAuthenticatedUser(body)
+        setAuthenticatedUser(responseBody)
         window.location.href = "/artist/"
       } else {
-        // TODO: better message, highlight problem
-        setMessage("Uh oh, failed to submit: " + response.body)
+        switch(response.status) {
+        case (401):
+          // Un-authorized
+          setMessage(responseBody)
+          break;
+        case (400):
+          // Bad Request
+          setMessage(responseBody)
+          break;
+        case (405):
+          // Method not allowed
+          throw new Error(responseBody)
+        case (500):
+          // Internal error
+          throw new Error(responseBody)
+        default:
+            throw new Error("Unhandled response(" + response.status + "): " + responseBody)
+        }
       }
     } catch (error) {
       // Handle network or other errors
-      setMessage("Uh oh, failed to submit: " + error)
+      setMessage("Something has gone critically wrong: " + error)
     }
   };
 

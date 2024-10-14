@@ -71,7 +71,7 @@ export default function Signup() {
 
     // Convert form data to JSON    
     const jsonData = JSON.stringify(formData);
-
+    let responseBody = "";
     try {
       const response = await fetch(process.env.REACT_APP_API_URL + 'signup/', {
         method: 'POST',
@@ -85,12 +85,25 @@ export default function Signup() {
         // TODO: show this to users better
         window.location.href = "/login"
       } else {
-        // TODO: better message, highlight problem
-        setMessage("Uh oh, failed to submit: " + response.body)
+        responseBody = await response.text()
+        switch(response.status) {
+        case (400):
+          // Bad Request
+          setMessage(responseBody)
+          break;
+        case (405):
+          // Method not allowed
+          throw new Error(responseBody)
+        case (500):
+          // Internal error
+          throw new Error(responseBody)
+        default:
+            throw new Error("Unhandled response(" + response.status + "): " + responseBody)
+        }
       }
     } catch (error) {
       // Handle network or other errors
-      setMessage("Uh oh, failed to submit: " + error)
+      setMessage("Something has gone critically wrong: " + error)
     }
   };
 

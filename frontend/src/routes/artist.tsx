@@ -114,6 +114,7 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
     // Convert form data to JSON
     
     const jsonData = JSON.stringify(formData);
+    let responseBody = "";
     try {
       const response = await fetch(process.env.REACT_APP_API_URL + 'track/' + getAuthenticatedArtistLink() + "/", {
         method: 'POST',
@@ -130,12 +131,29 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
         changeMode(Mode.Standby);
         // window.location.href = "/artist"
       } else {
-        // TODO: better message, highlight problem
-        setMessage("Uh oh, failed to submit: " + response.body)
+        responseBody = await response.text()
+        switch(response.status) {
+        case (401):
+          // Un-authorized
+          window.location.href = "/login"
+          break;
+        case (400):
+          // Bad Request
+          setMessage(responseBody)
+          break;
+        case (405):
+          // Method not allowed
+          throw new Error(responseBody)
+        case (500):
+          // Internal error
+          throw new Error(responseBody)
+        default:
+            throw new Error("Unhandled response(" + response.status + "): " + responseBody)
+        }
       }
     } catch (error) {
       // Handle network or other errors
-      setMessage("Uh oh, failed to submit: " + error)
+      setMessage("Something has gone critically wrong: " + error)
     }
   };
 

@@ -44,6 +44,9 @@ X 10/05/2024
     - Render on artist page
     - Render on GLSL
   - Make logo on home rainbow
+- 10/14/2024
+  - Handle errors on the backend with something on the frontend
+  - Better error handling for Spotify
 X Add images for each platform
 X Render trackinfo dynamically
 X Store images as filepaths
@@ -84,5 +87,6 @@ X make rules for passwords
 - Don't render in background
 - Check for authentication expiry
 - Hide login/signup for auth'd users
-- Handle 404s on the backend with something on the frontend
 - Rate limit backend requests to external services
+- Give message when user gets kicked to login for being un-authenticated.
+- Send message and log when *we* fuck something up.
