@@ -39,8 +39,7 @@ X 10/13/2024
 - 10/14/2024
   X Handle errors on the backend with something on the frontend
   X Handle creation of existing user or artist
-  - Fix undefined track post
-  - Fix 404 on keypress in edit
+  X Fix undefined track post
   - Remove track from FE path
 X Add images for each platform
 X Render trackinfo dynamically

@@ -81,12 +81,13 @@ export default function Login() {
         credentials: "include"
       });
 
-      responseBody = await response.text()
       if (response.ok) {
         // TODO: show this to users better
+        responseBody = await response.json()
         setAuthenticatedUser(responseBody)
         window.location.href = "/artist/"
       } else {
+        responseBody = await response.text()
         switch(response.status) {
         case (401):
           // Un-authorized

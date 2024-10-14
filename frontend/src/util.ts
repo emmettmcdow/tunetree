@@ -66,7 +66,7 @@ export function setAuthenticatedUser(body: any) {
   document.cookie = "artist=" + body["Artist"];
   document.cookie = "email=" + body["Email"];
   document.cookie = "spotify_id=" + body["SpotifyId"];
-  document.cookie = "link=" + body["Link"]
+  document.cookie = "link=" + body["Link"];
 }
 
 export function getAuthorizationHeader() {
