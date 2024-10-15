@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
-	"math"
-	"math/rand"
 	"net/http"
+	"slices"
 
 	"github.com/lucasb-eyer/go-colorful"
 )
@@ -28,8 +27,8 @@ func getColorPalette(imageURL string) (paletteColors []string) {
 	}
 
 	// Generate palette using k-means clustering
-	numColors := 5
-	palette := generatePaletteKMeans(img, numColors)
+	pixels := getPixels(img)
+	palette := generatePalette(pixels)
 
 	// Print the palette
 	for _, color := range palette {
@@ -38,7 +37,45 @@ func getColorPalette(imageURL string) (paletteColors []string) {
 	return paletteColors
 }
 
-func generatePaletteKMeans(img image.Image, k int) []colorful.Color {
+func generatePalette(pixels []colorful.Color) (colors []colorful.Color) {
+	// Sort by hue
+	slices.SortFunc(pixels, func(a, b colorful.Color) int {
+		ha, _, _ := a.Hsl()
+		hb, _, _ := b.Hsl()
+		if ha > hb {
+			return 1
+		} else {
+			return -1
+		}
+	})
+
+	const THRESHOLD = 30
+	// Thin out the colors by removing similar colors
+	colors = []colorful.Color{pixels[0]}
+	lastHue, _, _ := colors[0].Hsl()
+	for _, pixel := range pixels[1:] {
+		thisHue, _, _ := pixel.Hsl()
+		if thisHue-lastHue > THRESHOLD {
+			colors = append(colors, pixel)
+			lastHue = thisHue
+		}
+	}
+	fmt.Println(len(colors))
+	return colors
+}
+
+func max(pixelCount []int) (mi int) {
+	mc := pixelCount[0]
+	for i, c := range pixelCount {
+		if c > mc {
+			mi = i
+			mc = c
+		}
+	}
+	return mi
+}
+
+func getPixels(img image.Image) []colorful.Color {
 	bounds := img.Bounds()
 	var pixels []colorful.Color
 
@@ -49,65 +86,5 @@ func generatePaletteKMeans(img image.Image, k int) []colorful.Color {
 			pixels = append(pixels, colorful.Color{R: float64(r) / 65535, G: float64(g) / 65535, B: float64(b) / 65535})
 		}
 	}
-
-	// Initialize centroids randomly
-	centroids := make([]colorful.Color, k)
-	for i := range centroids {
-		centroids[i] = pixels[rand.Intn(len(pixels))]
-	}
-
-	// Perform k-means clustering
-	maxIterations := 50
-	for iter := 0; iter < maxIterations; iter++ {
-		clusters := make([][]colorful.Color, k)
-
-		// Assign pixels to nearest centroid
-		for _, pixel := range pixels {
-			nearestCentroid := 0
-			minDistance := math.Inf(1)
-			for i, centroid := range centroids {
-				distance := colorDistance(pixel, centroid)
-				if distance < minDistance {
-					minDistance = distance
-					nearestCentroid = i
-				}
-			}
-			clusters[nearestCentroid] = append(clusters[nearestCentroid], pixel)
-		}
-
-		// Update centroids
-		moved := false
-		for i, cluster := range clusters {
-			if len(cluster) == 0 {
-				continue
-			}
-			newCentroid := averageColor(cluster)
-			if !newCentroid.AlmostEqualRgb(centroids[i]) {
-				centroids[i] = newCentroid
-				moved = true
-			}
-		}
-
-		// If centroids didn't move, we've converged
-		if !moved {
-			break
-		}
-	}
-
-	return centroids
-}
-
-func colorDistance(c1, c2 colorful.Color) float64 {
-	return math.Pow(c1.R-c2.R, 2) + math.Pow(c1.G-c2.G, 2) + math.Pow(c1.B-c2.B, 2)
-}
-
-func averageColor(colors []colorful.Color) colorful.Color {
-	var r, g, b float64
-	for _, c := range colors {
-		r += c.R
-		g += c.G
-		b += c.B
-	}
-	n := float64(len(colors))
-	return colorful.Color{R: r / n, G: g / n, B: b / n}
+	return pixels
 }

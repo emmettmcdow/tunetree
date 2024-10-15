@@ -42,12 +42,16 @@ function WebGLBackground() {
 }
 
 
-export function SongInfo({trackInfo}: {trackInfo: Track}) {
+export function SongInfo({trackInfo, textColor}: {trackInfo: Track, textColor?: string}) {
+  if (!textColor) {
+    textColor = "black";
+  }
+  const style = {"color": textColor} as React.CSSProperties;
   return (
-    <div className="flex flex-col items-center mx-auto z-50">
-      <p className="text-4xl"><b>{trackInfo.artist}</b></p>
+    <div className="flex flex-col items-center mx-auto bg-white/30 backdrop-blur-md py-2 px-4 rounded-lg z-50">
+      <p style={style} className="text-4xl"><b>{trackInfo.artist}</b></p>
       <img alt="album-art" src={trackInfo.image} className="w-52 my-2"/>
-      <p className="text-2xl">{trackInfo.name}</p>
+      <p style={style} className="text-2xl">{trackInfo.name}</p>
     </div>
   );
 }
@@ -114,9 +118,11 @@ function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: any, link: st
 // TODO: fix this any?
 function TrackInfo({trackInfo, setLink}: {trackInfo: any, setLink: Function}) {
   if (trackInfo) {
+    const colors = trackInfo.colors.split(';').map((color: any) => color.trim());
+    const style = {"background-color": colors[0] } as React.CSSProperties;
     return (
-        <div className="flex flex-col justify-evenly p-5 min-h-screen z-50">
-          <SongInfo trackInfo={trackInfo} />
+        <div className={"flex flex-col justify-evenly p-5 min-h-screen z-50"} style={style}>
+          <SongInfo trackInfo={trackInfo} textColor={colors[colors.length - 1]}/>
           <ButtonBox trackInfo={trackInfo} setLink={setLink}/>
         </div>
     );
@@ -216,14 +222,14 @@ export default function TrackPage() {
   const tInfo = useLoaderData();
   
   const [link, setLink] = useState("");
-  const [trackInfo, setTrackInfo] = useState(tInfo)
+  const [trackInfo, _] = useState(tInfo)
   
   return (
       <>
         <TrackInfo trackInfo={trackInfo} setLink={setLink}/>
         <SubscriptionPrompt trackInfo={trackInfo} link={link} toggle={setLink}/>
         <ColorPalette trackInfo={trackInfo}/>
-        <WebGLBackground/>
+        {/*<WebGLBackground/>*/ }
       </>
   );
 }
