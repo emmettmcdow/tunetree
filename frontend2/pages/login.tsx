@@ -7,7 +7,7 @@ import { UIButton } from './index';
 
 export function Header({msg}: {msg: string}) {
   return (
-      <span className="text-2xl rainbow-text"><img src="/favicon.ico" alt="tunetree logo" className="w-12 mx-auto inline mr-2"/>{msg}</span>
+      <div className="text-2xl rainbow-text"><img src="/favicon.ico" alt="tunetree logo" className="w-12 mx-auto inline mr-2"/>{msg}</div>
   )
 }
 
@@ -123,22 +123,23 @@ export default function Login() {
 
   return (
     <div className="h-screen flex flex-col">
-      <Header msg="Logging In..."/>      
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-indigo-200 w-3/4 p-4 rounded-lg">
-        <h1 className="text-2xl mb-2">Login</h1>
-        <Message content={message}/>
-        <form className="flex flex-col mb-2" onSubmit={(e) => handleSubmit(e, setMessage)}>
-          <input className="w-full rounded-lg p-1 mb-2"
-                 type="text"
-                 name="email"
-                 placeholder="username"
-                 value={formData.email}
-                 onChange={handleChange}/>
-          <Password password={formData.password} setPassword={handleChange} name="password"/>
-          <UIButton type="confirm" content="Login" submit={true} handle={() => {}}/>
-        </form>
-        <p><a href="/signup">Forgot your password?</a></p>
-        <p>Or create an account<a href="/signup"> here</a></p>
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-indigo-200 w-11/12 py-4 md:w-3/5 md:py-8 rounded-lg">
+        <div className="w-11/12 md:w-5/6 mx-auto">
+          <Header msg="Logging In..."/>
+          <Message content={message}/>
+          <form className="flex flex-col my-4" onSubmit={(e) => handleSubmit(e, setMessage)}>
+            <input className="w-full rounded-lg p-1 mb-2"
+                   type="text"
+                   name="email"
+                   placeholder="username"
+                   value={formData.email}
+                   onChange={handleChange}/>
+            <Password password={formData.password} setPassword={handleChange} name="password"/>
+            <UIButton type="confirm" content="Login" submit={true} handle={() => {}}/>
+          </form>
+          <p><a href="/signup">Forgot your password?</a></p>
+          <p>Or create an account<a href="/signup"> here</a></p>
+        </div>
       </div>
     </div>
   );

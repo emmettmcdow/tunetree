@@ -40,7 +40,9 @@ X 10/13/2024
   X Handle errors on the backend with something on the frontend
   X Handle creation of existing user or artist
   X Fix undefined track post
-  - Remove track from FE path
+X Remove track from FE path
+X Add validation for acceptable artist links
+X Automatically change up if unacceptable artist name
 X Add images for each platform
 X Render trackinfo dynamically
 X Store images as filepaths
@@ -94,3 +96,9 @@ X make rules for passwords
 - Send message and log when *we* fuck something up.
 - Autofill messing up font?
 - Do things the next way(server side props etc)
+X Unfuglify login
+X Unfuglify signup
+- Add forgot password workflow
+- remove unnessessary deps
+- Fix FE deployment lol
+
