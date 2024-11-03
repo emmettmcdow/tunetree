@@ -52,13 +52,24 @@ export function SongInfo({trackInfo, textColor, shadeColor}: {trackInfo: Track, 
   }
   const style = {"color": textColor} as React.CSSProperties;
   {/* this is a grody hak to get tailwind to render properly. sigh */}
-  return (
-    <div className={"bg-white/30 "+ (shadeColor == "black" ? "!" : "") + "bg-black/30 " + "flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-50"}>
-      <p style={style} className="text-black text-4xl"><b>{trackInfo.artist}</b></p>
-      <img alt="album-art" src={trackInfo.image} className="w-52 my-2"/>
-      <p style={style} className="text-2xl">{trackInfo.name}</p>
-    </div>
-  );
+  if (shadeColor == "white") {
+    return (
+      <div className={"bg-white/30 flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-50"}>
+        <p style={style} className="text-black text-4xl"><b>{trackInfo.artist}</b></p>
+        <img alt="album-art" src={trackInfo.image} className="w-52 my-2"/>
+        <p style={style} className="text-2xl">{trackInfo.name}</p>
+      </div>
+    );
+  } else {
+    return (
+      <div className={"bg-black/30 flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-50"}>
+        <p style={style} className="text-4xl"><b>{trackInfo.artist}</b></p>
+        <img alt="album-art" src={trackInfo.image} className="w-52 my-2"/>
+        <p style={style} className="text-2xl">{trackInfo.name}</p>
+      </div>
+    );
+  }
+    
 }
 function ButtonBox({trackInfo, setLink}: {trackInfo: Track, setLink: Function}) {
   const providers = Object.entries(trackInfo.links).filter(([_, value]) => value != "")
@@ -120,6 +131,11 @@ function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: any, link: st
   }
 }
 
+function  getShadeColor(colors: Array<string>) {
+  const textColor = getTextColor(colors);
+  return textColor == "white" ? "black" : "white";
+}
+
 function getTextColor(colors: Array<string>) {
   const selected = getBackgroundColor(colors);
   const r = parseInt(selected.substr(0, 2), 16);
@@ -130,13 +146,8 @@ function getTextColor(colors: Array<string>) {
 }
 
 function getBackgroundColor(colors: Array<string>) {
-  const selected = colors[1];
+  const selected = colors[0];
   return selected;
-}
-
-function  getShadeColor(colors: Array<string>) {
-  const textColor = getTextColor(colors);
-  return textColor == "white" ? "black" : "white";
 }
 
 // TODO: fix this any?
@@ -147,6 +158,9 @@ function TrackInfo({trackInfo, setLink}: {trackInfo: any, setLink: Function}) {
     const shade = getShadeColor(colors);
     const bg = getBackgroundColor(colors);
     const text = getTextColor(colors);
+    console.log(shade);
+    console.log(text);
+    
     const style = {"backgroundColor": bg } as React.CSSProperties;
     return (
         <div className={"flex flex-col justify-evenly p-5 min-h-screen z-40"} style={style}>

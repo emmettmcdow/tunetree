@@ -101,4 +101,4 @@ X Unfuglify signup
 - Add forgot password workflow
 - remove unnessessary deps
 - Fix FE deployment lol
-
+- About page
