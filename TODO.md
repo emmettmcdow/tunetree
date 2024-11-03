@@ -102,3 +102,5 @@ X Unfuglify signup
 - remove unnessessary deps
 - Fix FE deployment lol
 - About page
+- Fix silly looking track page w/links
+- Fix dynamic links on artist page spilling into footer on mobile

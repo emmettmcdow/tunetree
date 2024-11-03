@@ -78,7 +78,7 @@ code {
 /* for circular arrangment */
 .img-circle {
   /* image size */
-  --d: 4.5em;
+  --d: 4em;
   /* circle radius */
   --r: calc(.5*(1 + var(--rel))*var(--d)/var(--tan));
   /* img-circle size */

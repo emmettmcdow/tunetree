@@ -78,9 +78,10 @@ function ButtonBox({trackInfo, setLink}: {trackInfo: Track, setLink: Function}) 
   
   const tan = Math.tan(Math.PI/providers.length);
   let offset = 1;
-  let className = "w-52 img-circle mx-auto z-50"
+  let baseClass = "w-52 z-50 mx-auto "
+  let className = baseClass + "img-circle"
   if (providers.length < 3) {
-    className = "w-52 z-50 flex justify-center mx-auto";
+    className = baseClass + "flex justify-center";
   } else if (providers.length < 4) {
     offset = 3;
   } else if (providers.length > 5) {
@@ -158,8 +159,6 @@ function TrackInfo({trackInfo, setLink}: {trackInfo: any, setLink: Function}) {
     const shade = getShadeColor(colors);
     const bg = getBackgroundColor(colors);
     const text = getTextColor(colors);
-    console.log(shade);
-    console.log(text);
     
     const style = {"backgroundColor": bg } as React.CSSProperties;
     return (
