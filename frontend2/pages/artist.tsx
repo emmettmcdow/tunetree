@@ -1,4 +1,5 @@
 import { useState, Dispatch, SetStateAction, useEffect } from 'react';
+import Image from 'next/image';
 import {FiX} from 'react-icons/fi';
 
 import { getAuthenticatedArtistLink, getAuthorizationHeader, iconForService } from "../utils/utils"
@@ -11,18 +12,20 @@ import { UIButton } from './index';
 // TODO: wait does that hurt accessibility
 // Does abusing form hurt accessibility?
 
-function ServiceSelectorBar({selected, setSelected}: {selected: any, setSelected: Function}) { 
-  let buttons = [];
+function ServiceSelectorBar({selected, setSelected}: {selected: Selected, setSelected: React.Dispatch<React.SetStateAction<Selected>>}) { 
+  const buttons = [];
   for (const [provider, state] of Object.entries(selected)) {
     if (!state) {    
-      let alt = provider + "-icon";
+      const alt = provider + "-icon";
       buttons.push(
-        <button className="text-xl cursor-pointer bounce-button mx-2" key={provider} onClick={(_) => {
-          const newSelected = {...selected};
-          newSelected[provider] = true;
+        <button className="text-xl cursor-pointer bounce-button mx-2" key={provider} onClick={() => {
+          const newSelected: Selected = {
+            ...selected,
+            [provider]: true
+          };
           setSelected(newSelected);
         }}>
-          <img className="w-8 bounce-text" alt={alt} src={iconForService(provider)} />
+          <Image className="w-8 bounce-text" alt={alt} src={iconForService(provider)} />
         </button>
       );
     }
@@ -39,44 +42,9 @@ function ServiceSelectorBar({selected, setSelected}: {selected: any, setSelected
     </div>
   );
 }
-function ServiceURLs({formData, setFormData, selected, setSelected}: {formData: any, setFormData: any, selected: any, setSelected: Function}) { 
-  let serviceURLs = [];
-  for (const [provider, state] of Object.entries(selected)) {
-    if (state) {    
-      serviceURLs.push(
-        <div className="flex mb-2" key={provider}>
-          <input className="w-full rounded-lg p-1" type="text" name={provider}  value={formData[provider]} onChange={setFormData} placeholder={provider.charAt(0).toUpperCase() + provider.slice(1) + " URL"}/>
-          <span className="flex justify-around items-center cursor-pointer" onClick={(_) => {
-            const newSelected: any = {...selected};
-            newSelected[provider] = false;
-            setSelected(newSelected);
-          }}>
-            <FiX className="absolute mr-10" size={25}/>
-          </span>
-        </div>
-      );
-    }
-  }
-  return (
-    <>
-      {serviceURLs}
-    </>
-  );
-}
 
-
-function Editor({changeMode, formData, setFormData}: {changeMode: Function, formData: Track, setFormData: Dispatch<SetStateAction<Track>>}) {
-  // Honestly fuck typescript
-  const initialState: any = {
-    "apple": false,
-    "spotify": false,
-    "youtube": false,
-    "tidal": false,
-    "amazon": false,
-    "bandcamp": false
-  }
-  const [selected, setSelected] = useState(initialState);
-  const [message, setMessage] = useState("");
+function ServiceURLs({formData, setFormData, selected, setSelected}: {formData: Track, setFormData: React.Dispatch<React.SetStateAction<Track>>, selected: Selected, setSelected: React.Dispatch<React.SetStateAction<Selected>>}) { 
+  const serviceURLs = [];
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     if (name == "message") {
@@ -107,7 +75,54 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
       }));
     }
   };
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, setMessage: Function) => {
+  for (const [provider, state] of Object.entries(selected)) {
+    if (state) {
+      const typedProv = provider as "apple" | "amazon" | "spotify" | "tidal" | "bandcamp";
+      serviceURLs.push(
+        <div className="flex mb-2" key={provider}>
+          <input className="w-full rounded-lg p-1" type="text" name={provider}  value={formData.links[typedProv]} onChange={handleChange} placeholder={provider.charAt(0).toUpperCase() + provider.slice(1) + " URL"}/>
+          <span className="flex justify-around items-center cursor-pointer" onClick={() => {
+            const newSelected: Selected= {
+              ...selected,
+              [provider]: false
+            };
+            setSelected(newSelected);
+          }}>
+            <FiX className="absolute mr-10" size={25}/>
+          </span>
+        </div>
+      );
+    }
+  }
+  return (
+    <>
+      {serviceURLs}
+    </>
+  );
+}
+
+type Selected = {
+  apple: boolean;
+  spotify: boolean;
+  youtube: boolean;
+  tidal: boolean;
+  amazon: boolean;
+  bandcamp: boolean;
+}
+
+
+function Editor({changeMode, formData, setFormData}: {changeMode: Dispatch<SetStateAction<Mode>>, formData: Track, setFormData: Dispatch<SetStateAction<Track>>}) {
+  const initialState: Selected = {
+    "apple": false,
+    "spotify": false,
+    "youtube": false,
+    "tidal": false,
+    "amazon": false,
+    "bandcamp": false
+  }
+  const [selected, setSelected] = useState(initialState);
+  const [message, setMessage] = useState("");
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, setMessage: Dispatch<SetStateAction<string>>) => {
     event.preventDefault();
 
     // Convert form data to JSON
@@ -161,8 +176,14 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Function, form
       <Message content={message}/>
       <form onSubmit={(e) => handleSubmit(e, setMessage)} className="flex-col items-center">
         <ServiceSelectorBar selected={selected} setSelected={setSelected}/>
-        <ServiceURLs formData={formData} setFormData={handleChange} selected={selected} setSelected={setSelected}/>
-        <textarea  className="w-full rounded-lg p-1 my-2" value={formData["message"]} onChange={(e) => handleChange(e)} name="message" placeholder="A message to your fans"/>
+        <ServiceURLs formData={formData} setFormData={setFormData} selected={selected} setSelected={setSelected}/>
+        <textarea  className="w-full rounded-lg p-1 my-2" value={formData["message"]} onChange={(e) => {
+          const newTrack: Track= {
+            ...formData,
+            message: e.target.value,
+          };
+          setFormData(newTrack);
+        }} name="message" placeholder="A message to your fans"/>
         <div className="flex justify-center">
           <UIButton type="deny" content="Cancel" handle={() => {}} submit={true}/>
           <UIButton type="confirm" content="Submit" handle={() => {}} submit={true}/>
@@ -177,13 +198,13 @@ enum Mode {
   New,
 }
 
-function EditPanel({mode, changeMode, formData, setFormData}: {mode: Mode, changeMode: Function, formData: Track, setFormData: any}) {
+function EditPanel({mode, changeMode, formData, setFormData}: {mode: Mode, changeMode: Dispatch<SetStateAction<Mode>>, formData: Track, setFormData: Dispatch<SetStateAction<Track>>}) {
   switch(mode) {
     case Mode.Standby:
       return (
         <div className="flex items-center mx-auto">
-          <UIButton type="neutral" content="Edit" handle={(_: any) => {changeMode(Mode.Edit)}} submit={false}/>
-          <UIButton type="neutral" content="New" handle={(_: any) => {setFormData({}); changeMode(Mode.New)}} submit={false}/>
+          <UIButton type="neutral" content="Edit" handle={() => {changeMode(Mode.Edit)}} submit={false}/>
+          <UIButton type="neutral" content="New" handle={() => {setFormData(new Track({})); changeMode(Mode.New)}} submit={false}/>
         </div>
       );
     case Mode.Edit:
@@ -234,6 +255,7 @@ export class Track{
     amazon: string
     bandcamp: string
   }
+  // eslint-disable-next-line
   constructor(data: any) {
     this.artist = data['artistName'];
     if (Object.hasOwn(data, "track")) {

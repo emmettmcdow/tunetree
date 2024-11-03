@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useState } from 'react';
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
+import Image from 'next/image';
 
 import { Track } from './artist';
 import { getAuthenticatedArtistLink, iconForService } from '../utils/utils';
-import ShaderCanvas, { shader } from '../utils/shader';
+// import ShaderCanvas, { shader } from '../utils/shader';
 
 /*
 function WebGLBackground() {
@@ -56,7 +56,7 @@ export function SongInfo({trackInfo, textColor, shadeColor}: {trackInfo: Track, 
     return (
       <div className={"bg-white/30 flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-50"}>
         <p style={style} className="text-black text-4xl"><b>{trackInfo.artist}</b></p>
-        <img alt="album-art" src={trackInfo.image} className="w-52 my-2"/>
+        <Image alt="album-art" src={trackInfo.image} className="w-52 my-2"/>
         <p style={style} className="text-2xl">{trackInfo.name}</p>
       </div>
     );
@@ -64,21 +64,21 @@ export function SongInfo({trackInfo, textColor, shadeColor}: {trackInfo: Track, 
     return (
       <div className={"bg-black/30 flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-50"}>
         <p style={style} className="text-4xl"><b>{trackInfo.artist}</b></p>
-        <img alt="album-art" src={trackInfo.image} className="w-52 my-2"/>
+        <Image alt="album-art" src={trackInfo.image} className="w-52 my-2"/>
         <p style={style} className="text-2xl">{trackInfo.name}</p>
       </div>
     );
   }
     
 }
-function ButtonBox({trackInfo, setLink}: {trackInfo: Track, setLink: Function}) {
-  const providers = Object.entries(trackInfo.links).filter(([_, value]) => value != "")
+function ButtonBox({trackInfo, setLink}: {trackInfo: Track, setLink: React.Dispatch<React.SetStateAction<string>>}) {
+  const providers = Object.entries(trackInfo.links).filter(([, value]) => value != "")
   
-  let buttons = providers.map((provider, index) => <IconLink n={index} m={providers.length} provider={provider[0]} key={provider[0]} setLink={setLink} link={provider[1]} /> );
+  const buttons = providers.map((provider, index) => <IconLink n={index} m={providers.length} provider={provider[0]} key={provider[0]} setLink={setLink} link={provider[1]} /> );
   
   const tan = Math.tan(Math.PI/providers.length);
   let offset = 1;
-  let baseClass = "w-52 z-50 mx-auto "
+  const baseClass = "w-52 z-50 mx-auto "
   let className = baseClass + "img-circle"
   if (providers.length < 3) {
     className = baseClass + "flex justify-center";
@@ -98,8 +98,8 @@ function ButtonBox({trackInfo, setLink}: {trackInfo: Track, setLink: Function}) 
   );
 }
 
-function IconLink({ n, m, provider, link, setLink }: { n: number, m: number, provider: string, link: string, setLink: Function}) {
-  let alt = provider + "-icon";
+function IconLink({ n, m, provider, link, setLink }: { n: number, m: number, provider: string, link: string, setLink: React.Dispatch<React.SetStateAction<string>>}) {
+  const alt = provider + "-icon";
   const style = { 
     "--i": String(n),
     "--m": String(m)
@@ -109,22 +109,22 @@ function IconLink({ n, m, provider, link, setLink }: { n: number, m: number, pro
     className = "w-24 m-5 cursor-pointer bounce-button";
   }
   return (
-    <button className={className}  style={style} onClick={(_) => {setLink(link);} }>
-      <img  alt={alt} src={iconForService(provider)} className="bounce-text"/>
+    <button className={className}  style={style} onClick={() => {setLink(link);} }>
+      <Image  alt={alt} src={iconForService(provider)} className="bounce-text"/>
     </button>
   );
 }
 
-function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: any, link: string, toggle: Function}) {
+function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: Track, link: string, toggle: React.Dispatch<React.SetStateAction<string>>}) {
   if (link) {
     return (
       <div className="z-50 absolute w-3/4 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  bg-indigo-200 p-5 z-50">
-        <p>wanna be notified when {trackInfo.artist} drops? (it's free)</p>
+        <p>{"wanna be notified when "+ trackInfo.artist + " drops? (it's free)"}</p>
         <form className="my-2">
           <input className="w-1/2" name="email"/>
-          <a href={link}><button onClick={(_) => toggle("")} className="mx-2 bg-emerald-500 rounded-lg cursor-pointer bounce-button"><span className="p-4 py-2 text-white bounce-text">Yes</span></button></a>
+          <a href={link}><button onClick={() => toggle("")} className="mx-2 bg-emerald-500 rounded-lg cursor-pointer bounce-button"><span className="p-4 py-2 text-white bounce-text">Yes</span></button></a>
         </form>
-        <a href={link}><button onClick={(_) => toggle("")} className="mx-2 bg-indigo-500 rounded-lg cursor-pointer bounce-button"><span className="p-4 py-2 text-white bounce-text">I just wanna rock(no)</span></button></a>
+        <a href={link}><button onClick={() => toggle("")} className="mx-2 bg-indigo-500 rounded-lg cursor-pointer bounce-button"><span className="p-4 py-2 text-white bounce-text">I just wanna rock(no)</span></button></a>
       </div>
     );
   } else {
@@ -151,11 +151,10 @@ function getBackgroundColor(colors: Array<string>) {
   return selected;
 }
 
-// TODO: fix this any?
-function TrackInfo({trackInfo, setLink}: {trackInfo: any, setLink: Function}) {
+function TrackInfo({trackInfo, setLink}: {trackInfo: Track, setLink: React.Dispatch<React.SetStateAction<string>>}) {
 
   if (trackInfo.colors) {
-    const colors = trackInfo.colors.split(';').map((color: any) => color.trim());
+    const colors = trackInfo.colors.split(';').map((color: string) => color.trim());
     const shade = getShadeColor(colors);
     const bg = getBackgroundColor(colors);
     const text = getTextColor(colors);
@@ -174,7 +173,7 @@ function TrackInfo({trackInfo, setLink}: {trackInfo: any, setLink: Function}) {
 
 export async function getTrackInfo(artistLink: string|null) {  
   try {
-    var response = null
+    let response = null;
     if (!artistLink) {
       response = await fetch(process.env.NEXT_PUBLIC_API_URL + 'track/' + getAuthenticatedArtistLink(), {
         method: 'GET'
@@ -202,12 +201,12 @@ interface Styles {
   colorCode: React.CSSProperties;
 }
 
-function ColorPalette({ trackInfo }: {trackInfo: any}){
+function ColorPalette({ trackInfo }: {trackInfo: Track}){
   if (!trackInfo.colors) {
     return (<></>);
   }
   // Split the input string into an array of color codes
-  const colors = trackInfo.colors.split(';').map((color: any) => color.trim());
+  const colors = trackInfo.colors.split(';').map((color: string) => color.trim());
 
   // Styles for the component
   const styles: Styles = {
@@ -235,7 +234,7 @@ function ColorPalette({ trackInfo }: {trackInfo: any}){
 
   return (
     <div style={styles.container}>
-      {colors.map((color: any, index: any) => (
+      {colors.map((color: string, index: number) => (
         <div key={index} style={styles.colorBox}>
           <div 
             style={{
@@ -256,7 +255,7 @@ export const getServerSideProps = (async (ctx) => {
   const trackInfo = await getTrackInfo(slug);
   // Pass data to the page via props
   return { props: { trackInfo } }
-}) satisfies GetServerSideProps<{ trackInfo: any}>
+}) satisfies GetServerSideProps<{ trackInfo: Track}>
  
 
 export default function TrackPage({trackInfo}: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -271,4 +270,4 @@ export default function TrackPage({trackInfo}: InferGetServerSidePropsType<typeo
         {/*<WebGLBackground/>*/ }
       </>
   );
-}1
+}
