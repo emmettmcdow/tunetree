@@ -50,11 +50,11 @@ export function SongInfo({trackInfo, textColor, shadeColor}: {trackInfo: Track, 
   if (!shadeColor) {
     shadeColor = "white";
   }
-  const shade = "bg-"+ "rose-800"
   const style = {"color": textColor} as React.CSSProperties;
+  {/* this is a grody hak to get tailwind to render properly. sigh */}
   return (
-    <div className={shade + " flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-50"}>
-      <p style={style} className="text-4xl"><b>{trackInfo.artist}</b></p>
+    <div className={"bg-white/30 "+ (shadeColor == "black" ? "!" : "") + "bg-black/30 " + "flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-50"}>
+      <p style={style} className="text-black text-4xl"><b>{trackInfo.artist}</b></p>
       <img alt="album-art" src={trackInfo.image} className="w-52 my-2"/>
       <p style={style} className="text-2xl">{trackInfo.name}</p>
     </div>
