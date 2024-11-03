@@ -26,7 +26,6 @@ func getColorPalette(imageURL string) (paletteColors []string) {
 		return
 	}
 
-	// Generate palette using k-means clustering
 	pixels := getPixels(img)
 	palette := generatePalette(pixels)
 

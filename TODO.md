@@ -93,3 +93,4 @@ X make rules for passwords
 - Give message when user gets kicked to login for being un-authenticated.
 - Send message and log when *we* fuck something up.
 - Autofill messing up font?
+- Do things the next way(server side props etc)

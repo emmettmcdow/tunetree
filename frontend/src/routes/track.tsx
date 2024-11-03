@@ -42,13 +42,17 @@ function WebGLBackground() {
 }
 
 
-export function SongInfo({trackInfo, textColor}: {trackInfo: Track, textColor?: string}) {
+export function SongInfo({trackInfo, textColor, shadeColor}: {trackInfo: Track, textColor?: string, shadeColor?: string}) {
   if (!textColor) {
     textColor = "black";
   }
+  if (!shadeColor) {
+    shadeColor = "white";
+  }
+  const shade = "bg-"+ "rose-800"
   const style = {"color": textColor} as React.CSSProperties;
   return (
-    <div className="flex flex-col items-center mx-auto bg-white/30 backdrop-blur-md py-2 px-4 rounded-lg z-50">
+    <div className={shade + " flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-50"}>
       <p style={style} className="text-4xl"><b>{trackInfo.artist}</b></p>
       <img alt="album-art" src={trackInfo.image} className="w-52 my-2"/>
       <p style={style} className="text-2xl">{trackInfo.name}</p>
@@ -115,14 +119,37 @@ function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: any, link: st
   }
 }
 
+function getTextColor(colors: Array<string>) {
+  const selected = getBackgroundColor(colors);
+  const r = parseInt(selected.substr(0, 2), 16);
+  const g = parseInt(selected.substr(2, 2), 16);
+  const b = parseInt(selected.substr(4, 2), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  return luminance > 0.5 ? "black" :  "white"
+}
+
+function getBackgroundColor(colors: Array<string>) {
+  const selected = colors[0];
+  return selected;
+}
+
+function  getShadeColor(colors: Array<string>) {
+  const textColor = getTextColor(colors);
+  return textColor == "white" ? "black" : "white";
+}
+
 // TODO: fix this any?
 function TrackInfo({trackInfo, setLink}: {trackInfo: any, setLink: Function}) {
+
   if (trackInfo) {
     const colors = trackInfo.colors.split(';').map((color: any) => color.trim());
-    const style = {"background-color": colors[0] } as React.CSSProperties;
+    const shade = getShadeColor(colors);
+    const bg = getBackgroundColor(colors);
+    const text = getTextColor(colors);
+    const style = {"backgroundColor": bg } as React.CSSProperties;
     return (
-        <div className={"flex flex-col justify-evenly p-5 min-h-screen z-50"} style={style}>
-          <SongInfo trackInfo={trackInfo} textColor={colors[colors.length - 1]}/>
+        <div className={"flex flex-col justify-evenly p-5 min-h-screen z-40"} style={style}>
+          <SongInfo trackInfo={trackInfo} textColor={text} shadeColor={shade}/>
           <ButtonBox trackInfo={trackInfo} setLink={setLink}/>
         </div>
     );

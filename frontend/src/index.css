@@ -3,15 +3,9 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: "rainyhearts";
-  src: url("rainyhearts.woff");
-}
-
-@font-face {
   font-family: "kiwisoda";
-  src: url("KiwiSoda.woff");
+  src: url("/fonts/KiwiSoda.woff");
 }
-
 
 body {
   margin: 0;

@@ -1,0 +1,165 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "kiwisoda";
+  src: url("/fonts/KiwiSoda.woff");
+}
+
+body {
+  margin: 0;
+  font-family: "kiwisoda";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* for rainbows */
+.rainbow-text {
+  position: relative;
+  color: #000;
+  background: #fff;
+  mix-blend-mode: multiply;
+  overflow: hidden;
+
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  padding: 2px 4px 6px;
+  margin: -2px -4px -6px;
+}
+
+.rainbow-text::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: -100%;
+  background: white repeating-linear-gradient(90deg, #14ffe9 0%, #ffc800 16.66666%, #ff00e0 33.33333%, #14ffe9 50.0%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: move 1s linear infinite;
+}
+
+@keyframes move {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(50%);
+  }
+}
+
+@supports not (mix-blend-mode: multiply) {
+  .rainbow-text {
+    -webkit-text-fill-color: transparent;
+    background-clip: text !important;
+    background: white repeating-linear-gradient(90deg, #14ffe9, #ffc800, #ff00e0, #14ffe9);
+    text-shadow: none;
+  }
+
+  .rainbow-text::before {
+    content: none;
+  }
+}
+
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #eee url(http://api.thumbr.it/whitenoise-300x300.png?background=eeeeeeff&noise=000000&density=15&opacity=10) center;
+}
+
+/* for circular arrangment */
+.img-circle {
+  /* image size */
+  --d: 4.5em;
+  /* circle radius */
+  --r: calc(.5*(1 + var(--rel))*var(--d)/var(--tan));
+  /* img-circle size */
+  --s: calc(2*var(--r) + var(--d));
+  position: relative;
+  width: var(--s);
+  height: var(--s);
+}
+
+.img-circle button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: calc(-.5*var(--d));
+  width: var(--d);
+  height: var(--d);
+  --az: calc(var(--i)*1turn/var(--m));
+  transform:
+    rotate(var(--az)) translate(var(--r)) rotate(calc(-1*var(--az)))
+}
+
+img {
+  max-width: 100%
+}
+
+/* for div brackets */
+/* https://stackoverflow.com/questions/48149511/the-whole-div-between-brackets */
+.bracket-top {
+  position: relative;
+  display: block;
+}
+
+.bracket-top:after {
+  content: 'foo';
+  height: 10px;
+  width: 90%;
+  border: 2px solid black;
+  position: absolute;
+  top: 1em;
+}
+
+
+.bracket-left {
+  position: relative;
+  text-align: center;
+}
+
+.bracket-left:before {
+  content: '';
+  height: 90%;
+  width: 10px;
+  border: 2px solid black;
+  position: absolute;
+  top: 0;
+  left: -10px;
+  border-right: 0;
+}
+
+/* bouncy selections */
+.bounce-button {
+  position: relative;
+}
+
+.bounce-text {
+  display: inline-block;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.bounce-button:hover .bounce-text {
+  animation: textBounce 0.5s ease infinite alternate;
+}
+
+@keyframes textBounce {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-5px);
+  }
+}
