@@ -2,12 +2,15 @@ import {FiEyeOff} from 'react-icons/fi';
 import {FiEye} from 'react-icons/fi';
 import {FiAlertCircle} from 'react-icons/fi';
 import { useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+
 import { setAuthenticatedUser } from '../utils/utils';
 import { UIButton } from './index';
 
 export function Header({msg}: {msg: string}) {
   return (
-      <div className="text-2xl rainbow-text"><img src="/favicon.ico" alt="tunetree logo" className="w-12 mx-auto inline mr-2"/>{msg}</div>
+      <div className="text-2xl rainbow-text"><Image src="/favicon.ico" alt="tunetree logo" className="w-12 mx-auto inline mr-2"/>{msg}</div>
   )
 }
 
@@ -24,7 +27,11 @@ function Eye({state}: {state: string}) {
   }
 }
 
-export function Password({name, password, setPassword}: {name: string, password: string, setPassword: Function}) {
+interface SetPassword {
+  (password: string): void;
+}
+
+export function Password({name, password, setPassword}: {name: string, password: string, setPassword: SetPassword}) {
   const [type, setType] = useState('password');
   const handleToggle = () => {
    if (type==='password'){
@@ -36,7 +43,7 @@ export function Password({name, password, setPassword}: {name: string, password:
 
   return (
     <div className="flex mb-2">
-      <input className="w-full rounded-lg p-1" type={type} name={name} placeholder={name == "cpassword" ? "confirm password" : name} value={password} onChange={(e) =>setPassword(e)}/>
+      <input className="w-full rounded-lg p-1" type={type} name={name} placeholder={name == "cpassword" ? "confirm password" : name} value={password} onChange={(e) => setPassword(e.target.value)}/>
       <span className="flex justify-around items-center cursor-pointer" onClick={handleToggle}>
         <Eye state={type}/>
       </span>
@@ -66,14 +73,7 @@ export default function Login() {
     password: ''
   });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, setMessage: Function) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     // Convert form data to JSON
@@ -127,18 +127,30 @@ export default function Login() {
         <div className="w-11/12 md:w-5/6 mx-auto">
           <Header msg="Logging In..."/>
           <Message content={message}/>
-          <form className="flex flex-col my-4" onSubmit={(e) => handleSubmit(e, setMessage)}>
+          <form className="flex flex-col my-4" onSubmit={handleSubmit}>
             <input className="w-full rounded-lg p-1 mb-2"
                    type="text"
                    name="email"
                    placeholder="username"
                    value={formData.email}
-                   onChange={handleChange}/>
-            <Password password={formData.password} setPassword={handleChange} name="password"/>
+                   onChange={(e) => {
+                    const {name, value} = e.target;
+                    const newForm = {
+                      ...formData,
+                      [name]: value
+                    }
+                    setFormData(newForm);
+              }}/>
+            <Password password={formData.password} setPassword={(password: string) => {
+              setFormData({
+                ...formData,
+                password: password
+              })
+            }} name="password"/>
             <UIButton type="confirm" content="Login" submit={true} handle={() => {}}/>
           </form>
-          <p><a href="/signup">Forgot your password?</a></p>
-          <p>Or create an account<a href="/signup"> here</a></p>
+          <p><Link href="/signup">Forgot your password?</Link></p>
+          <p>Or create an account<Link href="/signup"> here</Link></p>
         </div>
       </div>
     </div>

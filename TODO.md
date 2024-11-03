@@ -95,12 +95,12 @@ X make rules for passwords
 - Give message when user gets kicked to login for being un-authenticated.
 - Send message and log when *we* fuck something up.
 - Autofill messing up font?
-- Do things the next way(server side props etc)
+X Do things the next way(server side props etc)
 X Unfuglify login
 X Unfuglify signup
 - Add forgot password workflow
 - remove unnessessary deps
-- Fix FE deployment lol
+X Fix FE deployment lol
 - About page
 - Fix silly looking track page w/links
 - Fix dynamic links on artist page spilling into footer on mobile

@@ -22,7 +22,7 @@ export default function Signup() {
   });
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    var { name, value } = event.target;
+    const { name, value } = event.target;
     if (name == "artist" && !separateLink) {
       setFormData(prevState => ({
         ...prevState,
@@ -36,7 +36,7 @@ export default function Signup() {
       }));
     }
   };
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, setMessage: Function) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     // MAKE SURE TO UPDATE THIS ON BACKEND IF YOU CHANGE THIS
@@ -116,7 +116,7 @@ export default function Signup() {
       })
     }, 500);
     return () => clearTimeout(timeOutId);
-  }, [formData['artist']])
+  }, [formData])
 
   return (
     <div className="h-screen flex flex-col">
@@ -124,7 +124,7 @@ export default function Signup() {
         <div className="w-11/12 md:w-5/6 mx-auto">
           <Header msg="Signing up..."/>
           <Message content={message}/>
-          <form onSubmit={(e) => handleSubmit(e, setMessage)} className="flex flex-col my-4">
+          <form onSubmit={handleSubmit} className="flex flex-col my-4">
             <input className="w-full rounded-lg p-1 mb-2"
                    type="text"
                    name="artist"
@@ -143,7 +143,7 @@ export default function Signup() {
             <UIButton type="neutral"
                       content={separateLink ? "Want a custom link?": "Want a separate link?"}
                       submit={false} 
-                      handle={ (e: any) => {
+                      handle={ (e: React.MouseEvent<HTMLButtonElement>) => {
                                   e.preventDefault();
                                   setSeparateLink(!separateLink);
                                   if (separateLink) {
@@ -162,8 +162,18 @@ export default function Signup() {
                    value={formData.email}
                    onChange={handleChange}/>
 
-            <Password password={formData.password} setPassword={handleChange} name="password"/>
-            <Password password={formData.cpassword} setPassword={handleChange} name="cpassword"/>
+            <Password password={formData.password} setPassword={(password: string) => {
+              setFormData({
+                ...formData,
+                password: password
+              })
+            }} name="password"/>
+            <Password password={formData.cpassword} setPassword={(password: string) => {
+              setFormData({
+                ...formData,
+                password: password
+              })
+            }} name="cpassword"/>
             <UIButton type="confirm" content="Submit" submit={true} handle={() => {}}/>
           </form>
         </div>
