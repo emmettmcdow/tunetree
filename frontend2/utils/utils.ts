@@ -1,3 +1,5 @@
+import { UIPaths } from "@/pages/signup";
+
 const placeholderSquare = "/placeholder-square.png";
 const spotify = "/spotify.png"
 const youtube = "/youtube.png"
@@ -105,8 +107,13 @@ function parseJwt (token: string) {
 }
 
 export function encodeArtistLink (name: string) {
-  return name.replaceAll(" ", "-")  // Spaces to dashes
+
+  name = name.replaceAll(" ", "-")  // Spaces to dashes
              .replaceAll(/[^a-zA-Z0-9-_.~]/g, "")  // Remove not allowed characters
-             .toLowerCase()
+             .toLowerCase();
+  if (UIPaths.some((path) => path == name)) {
+    name += "~";
+  }
+  return name;
 }
   

@@ -143,7 +143,6 @@ function  getShadeColor(colors: Array<string>) {
 function TrackInfo({trackInfo, setLink}: {trackInfo: any, setLink: Function}) {
 
   if (trackInfo.colors) {
-    console.log(trackInfo);
     const colors = trackInfo.colors.split(';').map((color: any) => color.trim());
     const shade = getShadeColor(colors);
     const bg = getBackgroundColor(colors);

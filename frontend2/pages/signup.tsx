@@ -6,6 +6,8 @@ import { spotifySearch } from '../utils/spotify';
 import { UIButton } from './index';
 
 
+export const UIPaths = ["login", "signup", "artist", "about", "track", "settings", "admin"]
+
 export default function Signup() {
   const [message, setMessage] = useState("");
   const [separateLink, setSeparateLink] = useState(false);
@@ -53,7 +55,11 @@ export default function Signup() {
     }
     if (formData.artist == "") {
       setMessage("Invalid artist")
-      return
+      return;
+    }
+    if (UIPaths.some((path) => path == formData.link)) {
+      setMessage("Link " + formData.link + " is already taken.")
+      return;
     }
     const validUrlPath = /^[a-zA-Z0-9\-_\.~]+$/
     const res = validUrlPath.test(formData.link);
@@ -114,7 +120,6 @@ export default function Signup() {
 
   return (
     <div className="h-screen flex flex-col">
-      "slambo"
       <Header msg="Signing up..."/>
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-indigo-200 w-3/4 p-4 rounded-lg">
         <p className="text-2xl mb-2">Sign Up</p>
