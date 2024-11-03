@@ -1,9 +1,9 @@
 # **************************************************************** Frontend
 FROM node:21-alpine AS frontend-build
 WORKDIR /frontend
-COPY frontend/package*.json ./
+COPY frontend2/package*.json ./
 RUN npm ci
-COPY frontend/ .
+COPY frontend2/ .
 RUN npm run build
 
 FROM nginx:1.21-alpine AS frontend
