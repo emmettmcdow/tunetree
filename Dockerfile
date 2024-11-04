@@ -1,17 +1,16 @@
 # **************************************************************** Frontend
-FROM node:21-alpine AS frontend-build
+FROM node:23 AS frontend-build
 WORKDIR /frontend
 COPY frontend2/package*.json ./
 RUN npm ci
 COPY frontend2/ .
 RUN npm run build
 
-FROM nginx:1.21-alpine AS frontend
-COPY --from=frontend-build /frontend/build /usr/share/nginx/html
-COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+FROM node:23 AS frontend
+COPY --from=frontend-build /frontend/ /frontend2
+WORKDIR /frontend2
 EXPOSE 80
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "run", "start"]
 
 
 # **************************************************************** Backend
