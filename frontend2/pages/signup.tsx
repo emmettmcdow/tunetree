@@ -168,10 +168,10 @@ export default function Signup() {
                 password: password
               })
             }} name="password"/>
-            <Password password={formData.cpassword} setPassword={(password: string) => {
+            <Password password={formData.cpassword} setPassword={(cpassword: string) => {
               setFormData({
                 ...formData,
-                password: password
+                cpassword: cpassword
               })
             }} name="cpassword"/>
             <UIButton type="confirm" content="Submit" submit={true} handle={() => {}}/>

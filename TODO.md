@@ -104,4 +104,5 @@ X Fix FE deployment lol
 - About page
 - Fix silly looking track page w/links
 - Fix dynamic links on artist page spilling into footer on mobile
-- Fix all the stuff next messed up...
+X Fix all the stuff next messed up...
+- Fix continuous polling of spotify on forms
