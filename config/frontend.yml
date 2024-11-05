@@ -38,10 +38,10 @@ ssh:
 
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 #
-# env:
-#   clear:
-#     DB_HOST: 192.168.0.2
-#   secret:
+env:
+  clear:
+    NEXT_PUBLIC_API_URL: "https://api.tunetree.xyz/"
+  # secret:
 #     - RAILS_MASTER_KEY
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
