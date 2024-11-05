@@ -25,7 +25,7 @@ function ServiceSelectorBar({selected, setSelected}: {selected: Selected, setSel
           };
           setSelected(newSelected);
         }}>
-          <Image className="w-8 bounce-text" alt={alt} src={iconForService(provider)} />
+          <Image className="w-8 bounce-text" alt={alt} src={iconForService(provider)} height="1024" width="1024"/>
         </button>
       );
     }

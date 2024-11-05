@@ -56,7 +56,7 @@ export function SongInfo({trackInfo, textColor, shadeColor}: {trackInfo: Track, 
     return (
       <div className={"bg-white/30 flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-50"}>
         <p style={style} className="text-black text-4xl"><b>{trackInfo.artist}</b></p>
-        <Image alt="album-art" src={trackInfo.image} className="w-52 my-2"/>
+        <Image alt="album-art" src={trackInfo.image} className="w-52 my-2" height="1024" width="1024"/>
         <p style={style} className="text-2xl">{trackInfo.name}</p>
       </div>
     );
@@ -64,7 +64,7 @@ export function SongInfo({trackInfo, textColor, shadeColor}: {trackInfo: Track, 
     return (
       <div className={"bg-black/30 flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-50"}>
         <p style={style} className="text-4xl"><b>{trackInfo.artist}</b></p>
-        <Image alt="album-art" src={trackInfo.image} className="w-52 my-2"/>
+        <Image alt="album-art" src={trackInfo.image} className="w-52 my-2" height="1024" width="1024"/>
         <p style={style} className="text-2xl">{trackInfo.name}</p>
       </div>
     );
@@ -110,7 +110,7 @@ function IconLink({ n, m, provider, link, setLink }: { n: number, m: number, pro
   }
   return (
     <button className={className}  style={style} onClick={() => {setLink(link);} }>
-      <Image  alt={alt} src={iconForService(provider)} className="bounce-text"/>
+      <Image  alt={alt} src={iconForService(provider)} className="bounce-text" height="1024" width="1024"/>
     </button>
   );
 }

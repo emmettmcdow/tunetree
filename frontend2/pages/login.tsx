@@ -10,7 +10,7 @@ import { UIButton } from './index';
 
 export function Header({msg}: {msg: string}) {
   return (
-      <div className="text-2xl rainbow-text"><Image src="/favicon.ico" alt="tunetree logo" className="w-12 mx-auto inline mr-2"/>{msg}</div>
+      <div className="text-2xl rainbow-text"><Image src="/favicon.ico" alt="tunetree logo" className="w-12 mx-auto inline mr-2" height="1024" width="1024"/>{msg}</div>
   )
 }
 
