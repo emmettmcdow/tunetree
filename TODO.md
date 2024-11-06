@@ -106,3 +106,4 @@ X Fix FE deployment lol
 - Fix dynamic links on artist page spilling into footer on mobile
 X Fix all the stuff next messed up...
 - Fix continuous polling of spotify on forms
+- Name up top better
