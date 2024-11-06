@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import Link from "next/link";
+import { DefaultSeo } from 'next-seo';
 
 function Footer() {
   return (
@@ -15,6 +16,16 @@ function Footer() {
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <div className="bg-indigo-100">
+        <DefaultSeo
+          title={"tunetree"}
+          description={"join the music revolution"}
+          openGraph={{
+            type: 'website',
+            locale: 'en_US',
+            url: 'https://tunetree.xyz',
+            site_name: 'tunetree',
+          }}
+        />
       <Component {...pageProps} />
       <Footer/>
     </div>

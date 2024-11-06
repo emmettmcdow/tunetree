@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import Image from 'next/image';
+import { NextSeo } from 'next-seo';
 
 import { Track } from './artist';
 import { getAuthenticatedArtistLink, iconForService } from '../utils/utils';
@@ -253,17 +254,48 @@ export const getServerSideProps = (async (ctx) => {
   // Fetch data from external API
   const slug = ctx.params!.track as string;
   const trackInfo = await getTrackInfo(slug);
-  // Pass data to the page via props
-  return { props: { trackInfo } }
-}) satisfies GetServerSideProps<{ trackInfo: Track}>
+  if (trackInfo != "") {
+    // Pass data to the page via props
+    return { props: { trackInfo, slug } }
+  } else {
+      return {
+        redirect: {
+          destination: '/error',
+          permanent: false,
+        },
+      }
+  }
+}) satisfies GetServerSideProps<{ trackInfo: Track, slug: string}>
  
 
-export default function TrackPage({trackInfo}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function TrackPage({trackInfo, slug}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [link, setLink] = useState("")
   const ti = new Track(trackInfo);
+
+  const title = ti.artist + " | " + ti.name;
+  const description = ti.name + " by " + ti.artist;
   
   return (
       <>
+        <NextSeo
+          title={title}
+          description={description}
+          openGraph={{
+            title: title,
+            description: description,
+            type: "audio.music",
+            images: [
+              {
+                url: trackInfo.image,
+                width: 1024,
+                height: 1024,
+                alt: trackInfo.name + " album art"
+              }
+            ],
+            url: "https://tunetree.xyz/" + slug
+          }}
+          
+        />
         <TrackInfo trackInfo={ti} setLink={setLink}/>
         <SubscriptionPrompt trackInfo={ti} link={link} toggle={setLink}/>
         <ColorPalette trackInfo={ti}/>
