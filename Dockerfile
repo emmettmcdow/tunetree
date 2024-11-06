@@ -2,7 +2,7 @@
 FROM node:23 AS frontend-build
 WORKDIR /frontend
 COPY frontend2/package*.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 COPY frontend2/ .
 RUN npm run build
 
