@@ -106,4 +106,8 @@ X Fix FE deployment lol
 - Fix dynamic links on artist page spilling into footer on mobile
 X Fix all the stuff next messed up...
 - Fix continuous polling of spotify on forms
-- Name up top better
+X Name up top better
+- make favicon white?
+X 404 on not found artist
+X ban error
+- Better 404 page
