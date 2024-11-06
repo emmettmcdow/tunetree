@@ -273,7 +273,7 @@ export default function TrackPage({trackInfo, slug}: InferGetServerSidePropsType
   const ti = new Track(trackInfo);
 
   const title = ti.artist + " | " + ti.name;
-  const description = ti.name + " by " + ti.artist;
+  const description = "Listen to " + ti.name + " by " + ti.artist + " on tunetree!";
   
   return (
       <>
@@ -286,10 +286,10 @@ export default function TrackPage({trackInfo, slug}: InferGetServerSidePropsType
             type: "audio.music",
             images: [
               {
-                url: trackInfo.image,
+                url: ti.image,
                 width: 1024,
                 height: 1024,
-                alt: trackInfo.name + " album art"
+                alt: ti.name + " album art"
               }
             ],
             url: "https://tunetree.xyz/" + slug
