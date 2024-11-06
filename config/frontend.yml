@@ -38,9 +38,9 @@ ssh:
 
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 #
-env:
-  clear:
-    NEXT_PUBLIC_API_URL: "https://api.tunetree.xyz/"
+# env:
+#   clear:
+#     NEXT_PUBLIC_API_URL: "https://api.tunetree.xyz/"
   # secret:
 #     - RAILS_MASTER_KEY
 
