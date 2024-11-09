@@ -127,7 +127,7 @@ function TrackInfo({trackInfo, setLink}: {trackInfo: Track, setLink: React.Dispa
     
     const style = {"backgroundColor": bg } as React.CSSProperties;
     return (
-        <div className={"flex flex-col justify-evenly p-5 min-h-screen z-40"} style={style}>
+        <div className={"flex flex-col justify-evenly p-5 h-dvh z-40"} style={style}>
           <SongInfo trackInfo={trackInfo} textColor={text} shadeColor={shade}/>
           <ButtonBox trackInfo={trackInfo} setLink={setLink}/>
         </div>
