@@ -285,8 +285,8 @@ vec3 tunnel(vec2 uv)
     float fbm4 = fbm(vec2( r, PI - mod(theta - 0.001, PI) ) * 2.0);
     
     // Colours for the tunnel
-    vec3 tc1 = vec3(0.0, 1.0, 0.5);
-    vec3 tc2 = vec3(0.0, 0.5, 1.0);
+    vec3 tc1 = REPLACEME;
+    vec3 tc2 = REPLACEME;
     
     // Set the noise value based on the angle
     if (theta > 0.0)
