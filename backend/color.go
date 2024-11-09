@@ -10,6 +10,9 @@ import (
 	"github.com/lucasb-eyer/go-colorful"
 )
 
+var WHITE = colorful.Color{R: 255, G: 255, B: 255}
+var BLACK = colorful.Color{R: 0, G: 0, B: 0}
+
 func getColorPalette(imageURL string) (paletteColors []string) {
 	// Download the image
 	resp, err := http.Get(imageURL)
@@ -48,7 +51,7 @@ func generatePalette(pixels []colorful.Color) (colors []colorful.Color) {
 		}
 	})
 
-	const THRESHOLD = 30
+	const THRESHOLD = 20
 	// Thin out the colors by removing similar colors
 	colors = []colorful.Color{pixels[0]}
 	lastHue, _, _ := colors[0].Hsl()
@@ -59,8 +62,31 @@ func generatePalette(pixels []colorful.Color) (colors []colorful.Color) {
 			lastHue = thisHue
 		}
 	}
-	fmt.Println(len(colors))
+	colors = filterUncolorful(colors)
+	if len(colors) == 0 {
+		colors = []colorful.Color{WHITE, BLACK}
+	}
 	return colors
+}
+
+func isColorful(color colorful.Color) bool {
+	_, s, l := color.Hsl()
+	if l < 0.15 || l > 0.80 {
+		return false
+	}
+	if s < 0.20 {
+		return false
+	}
+	return true
+}
+
+func filterUncolorful(input []colorful.Color) (output []colorful.Color) {
+	for _, color := range input {
+		if isColorful(color) {
+			output = append(output, color)
+		}
+	}
+	return output
 }
 
 func max(pixelCount []int) (mi int) {

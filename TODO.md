@@ -46,11 +46,14 @@
 - Autofill messing up font?
 - Add forgot password workflow
 - remove unnessessary deps
-- About page
-- Fix silly looking track page w/links
-- Fix dynamic links on artist page spilling into footer on mobile
 - make favicon white?
-- Better 404 page
+- 11/09/2024
+  - Better 404 page
+  - About page
+  - Integrate colors with shader
+  - Fix silly looking track page w/links
+  - Fix dynamic links on artist page spilling into footer on mobile
+  X Better color alg
 X Fix continuous polling of spotify on forms
 X Do things the next way(server side props etc)
 X Unfuglify login

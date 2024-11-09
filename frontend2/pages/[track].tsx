@@ -264,7 +264,7 @@ export default function TrackPage({trackInfo, slug}: InferGetServerSidePropsType
         <TrackInfo trackInfo={ti} setLink={setLink}/>
         <SubscriptionPrompt trackInfo={ti} link={link} toggle={setLink}/>
         <ColorPalette trackInfo={ti}/>
-        <WebGLBackground/>
+        {/* <WebGLBackground/> */}
       </>
   );
 }
