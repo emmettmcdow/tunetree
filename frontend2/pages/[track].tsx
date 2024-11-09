@@ -5,43 +5,8 @@ import { NextSeo } from 'next-seo';
 
 import { Track } from './artist';
 import { getAuthenticatedArtistLink, iconForService } from '../utils/utils';
-// import ShaderCanvas, { shader } from '../utils/shader';
+import WebGLBackground from '@/components/webgl';
 
-/*
-function WebGLBackground() {
-  const canvasRef = useRef(null)
-  let shaderCanvas: ShaderCanvas | null = null;
-
-  
-  const fpsLimit = 30;
-  let previousDelta = 0;
-  function animate(time: number): void {
-    // We know shaderCanvas isn't null
-    requestAnimationFrame(animate);
-
-    var delta = time - previousDelta;
-
-    if (fpsLimit && delta < 1000 / fpsLimit) {
-        return;
-    }
-    shaderCanvas!.render(time);
-    previousDelta = time;
-  }
-
-  useEffect(() => {
-    if (canvasRef != null && canvasRef.current != null) {
-      if (shaderCanvas == null) {
-        shaderCanvas = new ShaderCanvas(canvasRef.current, shader);
-      }
-      if (shaderCanvas) {
-        animate(0);
-      }
-    }
-  });
-  return (
-      <canvas id="glcanvas" ref={canvasRef} width={window.innerWidth / 2} height={window.innerHeight / 2} className="w-full h-full absolute top-0 left-0 z-0" />
-  );
-}*/
 
 
 export function SongInfo({trackInfo, textColor, shadeColor}: {trackInfo: Track, textColor?: string, shadeColor?: string}) {
@@ -299,7 +264,7 @@ export default function TrackPage({trackInfo, slug}: InferGetServerSidePropsType
         <TrackInfo trackInfo={ti} setLink={setLink}/>
         <SubscriptionPrompt trackInfo={ti} link={link} toggle={setLink}/>
         <ColorPalette trackInfo={ti}/>
-        {/*<WebGLBackground/>*/ }
+        <WebGLBackground/>
       </>
   );
 }
