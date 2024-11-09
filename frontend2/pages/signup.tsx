@@ -11,6 +11,7 @@ export const UIPaths = ["login", "signup", "artist", "about", "track", "settings
 export default function Signup() {
   const [message, setMessage] = useState("");
   const [separateLink, setSeparateLink] = useState(false);
+  const [lastArtist, setLastArtist] = useState("");
 
   const [formData, setFormData] = useState({
     artist: '',
@@ -108,12 +109,15 @@ export default function Signup() {
 
   useEffect(() => {
     const timeOutId = setTimeout(() => {
-      spotifySearch(formData['artist'], "artist").then( (spotifyId) => {
-        setFormData(prevState => ({
-          ...prevState,
-          'spotifyId': spotifyId
-        }));
-      })
+      if (formData['artist'] != lastArtist) {
+        spotifySearch(formData['artist'], "artist").then( (spotifyId) => {
+          setFormData(prevState => ({
+            ...prevState,
+            'spotifyId': spotifyId
+          }));
+        })
+        setLastArtist(formData['artist']);
+      }
     }, 500);
     return () => clearTimeout(timeOutId);
   }, [formData])
@@ -141,7 +145,7 @@ export default function Signup() {
                      readOnly={!separateLink}/>
             </div>
             <UIButton type="neutral"
-                      content={separateLink ? "Want a custom link?": "Want a separate link?"}
+                      content={separateLink ? "Want the default link?": "Want a custom link?"}
                       submit={false} 
                       handle={ (e: React.MouseEvent<HTMLButtonElement>) => {
                                   e.preventDefault();

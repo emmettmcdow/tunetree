@@ -26,7 +26,7 @@ export function UIButton({type, content, handle, submit}: {type: string, content
     actiontype = "submit";
   }
 
-  const buttonClass = "rounded-lg cursor-pointer bounce-button" + color;
+  const buttonClass = "m-4 rounded-lg cursor-pointer bounce-button" + color;
   const textClass = "text-xl p-6 text-white bounce-text";
   return (
     <button className={buttonClass} onClick={(e) => handle(e)} type={actiontype}><span className={textClass}>{content}</span></button>

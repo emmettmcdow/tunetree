@@ -1,4 +1,65 @@
 # TODO
+- Add `your url will be`
+  X Add button to change the url
+  - Un-fuglify it 
+  - Add validation for custom
+  X Add field in user designating the encoded url
+  X Add backend ^
+- Hook up Spotify API
+  - Better error handling for Spotify
+  - Make it more robust, if ambiguous, present to user and have them select
+  - Return multiple values
+  - Display selected artist
+  X Add artist id to user table
+  X Pull in album art from Spotify
+- Get color palette from album art
+  X Backend storage
+  X Backend calculation
+  - Speed up compute
+  - Render on track page
+  - Render on artist page
+  - Render on GLSL
+- NO-track = off center in track edit page
+- Validate links
+- add sticker buy prompt
+- Add banned passsword list
+- Make sure I'm avoiding all the cors shit
+- Make failure in login and signup sexy
+- micro adjust desktop
+- dark mode?
+- Specify if new artist signup failed due to duplicate user
+  - Display special text saying if you think this is a mistake, contact XYZ
+- Hook up email backend
+  - Make newsletter table in DB
+  - Hook up mailgun
+  - Hook up support email that redirects to emmett.mcdow@gmail.com
+  - Hook up form for support
+- Rotate icons slightly. Pointy side up.
+- Add soundcloud support
+- improve shader performance
+- Make logo on home rainbow
+- Check for authentication expiry
+- Hide login/signup for auth'd users
+- Rate limit backend requests to external services
+- Give message when user gets kicked to login for being un-authenticated.
+- Send message and log when *we* fuck something up.
+- Autofill messing up font?
+- Add forgot password workflow
+- remove unnessessary deps
+- About page
+- Fix silly looking track page w/links
+- Fix dynamic links on artist page spilling into footer on mobile
+- make favicon white?
+- Better 404 page
+X Fix continuous polling of spotify on forms
+X Do things the next way(server side props etc)
+X Unfuglify login
+X Unfuglify signup
+X Fix FE deployment lol
+X Fix all the stuff next messed up...
+X 404 on not found artist
+X Name up top better
+X ban error
 X 10/05/2024
   X Query using ID
   X Verify posts to `track/{artist}` have equal params and token
@@ -50,64 +111,3 @@ X Pull in trackinfo from backend
 X Add frontend code for getting current user from jwt
 X Figure out how the fuck to deploy to prod?
 X make rules for passwords
-- Add `your url will be`
-  X Add button to change the url
-  - Un-fuglify it 
-  - Add validation for custom
-  X Add field in user designating the encoded url
-  X Add backend ^
-- Hook up Spotify API
-  - Better error handling for Spotify
-  - Make it more robust, if ambiguous, present to user and have them select
-  - Return multiple values
-  - Display selected artist
-  X Add artist id to user table
-  X Pull in album art from Spotify
-- Get color palette from album art
-  X Backend storage
-  X Backend calculation
-  - Speed up compute
-  - Render on track page
-  - Render on artist page
-  - Render on GLSL
-- NO-track = off center in track edit page
-- Validate links
-- add sticker buy prompt
-- Add banned passsword list
-- Make sure I'm avoiding all the cors shit
-- Make failure in login and signup sexy
-- micro adjust desktop
-- dark mode?
-- Specify if new artist signup failed due to duplicate user
-  - Display special text saying if you think this is a mistake, contact XYZ
-- Hook up email backend
-  - Make newsletter table in DB
-  - Hook up mailgun
-  - Hook up support email that redirects to emmett.mcdow@gmail.com
-  - Hook up form for support
-- Rotate icons slightly. Pointy side up.
-- Add soundcloud support
-- improve shader performance
-- Make logo on home rainbow
-- Check for authentication expiry
-- Hide login/signup for auth'd users
-- Rate limit backend requests to external services
-- Give message when user gets kicked to login for being un-authenticated.
-- Send message and log when *we* fuck something up.
-- Autofill messing up font?
-X Do things the next way(server side props etc)
-X Unfuglify login
-X Unfuglify signup
-- Add forgot password workflow
-- remove unnessessary deps
-X Fix FE deployment lol
-- About page
-- Fix silly looking track page w/links
-- Fix dynamic links on artist page spilling into footer on mobile
-X Fix all the stuff next messed up...
-- Fix continuous polling of spotify on forms
-X Name up top better
-- make favicon white?
-X 404 on not found artist
-X ban error
-- Better 404 page
