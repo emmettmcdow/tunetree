@@ -120,7 +120,7 @@ export default function Signup() {
       }
     }, 500);
     return () => clearTimeout(timeOutId);
-  }, [formData])
+  }, [formData, lastArtist])
 
   return (
     <div className="h-screen flex flex-col">

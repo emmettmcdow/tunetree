@@ -16,7 +16,7 @@ export default function WebGLBackground() {
     // We know shaderCanvas isn't null
     requestAnimationFrame(animate);
 
-    var delta = time - previousDelta;
+    const delta = time - previousDelta;
 
     if (fpsLimit && delta < 1000 / fpsLimit) {
         return;
