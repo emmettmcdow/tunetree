@@ -317,7 +317,7 @@ export default function Artist() {
   })
 
   return (
-    <div className="h-screen flex flex-col p-5">
+    <div className="min-h-dvh flex flex-col p-5">
       <Header msg={getHeader(mode)}/>
       <div className="flex w-3/4 mx-auto my-2 rounded-lg">
         <SongInfo trackInfo={mode == Mode.Standby ? currTrack : formData}/>

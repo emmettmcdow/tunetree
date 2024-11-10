@@ -46,12 +46,12 @@
 - Autofill messing up font?
 - Add forgot password workflow
 - remove unnessessary deps
+- Integrate colors with shader
 - make favicon white?
 - 11/09/2024
   - Better 404 page
   - About page
-  - Integrate colors with shader
-  - Fix silly looking track page w/links
+  X Fix silly looking track page w/links
   X Fix edit song form
   X Fix submit song form
   X Fix dynamic links on artist page spilling into footer on mobile
