@@ -215,7 +215,7 @@ function ColorPalette({ trackInfo }: {trackInfo: Track}){
   );
 };
 
-export const getServerSideProps = (async (ctx) => {
+const getServerSideProps = (async (ctx) => {
   // Fetch data from external API
   const slug = ctx.params!.track as string;
   const trackInfo = await getTrackInfo(slug);

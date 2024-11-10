@@ -52,9 +52,10 @@
   - About page
   - Integrate colors with shader
   - Fix silly looking track page w/links
-  - Fix dynamic links on artist page spilling into footer on mobile
-  - Fix edit song form
-  - Fix submit song form
+  X Fix edit song form
+  X Fix submit song form
+  X Fix dynamic links on artist page spilling into footer on mobile
+  X Switch to THREE
   X Better color alg
 X Fix continuous polling of spotify on forms
 X Do things the next way(server side props etc)

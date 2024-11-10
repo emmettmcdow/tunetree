@@ -80,13 +80,20 @@ function ServiceURLs({formData, setFormData, selected, setSelected}: {formData: 
       const typedProv = provider as "apple" | "amazon" | "spotify" | "tidal" | "bandcamp";
       serviceURLs.push(
         <div className="flex mb-2" key={provider}>
-          <input className="w-full rounded-lg p-1" type="text" name={provider}  value={formData.links[typedProv]} onChange={handleChange} placeholder={provider.charAt(0).toUpperCase() + provider.slice(1) + " URL"}/>
+          <input className="w-full rounded-lg p-1 pr-10" type="text" name={provider}  value={formData.links[typedProv]} onChange={handleChange} placeholder={provider.charAt(0).toUpperCase() + provider.slice(1) + " URL"}/>
           <span className="flex justify-around items-center cursor-pointer" onClick={() => {
             const newSelected: Selected= {
               ...selected,
               [provider]: false
             };
             setSelected(newSelected);
+            setFormData({
+              ...formData,
+              links: {
+                ...formData.links,
+                [provider]: ""
+              }
+            })
           }}>
             <FiX className="absolute mr-10" size={25}/>
           </span>
@@ -111,14 +118,14 @@ type Selected = {
 }
 
 
-function Editor({changeMode, formData, setFormData}: {changeMode: Dispatch<SetStateAction<Mode>>, formData: Track, setFormData: Dispatch<SetStateAction<Track>>}) {
+function Editor({changeMode, setCurrTrack, formData, setFormData}: {changeMode: Dispatch<SetStateAction<Mode>>, setCurrTrack: Dispatch<SetStateAction<Track>>, formData: Track, setFormData: Dispatch<SetStateAction<Track>>}) {
   const initialState: Selected = {
-    "apple": false,
-    "spotify": false,
-    "youtube": false,
-    "tidal": false,
-    "amazon": false,
-    "bandcamp": false
+    "apple": formData.links.apple != "",
+    "spotify": formData.links.spotify != "",
+    "youtube": formData.links.youtube != "",
+    "tidal": formData.links.tidal != "",
+    "amazon": formData.links.amazon != "",
+    "bandcamp": formData.links.bandcamp != ""
   }
   const [selected, setSelected] = useState(initialState);
   const [message, setMessage] = useState("");
@@ -126,7 +133,6 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Dispatch<SetSt
     event.preventDefault();
 
     // Convert form data to JSON
-    
     const jsonData = JSON.stringify(formData);
     let responseBody = "";
     try {
@@ -141,9 +147,8 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Dispatch<SetSt
       });
 
       if (response.ok) {
-        // TODO: show this to users better
+        setCurrTrack(formData)
         changeMode(Mode.Standby);
-        // window.location.href = "/artist"
       } else {
         responseBody = await response.text()
         switch(response.status) {
@@ -185,7 +190,7 @@ function Editor({changeMode, formData, setFormData}: {changeMode: Dispatch<SetSt
           setFormData(newTrack);
         }} name="message" placeholder="A message to your fans"/>
         <div className="flex justify-center">
-          <UIButton type="deny" content="Cancel" handle={() => {}} submit={true}/>
+          <UIButton type="deny" content="Cancel" handle={() => {changeMode(Mode.Standby)}} submit={false}/>
           <UIButton type="confirm" content="Submit" handle={() => {}} submit={true}/>
         </div>
       </form>
@@ -198,19 +203,25 @@ enum Mode {
   New,
 }
 
-function EditPanel({mode, changeMode, formData, setFormData}: {mode: Mode, changeMode: Dispatch<SetStateAction<Mode>>, formData: Track, setFormData: Dispatch<SetStateAction<Track>>}) {
+function EditPanel({mode, changeMode, currTrack, setCurrTrack, formData, setFormData}: {mode: Mode, changeMode: Dispatch<SetStateAction<Mode>>, currTrack: Track, setCurrTrack: Dispatch<SetStateAction<Track>>, formData: Track, setFormData: Dispatch<SetStateAction<Track>>}) {
   switch(mode) {
     case Mode.Standby:
       return (
         <div className="flex items-center mx-auto">
-          <UIButton type="neutral" content="Edit" handle={() => {changeMode(Mode.Edit)}} submit={false}/>
-          <UIButton type="neutral" content="New" handle={() => {setFormData(new Track({})); changeMode(Mode.New)}} submit={false}/>
+          <UIButton type="neutral" content="Edit" handle={() => {
+            setFormData(currTrack);
+            changeMode(Mode.Edit);
+          }} submit={false}/>
+          <UIButton type="neutral" content="New" handle={() => {
+            setFormData(new Track({}));
+            changeMode(Mode.New)
+          }} submit={false}/>
         </div>
       );
     case Mode.Edit:
-      return <Editor changeMode={changeMode} formData={formData} setFormData={setFormData} />;
+      return <Editor changeMode={changeMode} setCurrTrack={setCurrTrack} formData={formData} setFormData={setFormData} />;
     case Mode.New:
-      return <Editor changeMode={changeMode} formData={formData} setFormData={setFormData} />;
+      return <Editor changeMode={changeMode} setCurrTrack={setCurrTrack} formData={formData} setFormData={setFormData} />;
   }
 }
 
@@ -292,29 +303,29 @@ export class Track{
 export default function Artist() {
   const [mode, changeMode] = useState(Mode.Standby);
   const [formData, setFormData] = useState<Track>(new Track({}));
+  const [currTrack, setCurrTrack] = useState<Track>(new Track({}));
+
   useEffect(() => {
-    async function populateForm(artistLink: string) {
-      const ti = await getTrackInfo(artistLink)
-      if (ti != "") { 
-        setFormData(new Track(ti));
-      }
-    }
-    if (!formData.artist) {
+    if (!currTrack.artist) {
       const artistLink = getAuthenticatedArtistLink();
       if (!artistLink) {
         window.location.href = "/login"
       }
-      populateForm(artistLink)
+      getTrackInfo(artistLink).then((ti) => {
+        if (ti != "") { 
+          setCurrTrack(new Track(ti));
+        }
+      })
     }
   })
-  // TODO: obvi
+
   return (
     <div className="h-screen flex flex-col p-5">
       <Header msg={getHeader(mode)}/>
       <div className="flex w-3/4 mx-auto my-2 rounded-lg">
-        <SongInfo trackInfo={formData}/>
+        <SongInfo trackInfo={mode == Mode.Standby ? currTrack : formData}/>
       </div>
-      <EditPanel mode={mode} changeMode={changeMode} formData={formData} setFormData={setFormData}/>
+      <EditPanel mode={mode} changeMode={changeMode} setCurrTrack={setCurrTrack} currTrack={currTrack} formData={formData} setFormData={setFormData}/>
     </div>
   );
 }
