@@ -155,7 +155,7 @@ export async function getTrackInfo(artistLink: string|null) {
       return body;
     }
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error FROM TUNETREE:', error);
   }
   return ""
 }
@@ -215,11 +215,12 @@ function ColorPalette({ trackInfo }: {trackInfo: Track}){
   );
 };
 
-const getServerSideProps = (async (ctx) => {
+export const getServerSideProps = (async (ctx) => {
   // Fetch data from external API
   const slug = ctx.params!.track as string;
   const trackInfo = await getTrackInfo(slug);
-  if (trackInfo != "") {
+  console.log("hereHERE");
+  if (typeof trackInfo !== "undefined") {
     // Pass data to the page via props
     return { props: { trackInfo, slug } }
   } else {
@@ -235,7 +236,7 @@ const getServerSideProps = (async (ctx) => {
 
 export default function TrackPage({trackInfo, slug}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [link, setLink] = useState("")
-  const ti = new Track(trackInfo);
+  const ti = new Track(typeof trackInfo !== "undefined" ? trackInfo : {});
 
   const title = ti.artist + " | " + ti.name;
   const description = "Listen to " + ti.name + " by " + ti.artist + " on tunetree!";

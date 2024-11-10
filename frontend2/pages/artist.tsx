@@ -8,10 +8,6 @@ import { SongInfo, getTrackInfo } from './[track]';
 import { Header, Message } from './login';
 import { UIButton } from './index';
 
-// TODO: lets get rid of 'h{n}' tags
-// TODO: wait does that hurt accessibility
-// Does abusing form hurt accessibility?
-
 function ServiceSelectorBar({selected, setSelected}: {selected: Selected, setSelected: React.Dispatch<React.SetStateAction<Selected>>}) { 
   const buttons = [];
   for (const [provider, state] of Object.entries(selected)) {
@@ -213,7 +209,7 @@ function EditPanel({mode, changeMode, currTrack, setCurrTrack, formData, setForm
             changeMode(Mode.Edit);
           }} submit={false}/>
           <UIButton type="neutral" content="New" handle={() => {
-            setFormData(new Track({}));
+            setFormData(new Track({artist: currTrack.artist}));
             changeMode(Mode.New)
           }} submit={false}/>
         </div>
@@ -268,8 +264,8 @@ export class Track{
   }
   // eslint-disable-next-line
   constructor(data: any) {
-    this.artist = data['artistName'];
     if (Object.hasOwn(data, "track")) {
+      this.artist = data['artistName'];
       this.name = data['track']['name'];
       this.message = data['track']['message'];
       this.image = data['track']['image'];
@@ -284,6 +280,7 @@ export class Track{
       }
     } else { 
       this.name = "";
+      this.artist = "";
       this.message = "";
       this.image = "";
       this.colors = "";
