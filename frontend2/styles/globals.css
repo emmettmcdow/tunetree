@@ -2,12 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Theme */
+.bg-color {
+  background-color: #000000
+}
+
+.fg-color {
+  background-color: #282828
+}
+
+.txt-color {
+  color: #FFFFFF
+}
+
 @font-face {
   font-family: "kiwisoda";
   src: url("/fonts/KiwiSoda.woff");
 }
 
 body {
+  color: white;
   margin: 0;
   font-family: "kiwisoda";
   -webkit-font-smoothing: antialiased;
@@ -27,7 +41,7 @@ code {
   mix-blend-mode: multiply;
   overflow: hidden;
 
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 1);
 }
 
 .rainbow-text::before {
@@ -37,7 +51,7 @@ code {
   right: 0;
   bottom: 0;
   left: -100%;
-  background: white repeating-linear-gradient(90deg, #14ffe9 0%, #ffc800 16.66666%, #ff00e0 33.33333%, #14ffe9 50.0%);
+  background: black repeating-linear-gradient(90deg, #14ffe9 0%, #ffc800 16.66666%, #ff00e0 33.33333%, #14ffe9 50.0%);
   mix-blend-mode: screen;
   pointer-events: none;
   animation: move 1s linear infinite;

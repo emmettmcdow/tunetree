@@ -6,7 +6,7 @@ import { getAuthenticatedArtistLink, getAuthorizationHeader, iconForService } fr
 import { spotifyGetArt } from '../utils/spotify';
 import { SongInfo, getTrackInfo } from './[track]';
 import { Header, Message } from './login';
-import { UIButton } from './index';
+import UIButton from "@/components/uibutton";
 
 function ServiceSelectorBar({selected, setSelected}: {selected: Selected, setSelected: React.Dispatch<React.SetStateAction<Selected>>}) { 
   const buttons = [];

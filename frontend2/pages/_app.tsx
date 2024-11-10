@@ -5,7 +5,7 @@ import { DefaultSeo } from 'next-seo';
 
 function Footer() {
   return (
-    <div className="flex flex-col text-center bg-indigo-200 py-4">
+    <div className="flex flex-col text-center fg-color py-4">
         <div className="my-2" >made with 💜 in sunnyvale, ca 🌞</div>
         <div className="my-2" ><Link href="/login">are you an artist? get <i>your</i> link here</Link></div>
         <div className="my-2" >font by <Link href="https://fontenddev.com">jeti</Link></div>
@@ -15,7 +15,7 @@ function Footer() {
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <div className="bg-indigo-100">
+    <div className="bg-color">
         <DefaultSeo
           title={"tunetree"}
           description={"join the music revolution"}

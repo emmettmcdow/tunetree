@@ -84,7 +84,7 @@ function IconLink({ n, m, provider, link, setLink }: { n: number, m: number, pro
 function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: Track, link: string, toggle: React.Dispatch<React.SetStateAction<string>>}) {
   if (link) {
     return (
-      <div className="z-50 absolute w-3/4 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  bg-indigo-200 p-5 z-50">
+      <div className="z-50 absolute w-3/4 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 fg-color p-5 z-50">
         <p>{"wanna be notified when "+ trackInfo.artist + " drops? (it's free)"}</p>
         <form className="my-2">
           <input className="w-1/2" name="email"/>

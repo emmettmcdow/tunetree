@@ -6,11 +6,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { setAuthenticatedUser } from '../utils/utils';
-import { UIButton } from './index';
+import UIButton from '@/components/uibutton';
 
 export function Header({msg}: {msg: string}) {
   return (
-      <div className="text-2xl rainbow-text"><Image src="/favicon.ico" alt="tunetree logo" className="w-12 mx-auto inline mr-2" height="1024" width="1024"/>{msg}</div>
+      <div className="text-2xl">
+        <Image src="/logo-white.png" alt="tunetree logo" className="w-12 mx-auto inline mr-2" height="1024" width="1024"/>
+        {msg}
+      </div>
   )
 }
 
@@ -123,7 +126,7 @@ export default function Login() {
 
   return (
     <div className="h-screen flex flex-col">
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-indigo-200 w-11/12 py-4 md:w-3/5 md:py-8 rounded-lg">
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 fg-color w-11/12 py-4 md:w-3/5 md:py-8 rounded-lg">
         <div className="w-11/12 md:w-5/6 mx-auto">
           <Header msg="Logging In..."/>
           <Message content={message}/>
