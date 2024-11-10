@@ -12,7 +12,7 @@ export default function Error({slug}: InferGetServerSidePropsType<typeof getServ
   return(
     <div className="min-h-dvh flex flex-col justify-evenly w-full">
       <div className="mx-auto w-fit relative">
-        <span className="text-3xl text-center absolute top-16 left-8 -rotate-12"><i>{location}</i>? <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; never heard of 'em</span>
+        <span className="text-3xl text-center absolute top-16 left-8 -rotate-12"><i>{location}</i>? <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; never heard of &apos;em</span>
         <Image alt="tunetree logo saying not found" src="/404-logo-png.png" width={400} height={400}/>
       </div>
     </div>
