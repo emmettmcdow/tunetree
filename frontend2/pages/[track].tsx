@@ -219,7 +219,6 @@ export const getServerSideProps = (async (ctx) => {
   // Fetch data from external API
   const slug = ctx.params!.track as string;
   const trackInfo = await getTrackInfo(slug);
-  console.log("hereHERE");
   if (typeof trackInfo !== "undefined") {
     // Pass data to the page via props
     return { props: { trackInfo, slug } }
