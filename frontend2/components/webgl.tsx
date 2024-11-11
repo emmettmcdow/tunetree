@@ -48,12 +48,9 @@ function sceneCube(canvas: HTMLCanvasElement, colors: Array<string>, image: stri
 }
 
 
-export default function WebGLBackground({colors, image, scene}: {colors: Array<string>, image: string, scene: string}) {
+export default function WebGLBackground({colors, image, scene, width, height}: {colors: Array<string>, image: string, scene: string, width: number, height: number}) {
   const canvasRef = useRef(null)
-  const [isClient, setIsClient] = useState(false)  
-
   useEffect(() => {
-    setIsClient(true);
     if (canvasRef != null && canvasRef.current != null) {
       switch(scene){
         case "cube":
@@ -68,7 +65,7 @@ export default function WebGLBackground({colors, image, scene}: {colors: Array<s
 
   if (typeof window !== "undefined") {
     return (
-        isClient && <canvas id="glcanvas" ref={canvasRef} width={window.innerWidth} height={window.innerHeight} className="w-full h-full absolute top-0 left-0 z-0" />
+        <canvas id="glcanvas" ref={canvasRef} width={width} height={height} className="absolute top-0 left-0 z-0" />
     );
   }
 }

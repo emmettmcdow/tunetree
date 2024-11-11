@@ -1,85 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import Image from 'next/image';
 import { NextSeo } from 'next-seo';
 
 import { Track } from './artist';
 import { getAuthenticatedArtistLink, iconForService } from '../utils/utils';
-import WebGLBackground from '@/components/webgl';
+import Display from '@/components/display';
 
 
 
-export function SongInfo({trackInfo, textColor, shadeColor}: {trackInfo: Track, textColor?: string, shadeColor?: string}) {
-  if (!textColor) {
-    textColor = "black";
-  }
-  if (!shadeColor) {
-    shadeColor = "white";
-  }
-  const style = {"color": textColor} as React.CSSProperties;
-  {/* this is a grody hak to get tailwind to render properly. sigh */}
-  if (shadeColor == "white") {
-    return (
-      <div className={"bg-white/30 flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-50"}>
-        <p style={style} className="text-black text-4xl"><b>{trackInfo.artist}</b></p>
-        <Image alt="album-art" src={trackInfo.image} className="w-52 my-2" height="1024" width="1024"/>
-        <p style={style} className="text-2xl">{trackInfo.name}</p>
-      </div>
-    );
-  } else {
-    return (
-      <div className={"bg-black/30 flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-50"}>
-        <p style={style} className="text-4xl"><b>{trackInfo.artist}</b></p>
-        <Image alt="album-art" src={trackInfo.image} className="w-52 my-2" height="1024" width="1024"/>
-        <p style={style} className="text-2xl">{trackInfo.name}</p>
-      </div>
-    );
-  }
-    
-}
-function ButtonBox({trackInfo, setLink}: {trackInfo: Track, setLink: React.Dispatch<React.SetStateAction<string>>}) {
-  const providers = Object.entries(trackInfo.links).filter(([, value]) => value != "")
-  
-  const buttons = providers.map((provider, index) => <IconLink n={index} m={providers.length} provider={provider[0]} key={provider[0]} setLink={setLink} link={provider[1]} /> );
-  
-  const tan = Math.tan(Math.PI/providers.length);
-  let offset = 1;
-  const baseClass = "w-52 z-50 mx-auto "
-  let className = baseClass + "img-circle"
-  if (providers.length < 3) {
-    className = baseClass + "flex justify-center";
-  } else if (providers.length < 4) {
-    offset = 3;
-  } else if (providers.length > 5) {
-    offset = 0.5;
-  }
-  const style = {
-    "--tan": tan,
-    "--rel": offset
-  } as React.CSSProperties;
-  return (
-    <div id="button-box" style={style} className={className} >
-      {buttons}
-    </div>
-  );
-}
 
-function IconLink({ n, m, provider, link, setLink }: { n: number, m: number, provider: string, link: string, setLink: React.Dispatch<React.SetStateAction<string>>}) {
-  const alt = provider + "-icon";
-  const style = { 
-    "--i": String(n),
-    "--m": String(m)
-  } as React.CSSProperties;
-  let className = "cursor-pointer bounce-button";
-  if (m < 3) {
-    className = "w-24 m-5 cursor-pointer bounce-button";
-  }
-  return (
-    <button className={className}  style={style} onClick={() => {setLink(link);} }>
-      <Image  alt={alt} src={iconForService(provider)} className="bounce-text" height="1024" width="1024"/>
-    </button>
-  );
-}
 
 function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: Track, link: string, toggle: React.Dispatch<React.SetStateAction<string>>}) {
   if (link) {
@@ -95,45 +25,6 @@ function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: Track, link: 
     );
   } else {
     return null;
-  }
-}
-
-function  getShadeColor(colors: Array<string>) {
-  const textColor = getTextColor(colors);
-  return textColor == "white" ? "black" : "white";
-}
-
-function getTextColor(colors: Array<string>) {
-  const selected = getBackgroundColor(colors);
-  const r = parseInt(selected.substr(0, 2), 16);
-  const g = parseInt(selected.substr(2, 2), 16);
-  const b = parseInt(selected.substr(4, 2), 16);
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-  return luminance > 0.5 ? "black" :  "white"
-}
-
-function getBackgroundColor(colors: Array<string>) {
-  const selected = colors[0];
-  return selected;
-}
-
-function TrackInfo({trackInfo, setLink}: {trackInfo: Track, setLink: React.Dispatch<React.SetStateAction<string>>}) {
-
-  if (trackInfo.colors) {
-    const colors = trackInfo.colors.split(';').map((color: string) => color.trim());
-    const shade = getShadeColor(colors);
-    const bg = getBackgroundColor(colors);
-    const text = getTextColor(colors);
-    
-    const style = {"backgroundColor": bg } as React.CSSProperties;
-    return (
-        <div className={"flex flex-col justify-evenly p-5 h-dvh z-40"} style={style}>
-          <SongInfo trackInfo={trackInfo} textColor={text} shadeColor={shade}/>
-          <ButtonBox trackInfo={trackInfo} setLink={setLink}/>
-        </div>
-    );
-  } else {
-    return (<></>);
   }
 }
 
@@ -240,6 +131,11 @@ export default function TrackPage({trackInfo, slug}: InferGetServerSidePropsType
   const [link, setLink] = useState("")
   const ti = new Track(typeof trackInfo !== "undefined" ? trackInfo : {});
 
+  const [isClient, setClient] = useState(false);
+  useEffect(() => {
+    setClient(true);
+  });
+
   const title = ti.artist + " | " + ti.name;
   const description = "Listen to " + ti.name + " by " + ti.artist + " on tunetree!";
   
@@ -264,10 +160,9 @@ export default function TrackPage({trackInfo, slug}: InferGetServerSidePropsType
           }}
           
         />
-        <TrackInfo trackInfo={ti} setLink={setLink}/>
+        {isClient && <Display track={ti} setLink={setLink} width={window.innerWidth} height={window.innerHeight}/>}
         <SubscriptionPrompt trackInfo={ti} link={link} toggle={setLink}/>
-        <ColorPalette trackInfo={ti}/>
-        <WebGLBackground colors={ti.colors.split(';').map((color: string) => color.trim())} image={ti.image} scene="cube"/>
+        {/*<ColorPalette trackInfo={ti}/>*/}
       </>
   );
 }

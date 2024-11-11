@@ -4,9 +4,10 @@ import {FiX} from 'react-icons/fi';
 
 import { getAuthenticatedArtistLink, getAuthorizationHeader, iconForService } from "../utils/utils"
 import { spotifyGetArt } from '../utils/spotify';
-import { SongInfo, getTrackInfo } from './[track]';
+import { getTrackInfo } from './[track]';
 import { Header, Message } from './login';
 import UIButton from "@/components/uibutton";
+import Display from '@/components/display';
 
 function ServiceSelectorBar({selected, setSelected}: {selected: Selected, setSelected: React.Dispatch<React.SetStateAction<Selected>>}) { 
   const buttons = [];
@@ -31,7 +32,6 @@ function ServiceSelectorBar({selected, setSelected}: {selected: Selected, setSel
       <div className="flex justify-start w-1/4 items-center">
         <p className="text-xl"> Add: </p>
       </div>
-      <div className="bracket-left"/>
       <div className="flex justify-evenly my-2 w-3/4">
         {buttons}
       </div>
@@ -76,7 +76,7 @@ function ServiceURLs({formData, setFormData, selected, setSelected}: {formData: 
       const typedProv = provider as "apple" | "amazon" | "spotify" | "tidal" | "bandcamp";
       serviceURLs.push(
         <div className="flex mb-2" key={provider}>
-          <input className="w-full rounded-lg p-1 pr-10" type="text" name={provider}  value={formData.links[typedProv]} onChange={handleChange} placeholder={provider.charAt(0).toUpperCase() + provider.slice(1) + " URL"}/>
+          <input className="w-full rounded-lg p-1 pr-10 text-black" type="text" name={provider}  value={formData.links[typedProv]} onChange={handleChange} placeholder={provider.charAt(0).toUpperCase() + provider.slice(1) + " URL"}/>
           <span className="flex justify-around items-center cursor-pointer" onClick={() => {
             const newSelected: Selected= {
               ...selected,
@@ -91,7 +91,7 @@ function ServiceURLs({formData, setFormData, selected, setSelected}: {formData: 
               }
             })
           }}>
-            <FiX className="absolute mr-10" size={25}/>
+            <FiX className="absolute mr-10 text-black" size={25}/>
           </span>
         </div>
       );
@@ -173,7 +173,7 @@ function Editor({changeMode, setCurrTrack, formData, setFormData}: {changeMode: 
   };
 
   return (
-    <div className="flex flex-col mx-auto">
+    <div className="flex flex-col mx-auto z-40">
       <Message content={message}/>
       <form onSubmit={(e) => handleSubmit(e, setMessage)} className="flex-col items-center">
         <ServiceSelectorBar selected={selected} setSelected={setSelected}/>
@@ -203,7 +203,7 @@ function EditPanel({mode, changeMode, currTrack, setCurrTrack, formData, setForm
   switch(mode) {
     case Mode.Standby:
       return (
-        <div className="flex items-center mx-auto">
+        <div className="flex items-center mx-auto fg-color z-50">
           <UIButton type="neutral" content="Edit" handle={() => {
             setFormData(currTrack);
             changeMode(Mode.Edit);
@@ -301,8 +301,10 @@ export default function Artist() {
   const [mode, changeMode] = useState(Mode.Standby);
   const [formData, setFormData] = useState<Track>(new Track({}));
   const [currTrack, setCurrTrack] = useState<Track>(new Track({}));
+  const [isClient, setIsClient] = useState<boolean>(false);
 
   useEffect(() => {
+    setIsClient(true);
     if (!currTrack.artist) {
       const artistLink = getAuthenticatedArtistLink();
       if (!artistLink) {
@@ -316,13 +318,22 @@ export default function Artist() {
     }
   })
 
+  const ratio = 3/4;
   return (
-    <div className="min-h-dvh flex flex-col p-5">
-      <Header msg={getHeader(mode)}/>
-      <div className="flex w-3/4 mx-auto my-2 rounded-lg">
-        <SongInfo trackInfo={mode == Mode.Standby ? currTrack : formData}/>
+    <>
+      <div className="p-4">
+        <Header msg={getHeader(mode)}/>
+        <div className="sticky top-0 flex flex-col items-center rounded-2xl border-2 border-b-0 border-white mx-auto mt-2">
+          {isClient && (<Display 
+                          track={mode == Mode.Standby ? currTrack : formData}
+                          width={window.innerWidth * ratio}
+                          height={window.innerHeight * ratio}
+                          setLink={()=>{}}/>)}
+        </div>
+        <div className="relative flex p-5 w-full fg-color rounded-2xl z-50 border-2 border-t-1">
+          <EditPanel mode={mode} changeMode={changeMode} setCurrTrack={setCurrTrack} currTrack={currTrack} formData={formData} setFormData={setFormData}/>
+        </div>
       </div>
-      <EditPanel mode={mode} changeMode={changeMode} setCurrTrack={setCurrTrack} currTrack={currTrack} formData={formData} setFormData={setFormData}/>
-    </div>
+    </>
   );
 }
