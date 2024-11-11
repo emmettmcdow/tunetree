@@ -316,7 +316,7 @@ export default function Artist() {
         }
       })
     }
-  })
+  }, [])
 
   const ratio = 3/4;
   return (

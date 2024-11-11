@@ -2,9 +2,9 @@ import WebGLBackground from '@/components/webgl';
 import Image from 'next/image';
 
 import { Track } from '@/pages/artist';
-import { getAuthenticatedArtistLink, iconForService } from '../utils/utils';
-import { useEffect, useState } from 'react';
+import {iconForService } from '../utils/utils';
 
+/*
 function  getShadeColor(colors: Array<string>) {
   const textColor = getTextColor(colors);
   return textColor == "white" ? "black" : "white";
@@ -18,11 +18,11 @@ function getTextColor(colors: Array<string>) {
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
   return luminance > 0.5 ? "black" :  "white"
 }
-
 function getBackgroundColor(colors: Array<string>) {
   const selected = colors[0];
   return selected;
 }
+*/
 
 function IconLink({ n, m, provider, link, setLink }: { n: number, m: number, provider: string, link: string, setLink: React.Dispatch<React.SetStateAction<string>>}) {
   const alt = provider + "-icon";

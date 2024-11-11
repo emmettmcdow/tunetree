@@ -1,7 +1,7 @@
 'use client';
 
 import * as THREE from "three";
-import {useState, useRef, useEffect} from 'react';
+import {useRef, useEffect} from 'react';
 
 
 function sceneCube(canvas: HTMLCanvasElement, colors: Array<string>, image: string){

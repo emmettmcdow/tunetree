@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
-import Image from 'next/image';
 import { NextSeo } from 'next-seo';
 
 import { Track } from './artist';
-import { getAuthenticatedArtistLink, iconForService } from '../utils/utils';
+import { getAuthenticatedArtistLink} from '../utils/utils';
 import Display from '@/components/display';
 
 
@@ -51,6 +50,7 @@ export async function getTrackInfo(artistLink: string|null) {
   return ""
 }
 
+/*
 interface Styles {
   container: React.CSSProperties;
   colorBox: React.CSSProperties;
@@ -105,6 +105,7 @@ function ColorPalette({ trackInfo }: {trackInfo: Track}){
     </div>
   );
 };
+*/
 
 export const getServerSideProps = (async (ctx) => {
   // Fetch data from external API
@@ -134,7 +135,7 @@ export default function TrackPage({trackInfo, slug}: InferGetServerSidePropsType
   const [isClient, setClient] = useState(false);
   useEffect(() => {
     setClient(true);
-  });
+  }, []);
 
   const title = ti.artist + " | " + ti.name;
   const description = "Listen to " + ti.name + " by " + ti.artist + " on tunetree!";
