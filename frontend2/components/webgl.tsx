@@ -72,6 +72,46 @@ function makeDesk(): THREE.Mesh{
   return desk
 }
 
+function makePlayer(): THREE.Mesh{
+  const playerGeo = new THREE.BoxGeometry(0.25, 0.05, 0.25);
+  const playerColor = new THREE.MeshPhongMaterial({color: 0x383838});
+  const player = new THREE.Mesh(playerGeo, playerColor);
+
+  const diskGeo = new THREE.CylinderGeometry(0.100, 0.100, 0.06);
+  const diskColor = new THREE.MeshPhongMaterial({color: 0x000000});
+  const disk = new THREE.Mesh(diskGeo, diskColor);
+
+  
+  const poleGeo = new THREE.CylinderGeometry(0.005, 0.005, 0.08);
+  const poleColor = new THREE.MeshPhongMaterial({color: 0xb6b6b6});
+  const pole = new THREE.Mesh(poleGeo, poleColor);
+
+  player.add(pole);
+  player.add(disk);
+  
+  return player
+}
+
+function makeCover(image: string): THREE.Mesh{
+
+  const loader = new THREE.TextureLoader();
+  const texture = loader.load(image);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const material = new THREE.MeshPhongMaterial({map: texture});
+  const coverGeo = new THREE.PlaneGeometry(0.2, 0.2);
+  const cover = new THREE.Mesh(coverGeo, material);
+  
+  return cover
+}
+
+function makeWall(): THREE.Mesh{
+  const backWallGeo = new THREE.PlaneGeometry(1, 1);
+  const wallColor = new THREE.MeshPhongMaterial({color: 0x44aa88});
+  const backWall = new THREE.Mesh(backWallGeo, wallColor);
+  return backWall;
+}
+
+
 
 function sceneVinyl(canvas: HTMLCanvasElement, colors: Array<string>, image: string){
       const fov = 75;
@@ -84,13 +124,20 @@ function sceneVinyl(canvas: HTMLCanvasElement, colors: Array<string>, image: str
       const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
       const scene = new THREE.Scene();
 
+      const wall1 = makeWall()
+      wall1.position.x = 0.7;
+      scene.add(wall1);
+      const wall2 = makeWall()
+      wall2.position.x = -0.7;
+      scene.add(wall2);
+      const wall3 = makeWall()
+      wall3.position.y = -0.7;
+      scene.add(wall3);
+      const wall4 = makeWall()
+      wall4.position.y = 0.95;
+      scene.add(wall4);
 
-      const backWallGeo = new THREE.PlaneGeometry(1, 1);
-      const wallColor = new THREE.MeshPhongMaterial({color: 0x44aa88});
-      const backWall = new THREE.Mesh(backWallGeo, wallColor);
-      scene.add(backWall);
-
-      const floorGeo = new THREE.PlaneGeometry(1, 1);
+      const floorGeo = new THREE.PlaneGeometry(10, 1);
       const floorColor = new THREE.MeshPhongMaterial({color: 0xDCC86B});
       const floor = new THREE.Mesh(floorGeo, floorColor);
       floor.rotateX(radians(-90));
@@ -100,6 +147,15 @@ function sceneVinyl(canvas: HTMLCanvasElement, colors: Array<string>, image: str
       const desk = makeDesk();
       desk.position.set(0,-0.25,0.25);
       scene.add(desk);
+
+      const player = makePlayer();
+      player.position.set(0,-0.20,0.25);
+      scene.add(player);
+
+      const cover = makeCover(image);
+      cover.position.set(-.3,-0.13,0.25);
+      cover.rotateX(radians(-15));
+      scene.add(cover);
 
       const color = 0xFFFFFF;
       const intensity = 3;
