@@ -1,4 +1,4 @@
-import WebGLBackground from '@/components/webgl';
+import WebGLBackground from '@/components/webgl2';
 import Image from 'next/image';
 
 import { Track } from '@/pages/artist';
