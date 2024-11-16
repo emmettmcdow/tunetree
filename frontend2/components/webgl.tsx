@@ -210,26 +210,26 @@ function sceneVinyl(renderer: THREE.WebGLRenderer, colors: Array<string>, image:
 
 export default function WebGLBackground({colors, image, scene, width, height}: {colors: Array<string>, image: string, scene: string, width: number, height: number}) {
   const canvasRef = useRef(null)
-  const rendererRef = useRef<THREE.WebGLRenderer>();
   useEffect(() => {
     if (canvasRef != null && canvasRef.current != null) {
       const renderer = new THREE.WebGLRenderer({antialias: true, canvas: canvasRef.current});
-      rendererRef.current = renderer;
-      if (rendererRef != null && rendererRef.current != null) {
-        switch(scene){
-          case "cube":
-            sceneCube(rendererRef.current, colors, image);
-            break
-          case "vinyl":
-            sceneVinyl(rendererRef.current, colors, image);
-            break
-          default:
-            console.log("NO SCENE!");
-            break
-        }
+      switch(scene){
+        case "cube":
+          sceneCube(renderer, colors, image);
+          break
+        case "vinyl":
+          sceneVinyl(renderer, colors, image);
+          break
+        default:
+          console.log("NO SCENE!");
+          break
       }
+      return () => {
+
+        canvasRef.current.removeChild(renderer.domElement);
+      };
     }
-  }, [rendererRef.current]);
+  }, []);
 
   if (typeof window !== "undefined") {
     return (

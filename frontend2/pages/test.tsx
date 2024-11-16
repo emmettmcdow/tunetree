@@ -1,4 +1,4 @@
-import WebGLBackground from "@/components/webgl";
+import WebGLBackground from "@/components/webgl2";
 import {useEffect, useState} from "react";
 
 export default function Test() {
