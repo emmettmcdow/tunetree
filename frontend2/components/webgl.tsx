@@ -8,7 +8,7 @@ function radians(degrees: number) {
   return degrees * Math.PI / 180;
 }
 
-function sceneCube(canvas: HTMLCanvasElement, colors: Array<string>, image: string){
+function sceneCube(renderer: THREE.WebGLRenderer, colors: Array<string>, image: string){
       const fov = 75;
       const aspect = window.innerWidth / window.innerHeight;  // the canvas default
       const near = 0.1;
@@ -16,7 +16,6 @@ function sceneCube(canvas: HTMLCanvasElement, colors: Array<string>, image: stri
       const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
       camera.position.z = 2;
 
-      const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
       const scene = new THREE.Scene();
 
       const boxWidth = 1;
@@ -111,9 +110,14 @@ function makeWall(): THREE.Mesh{
   return backWall;
 }
 
+function makeLamp(): THREE.Mesh {
+  const lampGeo = new THREE.BoxGeometry(0.25, 0.05, 0.25);
+  const lampColor = new THREE.MeshPhongMaterial({color: 0xFFFFFF});
+  const lampBase = new THREE.Mesh(lampGeo, lampColor);
+  return lampBase;
+}
 
-
-function sceneVinyl(canvas: HTMLCanvasElement, colors: Array<string>, image: string){
+function sceneVinyl(renderer: THREE.WebGLRenderer, colors: Array<string>, image: string){
       const fov = 75;
       const aspect = window.innerWidth / window.innerHeight;  // the canvas default
       const near = 0.1;
@@ -121,7 +125,6 @@ function sceneVinyl(canvas: HTMLCanvasElement, colors: Array<string>, image: str
       const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
       camera.position.z = 2;
 
-      const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
       const scene = new THREE.Scene();
 
       const wall1 = makeWall()
@@ -156,6 +159,10 @@ function sceneVinyl(canvas: HTMLCanvasElement, colors: Array<string>, image: str
       cover.position.set(-.3,-0.13,0.25);
       cover.rotateX(radians(-15));
       scene.add(cover);
+
+      const lamp = makeLamp();
+      lamp.position.set(0.3, -0.13, 0.25);
+      scene.add(lamp);
 
       const color = 0xFFFFFF;
       const intensity = 3;
@@ -203,21 +210,26 @@ function sceneVinyl(canvas: HTMLCanvasElement, colors: Array<string>, image: str
 
 export default function WebGLBackground({colors, image, scene, width, height}: {colors: Array<string>, image: string, scene: string, width: number, height: number}) {
   const canvasRef = useRef(null)
+  const rendererRef = useRef<THREE.WebGLRenderer>();
   useEffect(() => {
     if (canvasRef != null && canvasRef.current != null) {
-      switch(scene){
-        case "cube":
-          sceneCube(canvasRef.current, colors, image);
-          break
-        case "vinyl":
-          sceneVinyl(canvasRef.current, colors, image);
-          break
-        default:
-          console.log("NO SCENE!");
-          break
+      const renderer = new THREE.WebGLRenderer({antialias: true, canvas: canvasRef.current});
+      rendererRef.current = renderer;
+      if (rendererRef != null && rendererRef.current != null) {
+        switch(scene){
+          case "cube":
+            sceneCube(rendererRef.current, colors, image);
+            break
+          case "vinyl":
+            sceneVinyl(rendererRef.current, colors, image);
+            break
+          default:
+            console.log("NO SCENE!");
+            break
+        }
       }
     }
-  });
+  }, [rendererRef.current]);
 
   if (typeof window !== "undefined") {
     return (
