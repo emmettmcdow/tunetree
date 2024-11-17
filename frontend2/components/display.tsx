@@ -87,7 +87,7 @@ export default function Display({track, setLink, width, height}: {track: Track, 
         <p className="text-2xl">{track.name}</p>
       </div>
       <ButtonBox trackInfo={track} setLink={setLink}/>
-      <WebGLBackground colors={track.colors.split(';').map((color: string) => color.trim())} image={track.image} scene="cube" width={width} height={height}/>
+      <WebGLBackground colors={track.colors.split(';').map((color: string) => color.trim())} image={track.image} scene="vinyl" width={width} height={height}/>
     </div>
   );
 }

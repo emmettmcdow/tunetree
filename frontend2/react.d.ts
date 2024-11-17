@@ -10,6 +10,7 @@ declare module JSX{
         "meshPhongMaterial": any,
         "boxGeometry": any,
         "planeGeometry": any,
-        "directionalLight": any
+        "directionalLight": any,
+        "primitive": any
     }
 }
