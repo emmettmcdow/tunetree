@@ -1,6 +1,6 @@
 import { extend } from '@react-three/fiber'
-import { CubeTextureLoader, TextureLoader, DirectionalLight, Mesh, MeshPhongMaterial, SphereGeometry, DirectionalLightHelper, SpotLight, SpotLightHelper, Object3D, Vector3, Box3, Group } from 'three'
-import React, { useRef, useEffect, forwardRef } from 'react'
+import { CubeTextureLoader, TextureLoader, DirectionalLight, Mesh, MeshPhongMaterial, SphereGeometry, DirectionalLightHelper, SpotLight, SpotLightHelper, Object3D, Vector3, Box3, Group, BufferGeometry, BufferAttribute } from 'three'
+import React, { useRef, useEffect, forwardRef, useMemo, useCallback } from 'react'
 // @ts-ignore: 2305
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'
 import { useHelper, OrbitControls, Center, Text3D} from '@react-three/drei'
@@ -25,6 +25,7 @@ interface CameraControlsProps {
   moveSpeed?: number;
   rotateSpeed?: number;
 }
+/**************************************************************************************** Desk */
 
 // Camera controls component with keyboard input
 const CameraControls: React.FC<CameraControlsProps> = ({
@@ -232,7 +233,6 @@ const VinylScene: React.FC<{ image: string }> = ({ image }) => {
   });
   return (
     <>
-      <OrbitControls />
       <SkyBox/>
       <directionalLight position={[1, 2, 4]} intensity={2} />
 
@@ -269,6 +269,7 @@ const CubeScene: React.FC<{ image: string }> = ({ image }) => {
 
   return (
     <>
+      <SkyBox/>
       <directionalLight position={[-1, 2, 4]} intensity={3} />
       <mesh ref={cubeRef}>
         <boxGeometry />
@@ -294,7 +295,7 @@ const WebGLBackground: React.FC<SceneProps & { scene: string }> = ({
     <Canvas
       className="absolute top-0 left-0 z-0"
       style={{ width: width, height: height, position: "absolute"}}
-      camera={{ position: camPos, fov: 100 }}
+      camera={{ position: scene == "vinyl" ? camPos : [1, 1, 1], fov: 100 }}
       resize={{ scroll: false }}
     >
       {scene === "cube" ? (

@@ -8,9 +8,9 @@ export default function Test() {
     setClient(true);
   }, []);
 
-  const colors = [] as Array<string>;
+  const colors = ['#4a6741', '#6a8c5f', '#8fb280', '#b3d9a3'] as Array<string>;
   const image = "/placeholder-square.png";
-  const scene = "vinyl";
+  const scene = "cube";
   return (
     <>
       {client && <WebGLBackground colors={colors} image={image} scene={scene} width={window.innerWidth} height={window.innerHeight}/>}
