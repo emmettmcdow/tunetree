@@ -99,13 +99,6 @@ const Desk: React.FC = () => {
 };
 
 const Player = forwardRef((_: unknown, ref: Ref<HTMLDivElement>) => {
-  const fontref = useRef<Group>();
-  useEffect(() => {
-  }, []);
-  useFrame((state: any, delta: number) => {
-    if (typeof fontref.current != "undefined") {
-    }
-  });
   return (
     <group position={[0, -0.2, 0.25]} ref={ref}>
       <mesh>
@@ -300,8 +293,9 @@ const WebGLBackground: React.FC<SceneProps & { scene: string }> = ({
   return (
     <Canvas
       className="absolute top-0 left-0 z-0"
-      style={{ width, height }}
+      style={{ width: width, height: height, position: "absolute"}}
       camera={{ position: camPos, fov: 100 }}
+      resize={{ scroll: false }}
     >
       {scene === "cube" ? (
         <CubeScene image={image} />
