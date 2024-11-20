@@ -1,5 +1,5 @@
 import { extend } from '@react-three/fiber'
-import { CubeTextureLoader, TextureLoader, DirectionalLight, Mesh, MeshPhongMaterial, SphereGeometry, DirectionalLightHelper, SpotLight, SpotLightHelper, Object3D, Vector3, Box3, Group, BufferGeometry, BufferAttribute } from 'three'
+import { CubeTextureLoader, TextureLoader, DirectionalLight, Mesh, MeshPhongMaterial, SphereGeometry, DirectionalLightHelper, SpotLight, SpotLightHelper, Object3D, Vector3, Box3, Group, BufferGeometry, BufferAttribute, PointLight } from 'three'
 import React, { useRef, useEffect, forwardRef, useMemo, useCallback } from 'react'
 // @ts-ignore: 2305
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'
@@ -25,6 +25,50 @@ interface CameraControlsProps {
   moveSpeed?: number;
   rotateSpeed?: number;
 }
+
+/**************************************************************************************** Mountains*/
+
+const Mountain: React.FC = () => {
+  const target = new Object3D();
+  target.position.set(0, -0.2, 0.25);
+
+  const mountain = useLoader(GLTFLoader, "/models/halfmountain.gltf");
+  const material = new MeshPhongMaterial({color: "#90A959"});
+  const meshes = useRef([]);
+  mountain.scene.traverse((o) => {
+    if (o.isMesh) {
+      o.material = material;
+      meshes.current = meshes.current.concat(o);
+    }
+  })
+  const scaleFactor = 1 / 5;
+
+  useFrame((state: any, delta: number) => {
+    if (meshes.current.constructor.name == "Array"){
+      let rev = 1;
+      meshes.current.forEach((mesh: Object3D) => {
+        mesh.rotation.y += delta * rev * scaleFactor;
+        // hack
+        rev *= -1;
+      })
+    }
+  });
+  
+  return (<>
+    <OrbitControls/>
+    <pointLight position={[20,20,20]} intensity={100}/>
+    <primitive
+      object={mountain.scene}
+      scale={[scaleFactor, scaleFactor, scaleFactor]}
+      position={[0,0,0]}
+      color={"#90A959"}>
+
+      <pointLight position={[20,20,20]} intensity={100}/>
+    </primitive>
+  </>
+  );
+};
+
 /**************************************************************************************** Desk */
 
 // Camera controls component with keyboard input
@@ -302,6 +346,8 @@ const WebGLBackground: React.FC<SceneProps & { scene: string }> = ({
         <CubeScene image={image} />
       ) : scene === "vinyl" ? (
         <VinylScene image={image} />
+      ) : scene === "mountain" ? (
+        <Mountain />
       ) : null}
     </Canvas>
   );
