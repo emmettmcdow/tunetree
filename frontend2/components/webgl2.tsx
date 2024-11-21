@@ -262,7 +262,7 @@ const MountainScene: React.FC<{colors: Array<string>, dimensions: Array<number>}
     <Canvas
       className="absolute top-0 left-0 z-0"
       style={{ width: dimensions[0], height: dimensions[1], position: "absolute"}}
-      camera={{ position: [1,1,1], fov: 100 }}
+      camera={{ position: [1, 3, 2], fov: 100 }}
       resize={{ scroll: false }}
     >
       <_Mountain colors={colors}/>
@@ -271,12 +271,18 @@ const MountainScene: React.FC<{colors: Array<string>, dimensions: Array<number>}
 };
 
 const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
+  const camref = useThree((state: any) => state.camera);
+
   const target = new Object3D();
   target.position.set(0, -0.2, 0.25);
 
   const mountain = useLoader(GLTFLoader, "/models/halfmountain.gltf");
   const material = new MeshPhongMaterial({color: "#90A959"});
   const meshes = useRef([]);
+  let center = new Vector3(0,0,0);
+  const xOff = -2;
+  const yOff = 2;
+  const zOff = 2.15;
   mountain.scene.traverse((o) => {
     if (o.isMesh) {
       o.material = material;
@@ -292,14 +298,21 @@ const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
         mesh.rotation.y += delta * rev * scaleFactor;
         // hack
         rev *= -1;
+        mesh.getWorldPosition(center);
       })
+
+      
+      if (camref.current != "undefined") {
+        camref.lookAt(new Vector3(center.x + xOff, center.y + yOff, center.z + zOff));
+      }
     }
   });
 
+
   return (
     <>
-      <OrbitControls/>
-      <pointLight position={[20,20,20]} intensity={100}/>
+      
+      <SkyBox/>
       <primitive
         object={mountain.scene}
         scale={[scaleFactor, scaleFactor, scaleFactor]}
