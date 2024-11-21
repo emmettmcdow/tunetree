@@ -21,103 +21,8 @@ interface SceneProps {
   height: number;
 }
 
-interface CameraControlsProps {
-  moveSpeed?: number;
-  rotateSpeed?: number;
-}
-
-/**************************************************************************************** Mountains*/
-
-const Mountain: React.FC = () => {
-  const target = new Object3D();
-  target.position.set(0, -0.2, 0.25);
-
-  const mountain = useLoader(GLTFLoader, "/models/halfmountain.gltf");
-  const material = new MeshPhongMaterial({color: "#90A959"});
-  const meshes = useRef([]);
-  mountain.scene.traverse((o) => {
-    if (o.isMesh) {
-      o.material = material;
-      meshes.current = meshes.current.concat(o);
-    }
-  })
-  const scaleFactor = 1 / 5;
-
-  useFrame((state: any, delta: number) => {
-    if (meshes.current.constructor.name == "Array"){
-      let rev = 1;
-      meshes.current.forEach((mesh: Object3D) => {
-        mesh.rotation.y += delta * rev * scaleFactor;
-        // hack
-        rev *= -1;
-      })
-    }
-  });
-  
-  return (<>
-    <OrbitControls/>
-    <pointLight position={[20,20,20]} intensity={100}/>
-    <primitive
-      object={mountain.scene}
-      scale={[scaleFactor, scaleFactor, scaleFactor]}
-      position={[0,0,0]}
-      color={"#90A959"}>
-
-      <pointLight position={[20,20,20]} intensity={100}/>
-    </primitive>
-  </>
-  );
-};
 
 /**************************************************************************************** Desk */
-
-// Camera controls component with keyboard input
-const CameraControls: React.FC<CameraControlsProps> = ({
-  moveSpeed = 0.25,
-  rotateSpeed = radians(15),
-}) => {
-  const { camera } = useThree();
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case "w":
-          camera.position.y += moveSpeed;
-          break;
-        case "s":
-          camera.position.y -= moveSpeed;
-          break;
-        case "a":
-          camera.position.x -= moveSpeed;
-          break;
-        case "d":
-          camera.position.x += moveSpeed;
-          break;
-        case "ArrowUp":
-          camera.rotateX(rotateSpeed);
-          break;
-        case "ArrowDown":
-          camera.rotateX(-rotateSpeed);
-          break;
-        case "ArrowLeft":
-          camera.rotateY(rotateSpeed);
-          break;
-        case "ArrowRight":
-          camera.rotateY(-rotateSpeed);
-          break;
-        case " ":
-          camera.position.set(0, 0, 2);
-          camera.rotation.set(0, 0, 0);
-          break;
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [camera, moveSpeed, rotateSpeed]);
-
-  return null;
-};
 
 // Reusable components
 const Desk: React.FC = () => {
@@ -263,7 +168,21 @@ function SpinText({artist, track}: {artist: string, track: string}) {
 }
 
 // Scene components
-const VinylScene: React.FC<{ image: string }> = ({ image }) => {
+const VinylScene: React.FC<{ image: string, dimensions: Array<number>}> = ({ image, dimensions }) => {
+  const camPos = [0.4, 0.0, 0.8];
+  return (
+    <Canvas
+      className="absolute top-0 left-0 z-0"
+      style={{ width: dimensions[0], height: dimensions[1], position: "absolute"}}
+      camera={{ position: camPos,  fov: 100 }}
+      resize={{ scroll: false }}
+    >
+      <_VinylScene image={image} camPos={camPos}/>
+    </Canvas>
+  );
+};
+
+const _VinylScene: React.FC<{ image: string, camPos: Array<number>}> = ({ image, camPos }) => {
   const vinylref = React.createRef<Object3D>();
   const camref = useThree((state: any) => state.camera);
   const circleSize = 1/8;
@@ -299,9 +218,22 @@ const VinylScene: React.FC<{ image: string }> = ({ image }) => {
       <Cover image={image} />
     </>
   );
+}
+
+const CubeScene: React.FC<{ image: string, dimensions: Array<number>}> = ({ image, dimensions }) => {
+  return (
+    <Canvas
+      className="absolute top-0 left-0 z-0"
+      style={{ width: dimensions[0], height: dimensions[1], position: "absolute"}}
+      camera={{ position: [1,1,1], fov: 100 }}
+      resize={{ scroll: false }}
+    >
+      <_CubeScene image={image}/>
+    </Canvas>
+  );
 };
 
-const CubeScene: React.FC<{ image: string }> = ({ image }) => {
+const _CubeScene: React.FC<{ image: string}> = ({ image }) => {
   const cubeRef = useRef<Mesh>(null);
 
   useFrame((state: any, delta: number) => {
@@ -321,9 +253,65 @@ const CubeScene: React.FC<{ image: string }> = ({ image }) => {
       </mesh>
     </>
   );
+}
+
+/**************************************************************************************** Mountains*/
+
+const MountainScene: React.FC<{colors: Array<string>, dimensions: Array<number>}> = ({ colors, dimensions }) => {  
+  return (
+    <Canvas
+      className="absolute top-0 left-0 z-0"
+      style={{ width: dimensions[0], height: dimensions[1], position: "absolute"}}
+      camera={{ position: [1,1,1], fov: 100 }}
+      resize={{ scroll: false }}
+    >
+      <_Mountain colors={colors}/>
+    </Canvas>
+  );
 };
 
-const camPos = [0.4, 0.0, 0.8];
+const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
+  const target = new Object3D();
+  target.position.set(0, -0.2, 0.25);
+
+  const mountain = useLoader(GLTFLoader, "/models/halfmountain.gltf");
+  const material = new MeshPhongMaterial({color: "#90A959"});
+  const meshes = useRef([]);
+  mountain.scene.traverse((o) => {
+    if (o.isMesh) {
+      o.material = material;
+      meshes.current = meshes.current.concat(o);
+    }
+  })
+  const scaleFactor = 1 / 5;
+
+  useFrame((state: any, delta: number) => {
+    if (meshes.current.constructor.name == "Array"){
+      let rev = 1;
+      meshes.current.forEach((mesh: Object3D) => {
+        mesh.rotation.y += delta * rev * scaleFactor;
+        // hack
+        rev *= -1;
+      })
+    }
+  });
+
+  return (
+    <>
+      <OrbitControls/>
+      <pointLight position={[20,20,20]} intensity={100}/>
+      <primitive
+        object={mountain.scene}
+        scale={[scaleFactor, scaleFactor, scaleFactor]}
+        position={[0,0,0]}
+        color={"#90A959"}>
+
+        <pointLight position={[20,20,20]} intensity={100}/>
+      </primitive>
+    </>
+  )
+}
+
 
 // Main component
 const WebGLBackground: React.FC<SceneProps & { scene: string }> = ({
@@ -333,24 +321,19 @@ const WebGLBackground: React.FC<SceneProps & { scene: string }> = ({
   width,
   height,
 }) => {
-  if (typeof window === "undefined") return <></>;
-
-  return (
-    <Canvas
-      className="absolute top-0 left-0 z-0"
-      style={{ width: width, height: height, position: "absolute"}}
-      camera={{ position: scene == "vinyl" ? camPos : [1, 1, 1], fov: 100 }}
-      resize={{ scroll: false }}
-    >
-      {scene === "cube" ? (
-        <CubeScene image={image} />
-      ) : scene === "vinyl" ? (
-        <VinylScene image={image} />
-      ) : scene === "mountain" ? (
-        <Mountain />
-      ) : null}
-    </Canvas>
-  );
+  if (typeof window === "undefined") {
+    return <></>;
+  }
+  switch(scene) {
+    case "cube":
+      return <CubeScene dimensions={[width, height]} image={image}/>;
+    case "vinyl":
+      return <VinylScene dimensions={[width, height]} image={image}/>;
+    case "mountain":
+      return <MountainScene dimensions={[width, height]} />;
+    default:
+      return null;
+  }
 };
 
 export default WebGLBackground;
