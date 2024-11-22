@@ -270,32 +270,60 @@ const MountainScene: React.FC<{colors: Array<string>, dimensions: Array<number>}
   );
 };
 
+function interpolateColor(color1, color2, ratio) {
+    const rgb1 = parseInt(color1.replace('#', ''), 16);
+    const rgb2 = parseInt(color2.replace('#', ''), 16);
+    
+    const r1 = (rgb1 >> 16) & 255;
+    const g1 = (rgb1 >> 8) & 255;
+    const b1 = rgb1 & 255;
+    
+    const r2 = (rgb2 >> 16) & 255;
+    const g2 = (rgb2 >> 8) & 255;
+    const b2 = rgb2 & 255;
+    
+    const r = Math.round(r1 + (r2 - r1) * ratio);
+    const g = Math.round(g1 + (g2 - g1) * ratio);
+    const b = Math.round(b1 + (b2 - b1) * ratio);
+    
+    return [r, g, b];
+}
+
 const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
+  // Settings
+  const xOff = -2;
+  const yOff = 2;
+  const zOff = 2.15;
+  const geoScale = 1 / 5;
+  // Controls how quickly the colors switch
+  const scalingColor = 5;
+  let currInterpolation = 0;
+  // Colors
+  if (typeof colors == "undefined" || colors.length == 0) {
+    colors = ["#00FF00", "#FF0000", "#0000FF"];
+  }
+  let colorIdx = 0;
+  let color1 = colors[colorIdx];
+  let color2 = colors[colorIdx + 1];
+  // Refs
   const camref = useThree((state: any) => state.camera);
-
-  const target = new Object3D();
-  target.position.set(0, -0.2, 0.25);
-
   const mountain = useLoader(GLTFLoader, "/models/halfmountain.gltf");
   const material = new MeshPhongMaterial({color: "#90A959"});
   const meshes = useRef([]);
   let center = new Vector3(0,0,0);
-  const xOff = -2;
-  const yOff = 2;
-  const zOff = 2.15;
+
   mountain.scene.traverse((o) => {
     if (o.isMesh) {
       o.material = material;
       meshes.current = meshes.current.concat(o);
     }
   })
-  const scaleFactor = 1 / 5;
 
   useFrame((state: any, delta: number) => {
     if (meshes.current.constructor.name == "Array"){
       let rev = 1;
       meshes.current.forEach((mesh: Object3D) => {
-        mesh.rotation.y += delta * rev * scaleFactor;
+        mesh.rotation.y += delta * rev * geoScale;
         // hack
         rev *= -1;
         mesh.getWorldPosition(center);
@@ -305,19 +333,25 @@ const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
       if (camref.current != "undefined") {
         camref.lookAt(new Vector3(center.x + xOff, center.y + yOff, center.z + zOff));
       }
+      if (currInterpolation >= 1) {
+        currInterpolation = 0;
+        color1 = color2
+        colorIdx = (colorIdx + 1) % colors.length
+        color2 = colors[colorIdx];
+      }
+      let [r,g,b] = interpolateColor(color1, color2, currInterpolation);
+      currInterpolation += delta / scalingColor;
+      material.color.setRGB(r/255, g/255, b/255);
     }
   });
 
 
   return (
     <>
-      
       <SkyBox/>
       <primitive
         object={mountain.scene}
-        scale={[scaleFactor, scaleFactor, scaleFactor]}
-        position={[0,0,0]}
-        color={"#90A959"}>
+        position={[0,0,0]}>
 
         <pointLight position={[20,20,20]} intensity={100}/>
       </primitive>
@@ -343,7 +377,7 @@ const WebGLBackground: React.FC<SceneProps & { scene: string }> = ({
     case "vinyl":
       return <VinylScene dimensions={[width, height]} image={image}/>;
     case "mountain":
-      return <MountainScene dimensions={[width, height]} />;
+      return <MountainScene colors={colors} dimensions={[width, height]} />;
     default:
       return null;
   }

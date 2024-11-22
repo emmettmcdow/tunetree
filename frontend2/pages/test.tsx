@@ -8,7 +8,7 @@ export default function Test() {
     setClient(true);
   }, []);
 
-  const colors = ['#4a6741', '#6a8c5f', '#8fb280', '#b3d9a3'] as Array<string>;
+  const colors = ["#00FF00", "#FF0000", "#0000FF"];
   const image = "/placeholder-square.png";
   const scene = "mountain";
   return (
