@@ -1,5 +1,5 @@
 import { extend } from '@react-three/fiber'
-import { CubeTextureLoader, TextureLoader, DirectionalLight, Mesh, MeshPhongMaterial, SphereGeometry, DirectionalLightHelper, SpotLight, SpotLightHelper, Object3D, Vector3, Box3, Group, BufferGeometry, BufferAttribute, PointLight } from 'three'
+import { CubeTextureLoader, TextureLoader, DirectionalLight, Mesh, MeshPhongMaterial, SphereGeometry, DirectionalLightHelper, SpotLight, SpotLightHelper, Object3D, Vector3, Box3, Group, BufferGeometry, BufferAttribute, PointLight, PerspectiveCamera, AxesHelper } from 'three'
 import React, { useRef, useEffect, forwardRef, useMemo, useCallback } from 'react'
 // @ts-ignore: 2305
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'
@@ -15,6 +15,7 @@ const radians = (degrees: number) => (degrees * Math.PI) / 180;
 
 // Types
 interface SceneProps {
+  scene: string;
   colors: string[];
   image: string;
   width: number;
@@ -71,7 +72,7 @@ const Player = forwardRef((_: unknown, ref: Ref<HTMLDivElement>) => {
   );
 });
 
-const Cover: React.FC<{ image: string }> = ({ image }) => {
+const Cover: React.FC<{ image: string, camPos: Vector3}> = ({ image, camPos}) => {
   const objectRef = useRef<Object3D>(null);
   useEffect(() => {
     if (typeof objectRef.current != "undefined") {
@@ -215,7 +216,7 @@ const _VinylScene: React.FC<{ image: string, camPos: Array<number>}> = ({ image,
       <Desk />
       <Player ref={vinylref}/>
       <SpinText/>
-      <Cover image={image} />
+      <Cover image={image} camPos={camref.position}/>
     </>
   );
 }
@@ -262,7 +263,6 @@ const MountainScene: React.FC<{colors: Array<string>, dimensions: Array<number>}
     <Canvas
       className="absolute top-0 left-0 z-0"
       style={{ width: dimensions[0], height: dimensions[1], position: "absolute"}}
-      camera={{ position: [1, 3, 2], fov: 100 }}
       resize={{ scroll: false }}
     >
       <_Mountain colors={colors}/>
@@ -291,26 +291,23 @@ function interpolateColor(color1, color2, ratio) {
 
 const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
   // Settings
-  const xOff = -2;
-  const yOff = 2;
-  const zOff = 2.15;
+  const xOff = -5;
+  const yOff = 0;
+  const zOff = 0;
   const geoScale = 1 / 5;
   // Controls how quickly the colors switch
   const scalingColor = 5;
   let currInterpolation = 0;
   // Colors
-  if (typeof colors == "undefined" || colors.length == 0) {
-    colors = ["#00FF00", "#FF0000", "#0000FF"];
-  }
   let colorIdx = 0;
   let color1 = colors[colorIdx];
   let color2 = colors[colorIdx + 1];
   // Refs
-  const camref = useThree((state: any) => state.camera);
+  const camref = useThree((state: any) => state.camera) as PerspectiveCamera;
   const mountain = useLoader(GLTFLoader, "/models/halfmountain.gltf");
   const material = new MeshPhongMaterial({color: "#90A959"});
   const meshes = useRef([]);
-  let center = new Vector3(0,0,0);
+  let center = new Vector3(0,10,10);
 
   mountain.scene.traverse((o) => {
     if (o.isMesh) {
@@ -319,20 +316,24 @@ const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
     }
   })
 
+  if (camref.current != "undefined") {
+    camref.lookAt(new Vector3(center.x + xOff, center.y + yOff, center.z + zOff));
+    camref.position.set(center.x + 5, center.y+5, center.z);
+    camref.fov = 130;
+    camref.updateProjectionMatrix();
+  }
+
   useFrame((state: any, delta: number) => {
     if (meshes.current.constructor.name == "Array"){
+      // Rotation
       let rev = 1;
       meshes.current.forEach((mesh: Object3D) => {
         mesh.rotation.y += delta * rev * geoScale;
         // hack
         rev *= -1;
-        mesh.getWorldPosition(center);
       })
 
-      
-      if (camref.current != "undefined") {
-        camref.lookAt(new Vector3(center.x + xOff, center.y + yOff, center.z + zOff));
-      }
+      // Color animation
       if (currInterpolation >= 1) {
         currInterpolation = 0;
         color1 = color2
@@ -349,11 +350,12 @@ const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
   return (
     <>
       <SkyBox/>
+      <pointLight position={[center.x+5, center.y+15, center.z]} intensity={200}/>
+      <primitive object={new AxesHelper(50)} />
       <primitive
         object={mountain.scene}
         position={[0,0,0]}>
 
-        <pointLight position={[20,20,20]} intensity={100}/>
       </primitive>
     </>
   )
@@ -361,7 +363,7 @@ const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
 
 
 // Main component
-const WebGLBackground: React.FC<SceneProps & { scene: string }> = ({
+const WebGLBackground: React.FC<SceneProps> = ({
   colors,
   image,
   scene,
@@ -370,6 +372,10 @@ const WebGLBackground: React.FC<SceneProps & { scene: string }> = ({
 }) => {
   if (typeof window === "undefined") {
     return <></>;
+  }
+  // Colors
+  if (typeof colors == "undefined" || colors.length < 2) {
+    colors = ["#00FF00", "#FF0000", "#0000FF"];
   }
   switch(scene) {
     case "cube":
