@@ -1,4 +1,4 @@
-import { useState, Dispatch, SetStateAction, useEffect } from 'react';
+import { useState, Dispatch, SetStateAction, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import {FiX} from 'react-icons/fi';
 
@@ -232,21 +232,6 @@ function getHeader(mode: Mode) {
     }
 }
 
-// export type Track = {
-//   message: string,
-//   name: string,
-//   artist: string,
-//   image: string,
-//   links: {
-//     apple: string
-//     spotify: string
-//     youtube: string
-//     tidal: string
-//     amazon: string
-//     bandcamp: string
-//   }
-// }
-
 export class Track{
 
   message: string
@@ -302,6 +287,7 @@ export default function Artist() {
   const [formData, setFormData] = useState<Track>(new Track({}));
   const [currTrack, setCurrTrack] = useState<Track>(new Track({}));
   const [isClient, setIsClient] = useState<boolean>(false);
+  const boundingBox = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -323,12 +309,13 @@ export default function Artist() {
     <>
       <div className="p-4">
         <Header msg={getHeader(mode)}/>
-        <div className="sticky top-0 flex flex-col items-center rounded-2xl border-2 border-b-0 border-white mx-auto mt-2">
+        <div ref={boundingBox} className="sticky top-0 flex flex-col items-center rounded-2xl border-2 border-b-0 border-white mx-auto mt-2 overflow-hidden z-40">
           {isClient && (<Display 
                           track={mode == Mode.Standby ? currTrack : formData}
-                          width={window.innerWidth * ratio}
+                          width={boundingBox.current?.clientWidth}
                           height={window.innerHeight * ratio}
-                          setLink={()=>{}}/>)}
+                          setLink={()=>{}}
+                          />)}
         </div>
         <div className="relative flex p-5 w-full fg-color rounded-2xl z-50 border-2 border-t-1">
           <EditPanel mode={mode} changeMode={changeMode} setCurrTrack={setCurrTrack} currTrack={currTrack} formData={formData} setFormData={setFormData}/>

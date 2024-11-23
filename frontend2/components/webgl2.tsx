@@ -261,7 +261,7 @@ const _CubeScene: React.FC<{ image: string}> = ({ image }) => {
 const MountainScene: React.FC<{colors: Array<string>, dimensions: Array<number>}> = ({ colors, dimensions }) => {  
   return (
     <Canvas
-      className="absolute top-0 left-0 z-0"
+      className="absolute top-0 left-0 z-0 rounded-2xl"
       style={{ width: dimensions[0], height: dimensions[1], position: "absolute"}}
       resize={{ scroll: false }}
     >
