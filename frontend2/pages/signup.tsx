@@ -129,7 +129,7 @@ export default function Signup() {
           <Header msg="Signing up..."/>
           <Message content={message}/>
           <form onSubmit={handleSubmit} className="flex flex-col my-4">
-            <input className="w-full rounded-lg p-1 mb-2"
+            <input className="w-full rounded-lg p-1 mb-2 text-black"
                    type="text"
                    name="artist"
                    placeholder="artist name"
@@ -137,9 +137,9 @@ export default function Signup() {
                    onChange={handleChange}/>
             <div className="mb-2">Your link will look like:</div>
             <div className="flex">
-              <span className="w-fit rounded-l-lg mb-2 pl-2 bg-slate-200 cursor-not-allowed inline mx-0" >tunetree.xyz/</span>
+              <span className="w-fit rounded-l-lg mb-2 pl-2 bg-slate-200 cursor-not-allowed inline mx-0 text-black" >tunetree.xyz/</span>
               <input name="link" type="text" 
-                     className={separateLink ? "w-full rounded-r-lg mb-2 mx-0 inline" : "w-full rounded-r-lg mb-2 mx-0 bg-slate-200 cursor-not-allowed inline"}
+                     className={separateLink ? "w-full rounded-r-lg mb-2 mx-0 inline text-black" : "w-full rounded-r-lg mb-2 mx-0 bg-slate-200 cursor-not-allowed inline text-black"}
                      value={formData.link}
                      onChange={handleChange}
                      readOnly={!separateLink}/>
@@ -159,7 +159,7 @@ export default function Signup() {
                                 }
                               }
             />
-            <input className="w-full rounded-lg p-1 my-2" 
+            <input className="w-full rounded-lg p-1 my-2 text-black" 
                    type="text"
                    name="email"
                    placeholder="e-mail address"

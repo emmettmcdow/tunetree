@@ -46,7 +46,7 @@ export function Password({name, password, setPassword}: {name: string, password:
 
   return (
     <div className="flex mb-2">
-      <input className="w-full rounded-lg p-1" type={type} name={name} placeholder={name == "cpassword" ? "confirm password" : name} value={password} onChange={(e) => setPassword(e.target.value)}/>
+      <input className="w-full rounded-lg p-1 text-black" type={type} name={name} placeholder={name == "cpassword" ? "confirm password" : name} value={password} onChange={(e) => setPassword(e.target.value)}/>
       <span className="flex justify-around items-center cursor-pointer" onClick={handleToggle}>
         <Eye state={type}/>
       </span>
@@ -131,7 +131,7 @@ export default function Login() {
           <Header msg="Logging In..."/>
           <Message content={message}/>
           <form className="flex flex-col my-4" onSubmit={handleSubmit}>
-            <input className="w-full rounded-lg p-1 mb-2"
+            <input className="w-full rounded-lg p-1 mb-2 text-black"
                    type="text"
                    name="email"
                    placeholder="username"
