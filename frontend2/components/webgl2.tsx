@@ -1,5 +1,5 @@
 import { extend } from '@react-three/fiber'
-import { CubeTextureLoader, TextureLoader, DirectionalLight, Mesh, MeshPhongMaterial, SphereGeometry, DirectionalLightHelper, SpotLight, SpotLightHelper, Object3D, Vector3, Box3, Group, BufferGeometry, BufferAttribute, PointLight, PerspectiveCamera, AxesHelper } from 'three'
+import { CubeTextureLoader, TextureLoader, DirectionalLight, Mesh, MeshPhongMaterial, SphereGeometry, DirectionalLightHelper, SpotLight, SpotLightHelper, Object3D, Vector3, Box3, Group, BufferGeometry, BufferAttribute, PointLight, PerspectiveCamera, AxesHelper, Scene } from 'three'
 import React, { useRef, useEffect, forwardRef, useMemo, useCallback } from 'react'
 // @ts-ignore: 2305
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'
@@ -123,20 +123,16 @@ const Lamp: React.FC = () => {
 };
 
 function SkyBox() {
-  const { scene } = useThree();
-  const loader = new CubeTextureLoader();
+  const scene: Scene  = useThree((state) => {return state.scene});
+  const loader = new TextureLoader();
   // The CubeTextureLoader load method takes an array of urls representing all 6 sides of the cube.
-  const texture = loader.load([
-    "/photos/night.jpg",
-    "/photos/night.jpg",
-    "/photos/night.jpg",
-    "/photos/night.jpg",
-    "/photos/night.jpg",
-    "/photos/night.jpg",
-  ]);
+  const texture = loader.load(
+    "/photos/night.jpg");
 
   // Set the scene background property to the resulting texture.
   scene.background = texture;
+  scene.backgroundIntensity = 0.5;
+  scene.backgroundBlurriness = 0.125;
   return null;
 }
 
@@ -351,7 +347,7 @@ const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
     <>
       <SkyBox/>
       <pointLight position={[center.x+5, center.y+15, center.z]} intensity={200}/>
-      <primitive object={new AxesHelper(50)} />
+      {/*<primitive object={new AxesHelper(50)} />*/}
       <primitive
         object={mountain.scene}
         position={[0,0,0]}>
