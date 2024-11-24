@@ -1,10 +1,10 @@
 import { extend } from '@react-three/fiber'
-import { CubeTextureLoader, TextureLoader, DirectionalLight, Mesh, MeshPhongMaterial, SphereGeometry, DirectionalLightHelper, SpotLight, SpotLightHelper, Object3D, Vector3, Box3, Group, BufferGeometry, BufferAttribute, PointLight, PerspectiveCamera, AxesHelper, Scene } from 'three'
-import React, { useRef, useEffect, forwardRef, useMemo, useCallback } from 'react'
+import { Color, CubeTextureLoader, TextureLoader, DirectionalLight, Mesh, MeshPhongMaterial, SphereGeometry, DirectionalLightHelper, SpotLight, SpotLightHelper, Object3D, Vector3, Box3, Group, BufferGeometry, BufferAttribute, PointLight, PerspectiveCamera, AxesHelper, Scene } from 'three'
+import React, { useRef, useEffect, forwardRef, useMemo, useCallback, useState } from 'react'
 // @ts-ignore: 2305
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'
 import { useHelper, OrbitControls, Center, Text3D} from '@react-three/drei'
-import { FontLoader, GLTFLoader, TextGeometry } from 'three/examples/jsm/Addons.js';
+import { ColorCorrectionShader, FontLoader, GLTFLoader, TextGeometry } from 'three/examples/jsm/Addons.js';
 import helvetiker_regular from 'three/examples/fonts/helvetiker_regular.typeface.json'
 
 extend({ TextGeometry })
@@ -259,6 +259,7 @@ const MountainScene: React.FC<{colors: Array<string>, dimensions: Array<number>}
     <Canvas
       className="absolute top-0 left-0 z-0 rounded-2xl"
       style={{ width: dimensions[0], height: dimensions[1], position: "absolute"}}
+      camera={{ position: [0,1.1,0.5], rotation: [radians(-5), 0, 0], fov: 150 }}
       resize={{ scroll: false }}
     >
       <_Mountain colors={colors}/>
@@ -299,35 +300,16 @@ const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
   let color1 = colors[colorIdx];
   let color2 = colors[colorIdx + 1];
   // Refs
-  const camref = useThree((state: any) => state.camera) as PerspectiveCamera;
   const mountain = useLoader(GLTFLoader, "/models/halfmountain.gltf");
-  const material = new MeshPhongMaterial({color: "#90A959"});
-  const meshes = useRef([]);
-  let center = new Vector3(0,10,10);
+  const [color, setColor] = useState<Color>(new Color().setRGB(1, 0, 0))
+  const mtnGroup = useRef<Group>(null);
+  const material = new MeshPhongMaterial({color: "red"});
 
-  mountain.scene.traverse((o) => {
-    if (o.isMesh) {
-      o.material = material;
-      meshes.current = meshes.current.concat(o);
-    }
-  })
 
-  if (camref.current != "undefined") {
-    camref.lookAt(new Vector3(center.x + xOff, center.y + yOff, center.z + zOff));
-    camref.position.set(center.x + 5, center.y+5, center.z);
-    camref.fov = 130;
-    camref.updateProjectionMatrix();
-  }
 
   useFrame((state: any, delta: number) => {
-    if (meshes.current.constructor.name == "Array"){
-      // Rotation
-      let rev = 1;
-      meshes.current.forEach((mesh: Object3D) => {
-        mesh.rotation.y += delta * rev * geoScale;
-        // hack
-        rev *= -1;
-      })
+    if (typeof mtnGroup.current !== "undefined" && mtnGroup.current != null){
+      mtnGroup.current.rotation.x += delta;
 
       // Color animation
       if (currInterpolation >= 1) {
@@ -346,13 +328,20 @@ const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
   return (
     <>
       <SkyBox/>
-      <pointLight position={[center.x+5, center.y+15, center.z]} intensity={200}/>
+      <pointLight position={[2, 2, 2]} intensity={20}/>
+      <group scale={1} position={[0.15, 0, 0]} rotation={[0,0,radians(90)]} ref={mtnGroup}>
+        <mesh position={[0,0.9,0]}
+              geometry={mountain.nodes.Cylinder.geometry}
+              rotation={[0, 0, radians(180)]}
+              material={material}
+              >
+        </mesh>
+        <mesh position={[0,-0.9,0]}
+              geometry={mountain.nodes.Cylinder001.geometry}
+              material={material}>
+        </mesh>
+      </group>
       {/*<primitive object={new AxesHelper(50)} />*/}
-      <primitive
-        object={mountain.scene}
-        position={[0,0,0]}>
-
-      </primitive>
     </>
   )
 }
