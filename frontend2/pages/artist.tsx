@@ -1,6 +1,6 @@
 import { useState, Dispatch, SetStateAction, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import {FiX} from 'react-icons/fi';
+import {FiX, FiChevronRight, FiChevronLeft } from 'react-icons/fi';
 
 import { getAuthenticatedArtistLink, getAuthorizationHeader, iconForService } from "../utils/utils"
 import { spotifyGetArt } from '../utils/spotify';
@@ -8,6 +8,7 @@ import { getTrackInfo } from './[track]';
 import { Header, Message } from './login';
 import UIButton from "@/components/uibutton";
 import Display from '@/components/display';
+import { ANIMATIONS } from '@/components/webgl2';
 
 function ServiceSelectorBar({selected, setSelected}: {selected: Selected, setSelected: React.Dispatch<React.SetStateAction<Selected>>}) { 
   const buttons = [];
@@ -239,6 +240,7 @@ export class Track{
   artist: string
   image: string
   colors: string
+  animation: string
   links: {
     apple: string
     spotify: string
@@ -255,6 +257,7 @@ export class Track{
       this.message = data['track']['message'];
       this.image = data['track']['image'];
       this.colors = data['track']['colors'];
+      this.animation = data['track']['animation'];
       this.links = {
         apple: data['track']['links']['apple'] || "",
         spotify: data['track']['links']['spotify'] || "",
@@ -269,6 +272,7 @@ export class Track{
       this.message = "";
       this.image = "";
       this.colors = "";
+      this.animation = "cube";
       this.links = {
         apple: "",
         spotify: "",
@@ -281,6 +285,14 @@ export class Track{
   }
 }
 
+function nextAnim(animation: string) {
+  const out = ANIMATIONS[(ANIMATIONS.indexOf(animation) + 1) % ANIMATIONS.length];
+  return out;
+}
+
+function lastAnim(animation: string) {
+  return ANIMATIONS[(ANIMATIONS.indexOf(animation) + 1) % ANIMATIONS.length];
+}
 
 export default function Artist() {
   const [mode, changeMode] = useState(Mode.Standby);
@@ -309,10 +321,30 @@ export default function Artist() {
     <>
       <div className="p-4">
         <Header msg={getHeader(mode)}/>
-        <div ref={boundingBox} className="sticky top-0 flex flex-col items-center rounded-2xl border-2 border-b-0 border-white mx-auto mt-2 overflow-hidden z-40">
+        <div ref={boundingBox} className="relative sticky top-0 flex flex-col items-center rounded-2xl border-2 border-b-0 border-white mx-auto mt-2 overflow-hidden z-40">
+          {mode != Mode.Standby && (
+            <>
+              <span className="absolute text-6xl top-1/2 z-50 left-0" onClick={() => {
+                setFormData({
+                  ...formData,
+                  animation: lastAnim(formData.animation)
+                })
+              }}>
+                <FiChevronLeft/>
+              </span>
+              <span className="absolute text-6xl top-1/2 z-50 right-0" onClick={() => {
+                setFormData({
+                  ...formData,
+                  animation: nextAnim(formData.animation)
+                })
+              }}>
+                <FiChevronRight/>
+              </span>
+            </>
+          )}
           {isClient && (<Display 
                           track={mode == Mode.Standby ? currTrack : formData}
-                          width={boundingBox.current?.clientWidth}
+                          width={boundingBox.current?.clientWidth || 0}
                           height={window.innerHeight * ratio}
                           setLink={()=>{}}
                           />)}

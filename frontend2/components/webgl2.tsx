@@ -357,6 +357,8 @@ const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
   )
 }
 
+export const ANIMATIONS = ["cube", "vinyl", "mountain"];
+
 
 // Main component
 const WebGLBackground: React.FC<SceneProps> = ({
@@ -369,9 +371,11 @@ const WebGLBackground: React.FC<SceneProps> = ({
   if (typeof window === "undefined") {
     return <></>;
   }
-  // Colors
   if (typeof colors == "undefined" || colors.length < 2) {
     colors = ["#00FF00", "#FF0000", "#0000FF"];
+  }
+  if (typeof scene == "undefined" || scene == "" ) {
+    scene = "cube";
   }
   switch(scene) {
     case "cube":
