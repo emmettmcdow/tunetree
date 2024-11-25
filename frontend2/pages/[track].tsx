@@ -13,10 +13,10 @@ import Display from '@/components/display';
 function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: Track, link: string, toggle: React.Dispatch<React.SetStateAction<string>>}) {
   if (link) {
     return (
-      <div className="z-50 absolute w-3/4 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 fg-color p-5 z-50">
+      <div className="z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 fg-color p-5 rounded-2xl text-center z-50 drop-shadow-lg">
         <p>{"wanna be notified when "+ trackInfo.artist + " drops? (it's free)"}</p>
         <form className="my-2">
-          <input className="w-1/2" name="email"/>
+          <input className="text-black w-1/2 rounded-xl p-2 " placeholder="email" name="email"/>
           <a href={link}><button onClick={() => toggle("")} className="mx-2 bg-emerald-500 rounded-lg cursor-pointer bounce-button"><span className="p-4 py-2 text-white bounce-text">Yes</span></button></a>
         </form>
         <a href={link}><button onClick={() => toggle("")} className="mx-2 bg-indigo-500 rounded-lg cursor-pointer bounce-button"><span className="p-4 py-2 text-white bounce-text">I just wanna rock(no)</span></button></a>
