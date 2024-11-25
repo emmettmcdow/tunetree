@@ -83,7 +83,7 @@ export default function Display({track, setLink, width, height}: {track: Track, 
     <div className={"relative flex flex-col justify-evenly"} style={displayStyle}>
       <div className={"bg-black/30 flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-30"}>
         <p className="text-4xl"><b>{track.artist}</b></p>
-        <Image alt="album-art" src={track.image} className="w-52 my-2" height="1024" width="1024"/>
+        <Image alt="album-art" src={track.image || "/placeholder-square.png" } className="w-52 my-2" height="1024" width="1024"/>
         <p className="text-2xl">{track.name}</p>
       </div>
       <ButtonBox trackInfo={track} setLink={setLink}/>

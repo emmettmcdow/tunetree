@@ -10,7 +10,7 @@ export default function Test() {
 
   const colors = ["#00FF00", "#FF0000", "#0000FF"];
   const image = "/placeholder-square.png";
-  const scene = "mountain";
+  const scene = "vinyl";
   return (
     <>
       {client && <WebGLBackground colors={colors} image={image} scene={scene} width={window.innerWidth} height={window.innerHeight}/>}

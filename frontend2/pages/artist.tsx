@@ -296,6 +296,7 @@ function lastAnim(animation: string) {
 
 export default function Artist() {
   const [mode, changeMode] = useState(Mode.Standby);
+  const [, setLink] = useState("");
   const [formData, setFormData] = useState<Track>(new Track({}));
   const [currTrack, setCurrTrack] = useState<Track>(new Track({}));
   const [isClient, setIsClient] = useState<boolean>(false);
@@ -346,7 +347,7 @@ export default function Artist() {
                           track={mode == Mode.Standby ? currTrack : formData}
                           width={boundingBox.current?.clientWidth || 0}
                           height={window.innerHeight * ratio}
-                          setLink={()=>{}}
+                          setLink={setLink}
                           />)}
         </div>
         <div className="relative flex p-5 w-full fg-color rounded-2xl z-50 border-2 border-t-1">

@@ -1,5 +1,6 @@
 import { extend } from '@react-three/fiber'
 import { Color, CubeTextureLoader, TextureLoader, DirectionalLight, Mesh, MeshPhongMaterial, SphereGeometry, DirectionalLightHelper, SpotLight, SpotLightHelper, Object3D, Vector3, Box3, Group, BufferGeometry, BufferAttribute, PointLight, PerspectiveCamera, AxesHelper, Scene } from 'three'
+import { Perf } from 'r3f-perf'
 import React, { useRef, useEffect, forwardRef, useMemo, useCallback, useState } from 'react'
 // @ts-ignore: 2305
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'
@@ -74,6 +75,8 @@ const Player = forwardRef((_: unknown, ref: Ref<HTMLDivElement>) => {
 
 const Cover: React.FC<{ image: string, camPos: Vector3}> = ({ image, camPos}) => {
   const objectRef = useRef<Object3D>(null);
+  console.log("re-render cover");
+  const texture = useLoader(TextureLoader, image);
   useEffect(() => {
     if (typeof objectRef.current != "undefined") {
       objectRef.current?.lookAt(new Vector3(...camPos));
@@ -82,7 +85,7 @@ const Cover: React.FC<{ image: string, camPos: Vector3}> = ({ image, camPos}) =>
   return (
     <mesh ref={objectRef} position={[0.3, -0.13, 0.25]}>
       <planeGeometry args={[0.2, 0.2]} />
-      <meshPhongMaterial map={new TextureLoader().load(image)} />
+      <meshPhongMaterial map={texture} />
     </mesh>
   );
 };
@@ -124,10 +127,7 @@ const Lamp: React.FC = () => {
 
 function SkyBox() {
   const scene: Scene  = useThree((state) => {return state.scene});
-  const loader = new TextureLoader();
-  // The CubeTextureLoader load method takes an array of urls representing all 6 sides of the cube.
-  const texture = loader.load(
-    "/photos/night.jpg");
+  const texture = useLoader(TextureLoader, "/photos/night.jpg");
 
   // Set the scene background property to the resulting texture.
   scene.background = texture;
@@ -169,7 +169,7 @@ const VinylScene: React.FC<{ image: string, dimensions: Array<number>}> = ({ ima
   const camPos = [0.4, 0.0, 0.8];
   return (
     <Canvas
-      className="absolute top-0 left-0 z-0"
+      className="absolute top-0 left-0 z-0 rounded-2xl"
       style={{ width: dimensions[0], height: dimensions[1], position: "absolute"}}
       camera={{ position: camPos,  fov: 100 }}
       resize={{ scroll: false }}
@@ -211,7 +211,7 @@ const _VinylScene: React.FC<{ image: string, camPos: Array<number>}> = ({ image,
 
       <Desk />
       <Player ref={vinylref}/>
-      <SpinText/>
+      <SpinText artist="foo" track="bar" />
       <Cover image={image} camPos={camref.position}/>
     </>
   );
@@ -220,7 +220,7 @@ const _VinylScene: React.FC<{ image: string, camPos: Array<number>}> = ({ image,
 const CubeScene: React.FC<{ image: string, dimensions: Array<number>}> = ({ image, dimensions }) => {
   return (
     <Canvas
-      className="absolute top-0 left-0 z-0"
+      className="absolute top-0 left-0 z-0 rounded-2xl"
       style={{ width: dimensions[0], height: dimensions[1], position: "absolute"}}
       camera={{ position: [1,1,1], fov: 100 }}
       resize={{ scroll: false }}
@@ -232,6 +232,7 @@ const CubeScene: React.FC<{ image: string, dimensions: Array<number>}> = ({ imag
 
 const _CubeScene: React.FC<{ image: string}> = ({ image }) => {
   const cubeRef = useRef<Mesh>(null);
+  const texture = useLoader(TextureLoader, image);
 
   useFrame((state: any, delta: number) => {
     if (cubeRef.current) {
@@ -246,7 +247,7 @@ const _CubeScene: React.FC<{ image: string}> = ({ image }) => {
       <directionalLight position={[-1, 2, 4]} intensity={3} />
       <mesh ref={cubeRef}>
         <boxGeometry />
-        <meshPhongMaterial map={new TextureLoader().load(image)} />
+        <meshPhongMaterial map={texture} />
       </mesh>
     </>
   );
@@ -341,10 +342,20 @@ const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
               material={material}>
         </mesh>
       </group>
-      {/*<primitive object={new AxesHelper(50)} />*/}
     </>
   )
 }
+
+function Debug() {
+  return (
+    <>
+      <Perf/>
+      <primitive object={new AxesHelper(50)} />
+      <OrbitControls />
+    </>
+  );
+}
+
 
 export const ANIMATIONS = ["cube", "vinyl", "mountain"];
 
@@ -359,6 +370,9 @@ const WebGLBackground: React.FC<SceneProps> = ({
 }) => {
   if (typeof window === "undefined") {
     return <></>;
+  }
+  if (typeof image == "undefined" || image == "") {
+    image = "/placeholder-square.png";
   }
   if (typeof colors == "undefined" || colors.length < 2) {
     colors = ["#00FF00", "#FF0000", "#0000FF"];
