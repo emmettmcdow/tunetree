@@ -13,10 +13,10 @@ function Panel({statement, img, alt}: {statement: string, img: string, alt: stri
   return (
     <div className="text-xl md:text-2xl">
       <span className="mr-2" onClick={() => {setHide(!hide)}}>
-        {hide ? <FiChevronRight className="inline rainbow-svg border-2 rounded"/> : <FiChevronDown className="inline rainbow-svg border-2 rounded"/>}
+        {hide ? <FiChevronRight className="inline rainbow-svg border-2 rounded cursor-pointer"/> : <FiChevronDown className="inline rainbow-svg border-2 rounded cursor-pointer"/>}
       </span>
       <span className="inline">{statement}</span>
-      {hide || <Image src={img} alt={alt} width={400} height={400} className="w-full"/>}
+      {hide || <span><br/>This will be a demo gif once the UI is complete<Image src={img} alt={alt} width={400} height={400} className="w-full"/></span>}
     </div>
   );
 }

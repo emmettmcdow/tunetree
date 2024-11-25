@@ -331,7 +331,7 @@ export default function Artist() {
                   animation: lastAnim(formData.animation)
                 })
               }}>
-                <FiChevronLeft className="rainbow-svg"/>
+                <FiChevronLeft className="cursor-pointer rainbow-svg"/>
               </span>
               <span className="absolute text-6xl top-1/2 z-50 right-0" onClick={() => {
                 setFormData({
@@ -339,7 +339,7 @@ export default function Artist() {
                   animation: nextAnim(formData.animation)
                 })
               }}>
-                <FiChevronRight className="rainbow-svg"/>
+                <FiChevronRight className="cursor-pointer rainbow-svg"/>
               </span>
             </>
           )}
