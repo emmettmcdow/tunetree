@@ -33,53 +33,53 @@ code {
     monospace;
 }
 
-/* for rainbows */
-.rainbow-text {
-  position: relative;
-  color: #000;
-  background: #fff;
-  mix-blend-mode: multiply;
-  overflow: hidden;
-
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 1);
+.rainbow-svg {
+  animation: rainbow 3s infinite;
 }
 
-.rainbow-text::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: -100%;
-  background: black repeating-linear-gradient(90deg, #14ffe9 0%, #ffc800 16.66666%, #ff00e0 33.33333%, #14ffe9 50.0%);
-  mix-blend-mode: screen;
-  pointer-events: none;
-  animation: move 1s linear infinite;
-}
-
-@keyframes move {
+@keyframes rainbow {
   0% {
-    transform: translateX(0);
+    stroke: red;
+    color: red;
+    border-color: red;
+  }
+
+  15% {
+    stroke: orange;
+    color: orange;
+    border-color: range;
+  }
+
+  30% {
+    stroke: yellow;
+    color: yellow;
+    border-color: yellow;
+  }
+
+  45% {
+    stroke: green;
+    color: green;
+    border-color: green;
+  }
+
+  60% {
+    stroke: blue;
+    color: blue;
+    border-color: blue;
+  }
+
+  75% {
+    stroke: purple;
+    color: purple;
+    border-color: purple;
   }
 
   100% {
-    transform: translateX(50%);
+    stroke: red;
+    color: red;
+    border-color: red;
   }
 }
-
-@supports not (mix-blend-mode: multiply) {
-  .rainbow-text {
-    -webkit-text-fill-color: transparent;
-    background-clip: text !important;
-    background: white repeating-linear-gradient(90deg, #14ffe9, #ffc800, #ff00e0, #14ffe9);
-    text-shadow: none;
-  }
-
-  .rainbow-text::before {
-    content: none;
-  }
-}
-
 
 .container {
   display: flex;
