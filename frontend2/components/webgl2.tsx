@@ -1,12 +1,14 @@
-import { extend } from '@react-three/fiber'
-import { Color, CubeTextureLoader, TextureLoader, DirectionalLight, Mesh, MeshPhongMaterial, SphereGeometry, DirectionalLightHelper, SpotLight, SpotLightHelper, Object3D, Vector3, Box3, Group, BufferGeometry, BufferAttribute, PointLight, PerspectiveCamera, AxesHelper, Scene } from 'three'
-import { Perf } from 'r3f-perf'
-import React, { useRef, useEffect, forwardRef, useMemo, useCallback, useState } from 'react'
-// @ts-ignore: 2305
+import { extend, RootState } from '@react-three/fiber'
+import { TextureLoader, Mesh, MeshPhongMaterial, Object3D, Vector3, Group, Scene, Object3DEventMap } from 'three'
+import React, { useRef, useEffect, forwardRef} from 'react'
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'
-import { useHelper, OrbitControls, Center, Text3D} from '@react-three/drei'
-import { ColorCorrectionShader, FontLoader, GLTFLoader, TextGeometry } from 'three/examples/jsm/Addons.js';
+import { Center, Text3D} from '@react-three/drei'
+import { GLTFLoader, TextGeometry } from 'three/examples/jsm/Addons.js';
 import helvetiker_regular from 'three/examples/fonts/helvetiker_regular.typeface.json'
+// Debug
+// import {OrbitControls} from '@react-three/drei'
+// import { Perf } from 'r3f-perf'
+// import { AxesHelper} from 'three';
 
 extend({ TextGeometry })
 
@@ -50,7 +52,7 @@ const Desk: React.FC = () => {
   );
 };
 
-const Player = forwardRef((_: unknown, ref: Ref<HTMLDivElement>) => {
+const Player = forwardRef((_: unknown, ref: React.ForwardedRef<Object3D<Object3DEventMap>>) => {
   return (
     <group position={[0, -0.2, 0.25]} ref={ref}>
       <mesh>
@@ -72,6 +74,7 @@ const Player = forwardRef((_: unknown, ref: Ref<HTMLDivElement>) => {
     </group>
   );
 });
+Player.displayName = "Player";
 
 const Cover: React.FC<{ image: string, camPos: Vector3}> = ({ image, camPos}) => {
   const objectRef = useRef<Object3D>(null);
@@ -103,30 +106,8 @@ const Wall: React.FC<{ position: [number, number, number], size: [number, number
   );
 };
 
-const Lamp: React.FC = () => {
-  const target = new Object3D();
-  target.position.set(0, -0.2, 0.25);
-
-  const luxo = useLoader(GLTFLoader, "/models/luxo.gltf");
-  luxo.materials.Luxo.color.r = .71;
-  luxo.materials.Luxo.color.b = .71;
-  luxo.materials.Luxo.color.g = .71;
-  const scaleFactor = 1 / 7;
-  const bulbPos = [0.22, -0.04, 0.26];
-  
-  return (<>
-    <primitive
-      object={luxo.scene}
-      scale={[scaleFactor, scaleFactor, scaleFactor]}
-      position={[0.3, -0.225, 0.25]}
-      color={"#FFFFFF"}
-      material={new MeshPhongMaterial({color: "#FFFFFF"})}/>
-  </>
-  );
-};
-
 function SkyBox() {
-  const scene: Scene  = useThree((state) => {return state.scene});
+  const scene: Scene  = useThree((state: RootState) => {return state.scene});
   const texture = useLoader(TextureLoader, "/photos/night.jpg");
 
   // Set the scene background property to the resulting texture.
@@ -141,7 +122,7 @@ function SpinText({artist, track}: {artist: string, track: string}) {
   const text = artist + "\n\n" + track
   useEffect(() => {
   }, []);
-  useFrame((state: any, delta: number) => {
+  useFrame((_state: RootState, delta: number) => {
     if (typeof fontref.current != "undefined") {
       fontref.current.rotation.y += delta;
     }
@@ -166,7 +147,7 @@ function SpinText({artist, track}: {artist: string, track: string}) {
 
 // Scene components
 const VinylScene: React.FC<{ image: string, dimensions: Array<number>}> = ({ image, dimensions }) => {
-  const camPos = [0.4, 0.0, 0.8];
+  const camPos = new Vector3(0.4, 0.0, 0.8);
   return (
     <Canvas
       className="absolute top-0 left-0 z-0 rounded-2xl"
@@ -174,21 +155,21 @@ const VinylScene: React.FC<{ image: string, dimensions: Array<number>}> = ({ ima
       camera={{ position: camPos,  fov: 100 }}
       resize={{ scroll: false }}
     >
-      <_VinylScene image={image} camPos={camPos}/>
+      <Vinyl image={image} camPos={camPos}/>
     </Canvas>
   );
 };
 
-const _VinylScene: React.FC<{ image: string, camPos: Array<number>}> = ({ image, camPos }) => {
+const Vinyl: React.FC<{ image: string, camPos: Vector3}> = ({ image, camPos }) => {
   const vinylref = React.createRef<Object3D>();
-  const camref = useThree((state: any) => state.camera);
+  const camref = useThree((state: RootState) => state.camera);
   const circleSize = 1/8;
-  useFrame((state: any, delta: number) => {
+  useFrame((state: RootState,) => {
     if (typeof vinylref.current != "undefined" && typeof camref != "undefined") {
-      camref.position.x = camPos[0] + (circleSize * Math.cos(state.clock.elapsedTime));
-      camref.position.y = camPos[1] + (circleSize * Math.sin(state.clock.elapsedTime));
-      camref.position.z = camPos[2];
-      camref.lookAt(vinylref.current?.position);
+      camref.position.x = camPos.x + (circleSize * Math.cos(state.clock.elapsedTime));
+      camref.position.y = camPos.y + (circleSize * Math.sin(state.clock.elapsedTime));
+      camref.position.z = camPos.z;
+      camref.lookAt(vinylref.current?.position || new Vector3(0,0,0));
     }
   });
   return (
@@ -225,16 +206,16 @@ const CubeScene: React.FC<{ image: string, dimensions: Array<number>}> = ({ imag
       camera={{ position: [1,1,1], fov: 100 }}
       resize={{ scroll: false }}
     >
-      <_CubeScene image={image}/>
+      <Cube image={image}/>
     </Canvas>
   );
 };
 
-const _CubeScene: React.FC<{ image: string}> = ({ image }) => {
+const Cube: React.FC<{ image: string}> = ({ image }) => {
   const cubeRef = useRef<Mesh>(null);
   const texture = useLoader(TextureLoader, image);
 
-  useFrame((state: any, delta: number) => {
+  useFrame((_state: RootState, delta: number) => {
     if (cubeRef.current) {
       cubeRef.current.rotation.x += delta;
       cubeRef.current.rotation.y += delta;
@@ -263,12 +244,12 @@ const MountainScene: React.FC<{colors: Array<string>, dimensions: Array<number>}
       camera={{ position: [0,1.1,0.5], rotation: [radians(-5), 0, 0], fov: 150 }}
       resize={{ scroll: false }}
     >
-      <_Mountain colors={colors}/>
+      <Mountain colors={colors}/>
     </Canvas>
   );
 };
 
-function interpolateColor(color1, color2, ratio) {
+function interpolateColor(color1: string, color2: string, ratio: number) {
     const rgb1 = parseInt(color1.replace('#', ''), 16);
     const rgb2 = parseInt(color2.replace('#', ''), 16);
     
@@ -287,12 +268,7 @@ function interpolateColor(color1, color2, ratio) {
     return [r, g, b];
 }
 
-const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
-  // Settings
-  const xOff = -5;
-  const yOff = 0;
-  const zOff = 0;
-  const geoScale = 1 / 5;
+const Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
   // Controls how quickly the colors switch
   const scalingColor = 5;
   let currInterpolation = 0;
@@ -302,13 +278,12 @@ const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
   let color2 = colors[colorIdx + 1];
   // Refs
   const mountain = useLoader(GLTFLoader, "/models/halfmountain.gltf");
-  const [color, setColor] = useState<Color>(new Color().setRGB(1, 0, 0))
   const mtnGroup = useRef<Group>(null);
   const material = new MeshPhongMaterial({color: "red"});
 
 
 
-  useFrame((state: any, delta: number) => {
+  useFrame((_state: RootState, delta: number) => {
     if (typeof mtnGroup.current !== "undefined" && mtnGroup.current != null){
       mtnGroup.current.rotation.x += delta;
 
@@ -319,7 +294,7 @@ const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
         colorIdx = (colorIdx + 1) % colors.length
         color2 = colors[colorIdx];
       }
-      let [r,g,b] = interpolateColor(color1, color2, currInterpolation);
+      const [r,g,b] = interpolateColor(color1, color2, currInterpolation);
       currInterpolation += delta / scalingColor;
       material.color.setRGB(r/255, g/255, b/255);
     }
@@ -332,13 +307,13 @@ const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
       <pointLight position={[2, 2, 2]} intensity={20}/>
       <group scale={1} position={[0.15, 0, 0]} rotation={[0,0,radians(90)]} ref={mtnGroup}>
         <mesh position={[0,0.9,0]}
-              geometry={mountain.nodes.Cylinder.geometry}
+              geometry={(mountain.nodes.Cylinder as Mesh).geometry}
               rotation={[0, 0, radians(180)]}
               material={material}
               >
         </mesh>
         <mesh position={[0,-0.9,0]}
-              geometry={mountain.nodes.Cylinder001.geometry}
+              geometry={(mountain.nodes.Cylinder001 as Mesh).geometry}
               material={material}>
         </mesh>
       </group>
@@ -346,6 +321,7 @@ const _Mountain: React.FC<{colors: Array<string>}> = ({ colors }) => {
   )
 }
 
+{/*
 function Debug() {
   return (
     <>
@@ -355,6 +331,7 @@ function Debug() {
     </>
   );
 }
+*/}
 
 
 export const ANIMATIONS = ["cube", "vinyl", "mountain"];

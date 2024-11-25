@@ -11,6 +11,7 @@ declare module JSX{
         "boxGeometry": any,
         "planeGeometry": any,
         "directionalLight": any,
-        "primitive": any
+        "primitive": any,
+        "pointLight": any
     }
 }

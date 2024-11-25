@@ -315,7 +315,7 @@ export default function Artist() {
         }
       })
     }
-  }, [])
+  }, [currTrack.artist])
 
   const ratio = 3/4;
   return (
