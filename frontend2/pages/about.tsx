@@ -1,4 +1,3 @@
-import Image from "next/image"
 import { FiChevronDown } from "react-icons/fi";
 import { FiChevronRight } from "react-icons/fi";
 import Link from 'next/link';
@@ -11,12 +10,16 @@ function Panel({statement, img, alt}: {statement: string, img: string, alt: stri
 
   const [hide, setHide] = useState<boolean>(true);
   return (
-    <div className="text-xl md:text-2xl">
-      <span className="mr-2" onClick={() => {setHide(!hide)}}>
-        {hide ? <FiChevronRight className="inline rainbow-svg border-2 rounded cursor-pointer"/> : <FiChevronDown className="inline rainbow-svg border-2 rounded cursor-pointer"/>}
-      </span>
-      <span className="inline">{statement}</span>
-      {hide || <span><br/>This will be a demo gif once the UI is complete<Image src={img} alt={alt} width={400} height={400} className="w-full"/></span>}
+    <div className="text-xl md:text-2xl flex flex-col items-center">
+      <div className="">
+        <span className="mr-2" onClick={() => {setHide(!hide)}}>
+          {hide ? <FiChevronRight className="inline rainbow-svg border-2 rounded cursor-pointer"/> : <FiChevronDown className="inline rainbow-svg border-2 rounded cursor-pointer"/>}
+        </span>
+        <span className="inline">{statement}</span>
+      </div>
+      <video className={"w-3/5 border-2 rounded-2xl " + (hide ? "hidden" : "")}  autoPlay muted loop>
+        <source src={img}/>    
+      </video>
     </div>
   );
 }
@@ -31,9 +34,9 @@ export default function About() {
     <div className="min-h-dvh flex flex-col justify-evenly items-center w-full py-8">
       <Talk words={words}/>
       <div className="mt-8 mx-auto">
-        <Panel statement="tunetree grows artists." img="/placeholder-square.png" alt="changeme"/>
-        <Panel statement="tunetree helps artists update fans." img="/placeholder-square.png" alt="changeme"/>
-        <Panel statement="tunetree is place for self expression." img="/placeholder-square.png" alt="changeme"/>
+        <Panel statement="tunetree grows artists." img="/videos/link.mp4" alt="video of tunetree link sharing"/>
+        <Panel statement="tunetree helps artists update fans." img="/videos/email.mp4" alt="video of tunetree email updates"/>
+        <Panel statement="tunetree is place for self expression." img="/videos/art.mp4" alt="video of tunetree 3d backgrounds"/>
       </div>
       <div className="mx-auto my-4">
         <Link href="/login"><UIButton type="neutral" content="Login" handle={() => {}} submit={false}/></Link>
