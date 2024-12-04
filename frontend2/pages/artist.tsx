@@ -179,7 +179,7 @@ function Editor({changeMode, setCurrTrack, formData, setFormData}: {changeMode: 
       <form onSubmit={(e) => handleSubmit(e, setMessage)} className="flex-col items-center">
         <ServiceSelectorBar selected={selected} setSelected={setSelected}/>
         <ServiceURLs formData={formData} setFormData={setFormData} selected={selected} setSelected={setSelected}/>
-        <textarea  className="w-full rounded-lg p-1 my-2" value={formData["message"]} onChange={(e) => {
+        <textarea  className="w-full rounded-lg p-1 my-2 text-black" value={formData["message"]} onChange={(e) => {
           const newTrack: Track= {
             ...formData,
             message: e.target.value,
