@@ -6,7 +6,7 @@ import Talk from "@/components/talk";
 import { useState } from "react";
 import UIButton from "@/components/uibutton";
 
-function Panel({statement, img, alt}: {statement: string, img: string, alt: string}) {
+function Panel({statement, img}: {statement: string, img: string}) {
 
   const [hide, setHide] = useState<boolean>(true);
   return (
@@ -34,9 +34,9 @@ export default function About() {
     <div className="min-h-dvh flex flex-col justify-evenly items-center w-full py-8">
       <Talk words={words}/>
       <div className="mt-8 mx-auto">
-        <Panel statement="tunetree grows artists." img="/videos/link.mp4" alt="video of tunetree link sharing"/>
-        <Panel statement="tunetree helps artists update fans." img="/videos/email.mp4" alt="video of tunetree email updates"/>
-        <Panel statement="tunetree is place for self expression." img="/videos/art.mp4" alt="video of tunetree 3d backgrounds"/>
+        <Panel statement="tunetree grows artists." img="/videos/link.mp4" />
+        <Panel statement="tunetree helps artists update fans." img="/videos/email.mp4" />
+        <Panel statement="tunetree is place for self expression." img="/videos/art.mp4" />
       </div>
       <div className="mx-auto my-4">
         <Link href="/login"><UIButton type="neutral" content="Login" handle={() => {}} submit={false}/></Link>
