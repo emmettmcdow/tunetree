@@ -10,14 +10,14 @@ function Panel({statement, img}: {statement: string, img: string}) {
 
   const [hide, setHide] = useState<boolean>(true);
   return (
-    <div className="text-xl md:text-2xl flex flex-col items-center">
+    <div className="text-xl md:text-2xl flex flex-col items-center my-2">
       <div className="">
         <span className="mr-2" onClick={() => {setHide(!hide)}}>
           {hide ? <FiChevronRight className="inline rainbow-svg border-2 rounded cursor-pointer"/> : <FiChevronDown className="inline rainbow-svg border-2 rounded cursor-pointer"/>}
         </span>
         <span className="inline">{statement}</span>
       </div>
-      <video className={"w-3/5 border-2 rounded-2xl " + (hide ? "hidden" : "")}  autoPlay muted loop>
+      <video className={"w-3/5 border-2 my-4 rounded-2xl " + (hide ? "hidden" : "")}  autoPlay muted loop playsInline>
         <source src={img}/>    
       </video>
     </div>
