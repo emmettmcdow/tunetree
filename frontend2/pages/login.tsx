@@ -7,6 +7,7 @@ import Link from 'next/link';
 
 import { setAuthenticatedUser } from '../utils/utils';
 import UIButton from '@/components/uibutton';
+import LightButton from '@/components/lightbutton';
 
 export function Header({left, right, rightLink}: {left?: string, right?: string, rightLink?: string}) {
   return (
@@ -162,8 +163,8 @@ export default function Login() {
             }} name="password"/>
             <UIButton type="confirm" content="Login" submit={true} handle={() => {}}/>
           </form>
-          <p><Link href="/signup">Forgot your password?</Link></p>
-          <p>Or create an account<Link href="/signup"> here</Link></p>
+          <div><LightButton link="/signup" content="create an account"/></div>
+          <div><LightButton link="/help" content="need help?"/></div>
         </div>
       </div>
     </div>

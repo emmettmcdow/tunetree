@@ -6,7 +6,7 @@ import { spotifySearch } from '../utils/spotify';
 import UIButton from "@/components/uibutton";
 
 
-export const UIPaths = ["login", "signup", "artist", "about", "track", "settings", "admin", "error"]
+export const UIPaths = ["login", "signup", "artist", "about", "track", "settings", "admin", "error", "help"]
 
 export default function Signup() {
   const [message, setMessage] = useState("");

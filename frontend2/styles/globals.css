@@ -54,48 +54,56 @@ code {
     stroke: red;
     color: red;
     border-color: red;
+    filter: drop-shadow(0 1px 3px red);
   }
 
   14% {
     stroke: orange;
     color: orange;
     border-color: range;
+    filter: drop-shadow(0 1px 3px orange);
   }
 
   29% {
     stroke: yellow;
     color: yellow;
     border-color: yellow;
+    filter: drop-shadow(0 1px 3px yellow);
   }
 
   43% {
     stroke: green;
     color: green;
     border-color: green;
+    filter: drop-shadow(0 1px 3px green);
   }
 
   57% {
     stroke: blue;
     color: blue;
     border-color: blue;
+    filter: drop-shadow(0 1px 3px blue);
   }
 
   71% {
     stroke: indigo;
     color: indigo;
     border-color: indigo;
+    filter: drop-shadow(0 1px 3px indigo);
   }
 
   86% {
     stroke: violet;
     color: violet;
     border-color: violet;
+    filter: drop-shadow(0 1px 3px violet);
   }
 
   100% {
     stroke: red;
     color: red;
     border-color: red;
+    filter: drop-shadow(0 1px 3px red);
   }
 }
 
@@ -192,4 +200,9 @@ img {
   to {
     transform: translateY(-5px);
   }
+}
+
+.bright-text {
+  /* text-shadow: 0 0 5px #ffff66; */
+  filter: drop-shadow(0 1px 3px #ffff66);
 }

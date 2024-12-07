@@ -1,5 +1,3 @@
-// We want any funciton here.
-
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 // eslint-disable-next-line
@@ -34,11 +32,11 @@ export default function UIButton({type, content, handle, submit}: {type: string,
       {(() => {
         switch(type) {
         case "left":
-          return <FiChevronLeft className="inline mx-2 rainbow-hover"/>;
+          return <FiChevronLeft className="inline mx-2 rainbow-hover bright-text"/>;
         case "right":
-          return <FiChevronRight className="inline mx-2 rainbow-hover"/>;
+          return <FiChevronRight className="inline mx-2 rainbow-hover bright-text"/>;
         default:
-          return (<span className="text-xl p-6 rainbow-hover">{content || ""}</span>);
+          return (<span className="text-xl p-6 rainbow-hover bright-text">{content || ""}</span>);
       }})()}
     </button>
   );  
