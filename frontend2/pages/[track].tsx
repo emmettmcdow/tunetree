@@ -5,6 +5,8 @@ import { NextSeo } from 'next-seo';
 import { Track } from './artist';
 import { getAuthenticatedArtistLink} from '../utils/utils';
 import Display from '@/components/display';
+import UIButton from '@/components/uibutton';
+import Link from 'next/link';
 
 
 
@@ -16,10 +18,12 @@ function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: Track, link: 
       <div className="z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 fg-color p-5 rounded-2xl text-center z-50 drop-shadow-lg">
         <p>{"wanna be notified when "+ trackInfo.artist + " drops? (it's free)"}</p>
         <form className="my-2">
-          <input className="text-black w-1/2 rounded-xl p-2 " placeholder="email" name="email"/>
-          <a href={link}><button onClick={() => toggle("")} className="mx-2 bg-emerald-500 rounded-lg cursor-pointer bounce-button"><span className="p-4 py-2 text-white bounce-text">Yes</span></button></a>
+          <input className="text-black rounded-xl p-2 " placeholder="email" name="email"/>
+          <div className="flex">
+            <Link href={link}><UIButton type="confirm" content="yes" handle={() => toggle("")} submit={false}/></Link>
+            <Link href={link}><UIButton type="deny" content="no" handle={() => toggle("")} submit={false}/></Link>
+          </div>
         </form>
-        <a href={link}><button onClick={() => toggle("")} className="mx-2 bg-indigo-500 rounded-lg cursor-pointer bounce-button"><span className="p-4 py-2 text-white bounce-text">I just wanna rock(no)</span></button></a>
       </div>
     );
   } else {

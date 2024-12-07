@@ -15,12 +15,14 @@ export function Header({left, right, rightLink}: {left?: string, right?: string,
           <Image src="/logo-white.png" alt="tunetree logo" className="w-12 mx-auto inline mr-2" height="1024" width="1024"/>
           {left}
         </span>
-        <Link href={rightLink || "/"}>
-          <span className="text-md rainbow-svg border rounded-xl px-2">
-            {right}
-            <FiChevronRight className="inline rainbow-svg"/> 
-          </span>
-        </Link>
+        {right &&
+          <Link href={rightLink || "/"}>
+            <span className="text-md rainbow-svg border rounded-xl px-2">
+              {right}
+              <FiChevronRight className="inline rainbow-svg"/> 
+            </span>
+          </Link>
+        }
       </div>
   )
 }

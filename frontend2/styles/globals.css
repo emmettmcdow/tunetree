@@ -38,6 +38,17 @@ code {
   animation-delay: var(--delay, 0s);
 }
 
+.rainbow-hover {
+  stroke: white;
+  color: white;
+  border-color: white;
+}
+
+.rainbow-hover:hover {
+  animation: rainbow 2s infinite;
+  animation-delay: var(--delay, 0s);
+}
+
 @keyframes rainbow {
   0% {
     stroke: red;

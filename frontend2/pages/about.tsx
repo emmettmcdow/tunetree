@@ -54,14 +54,15 @@ export default function About() {
     </span>
   );
   return (
-    <div className="min-h-dvh flex flex-col justify-evenly items-center w-full py-8">
+    <div className="min-h-dvh flex flex-col justify-start items-center w-full py-8">
       <Talk words={words}/>
       <div className="mt-8 mx-auto">
         <Panel statement="tunetree grows artists." detail="Get a link to your music you can easily share on social media." img="/videos/link.mp4" n={3}/>
         <Panel statement="tunetree helps artists update fans." detail="We will send your fans an email when you release." img="/videos/email.mp4" n={2}/>
         <Panel statement="tunetree is place for self expression." detail="Pick from a variety of 3D animations which integrate your album art uniquely." img="/videos/art.mp4" n={1}/>
       </div>
-      <div className="mx-auto my-4">
+      <div className="mx-auto my-4 fg-color rounded-xl">
+        <div className="text-2xl text-center mt-4"> get started now </div>
         <Link href="/login"><UIButton type="neutral" content="Login" handle={() => {}} submit={false}/></Link>
         <Link href="/signup"><UIButton type="neutral" content="Signup" handle={() => {}} submit={false}/></Link>
       </div>

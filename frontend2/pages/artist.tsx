@@ -9,6 +9,7 @@ import { Header, Message } from './login';
 import UIButton from "@/components/uibutton";
 import Display from '@/components/display';
 import { ANIMATIONS } from '@/components/webgl2';
+import ScrollPrompt from '@/components/scrollprompt';
 
 function ServiceSelectorBar({selected, setSelected}: {selected: Selected, setSelected: React.Dispatch<React.SetStateAction<Selected>>}) { 
   const buttons = [];
@@ -31,7 +32,7 @@ function ServiceSelectorBar({selected, setSelected}: {selected: Selected, setSel
   return (
     <div className="flex my-2">
       <div className="flex justify-start w-1/4 items-center">
-        <p className="text-xl"> Add: </p>
+        <p className="text-xl">add link:</p>
       </div>
       <div className="flex justify-evenly my-2 w-3/4">
         {buttons}
@@ -126,6 +127,7 @@ function Editor({changeMode, setCurrTrack, formData, setFormData}: {changeMode: 
   }
   const [selected, setSelected] = useState(initialState);
   const [message, setMessage] = useState("");
+  const submitRef = useRef<HTMLDivElement>(null);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, setMessage: Dispatch<SetStateAction<string>>) => {
     event.preventDefault();
 
@@ -174,24 +176,42 @@ function Editor({changeMode, setCurrTrack, formData, setFormData}: {changeMode: 
   };
 
   return (
-    <div className="flex flex-col mx-auto z-40">
-      <Message content={message}/>
-      <form onSubmit={(e) => handleSubmit(e, setMessage)} className="flex-col items-center">
-        <ServiceSelectorBar selected={selected} setSelected={setSelected}/>
-        <ServiceURLs formData={formData} setFormData={setFormData} selected={selected} setSelected={setSelected}/>
-        <textarea  className="w-full rounded-lg p-1 my-2 text-black" value={formData["message"]} onChange={(e) => {
-          const newTrack: Track= {
-            ...formData,
-            message: e.target.value,
-          };
-          setFormData(newTrack);
-        }} name="message" placeholder="A message to your fans"/>
-        <div className="flex justify-center">
-          <UIButton type="deny" content="Cancel" handle={() => {changeMode(Mode.Standby)}} submit={false}/>
-          <UIButton type="confirm" content="Submit" handle={() => {}} submit={true}/>
+    <>
+      <div className="flex flex-col mx-auto z-40">
+        <Message content={message}/>
+        <div className="flex justify-between items-center">
+          <UIButton type="left" submit={false} handle={(_: any) => {
+            setFormData({
+              ...formData,
+              animation: lastAnim(formData.animation)
+            })
+          }}/>
+          <span className="text-xl">change animation</span>
+          <UIButton type="right" submit={false} handle={(_: any) => {
+            setFormData({
+              ...formData,
+              animation: nextAnim(formData.animation)
+            })
+          }}/>
         </div>
-      </form>
-    </div>
+        <form onSubmit={(e) => handleSubmit(e, setMessage)} className="flex-col items-center">
+          <ServiceSelectorBar selected={selected} setSelected={setSelected}/>
+          <ServiceURLs formData={formData} setFormData={setFormData} selected={selected} setSelected={setSelected}/>
+          <textarea  className="w-full rounded-lg p-1 my-2 text-black" value={formData["message"]} onChange={(e) => {
+            const newTrack: Track= {
+              ...formData,
+              message: e.target.value,
+            };
+            setFormData(newTrack);
+          }} name="message" placeholder="A message to your fans"/>
+          <div ref={submitRef} className="flex justify-center">
+            <UIButton type="deny" content="Cancel" handle={() => {changeMode(Mode.Standby)}} submit={false}/>
+            <UIButton type="confirm" content="Submit" handle={() => {}} submit={true}/>
+          </div>
+        </form>
+      </div>
+      <ScrollPrompt target={submitRef}/>
+    </>
   );
 }
 enum Mode {
@@ -251,6 +271,7 @@ export class Track{
   }
   // eslint-disable-next-line
   constructor(data: any) {
+    this.artist = "";
     this.name = "";
     this.message = "";
     this.image = "";
@@ -328,26 +349,6 @@ export default function Artist() {
       <div className="p-4">
         <Header left={getHeader(mode)} right={`tunetree.xyz/${currTrack.artist || ""}`} rightLink={artistLink}/>
         <div ref={boundingBox} className="relative sticky top-0 flex flex-col items-center rounded-2xl border-2 border-b-0 border-white mx-auto mt-2 overflow-hidden z-40">
-          {mode != Mode.Standby && (
-            <>
-              <span className="absolute text-6xl top-1/2 z-50 left-0" onClick={() => {
-                setFormData({
-                  ...formData,
-                  animation: lastAnim(formData.animation)
-                })
-              }}>
-                <FiChevronLeft className="cursor-pointer rainbow-svg"/>
-              </span>
-              <span className="absolute text-6xl top-1/2 z-50 right-0" onClick={() => {
-                setFormData({
-                  ...formData,
-                  animation: nextAnim(formData.animation)
-                })
-              }}>
-                <FiChevronRight className="cursor-pointer rainbow-svg"/>
-              </span>
-            </>
-          )}
           {isClient && (<Display 
                           track={mode == Mode.Standby ? currTrack : formData}
                           width={boundingBox.current?.clientWidth || 0}

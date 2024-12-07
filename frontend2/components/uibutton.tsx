@@ -1,6 +1,9 @@
 // We want any funciton here.
+
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+
 // eslint-disable-next-line
-export default function UIButton({type, content, handle, submit}: {type: string, content: string, handle: Function, submit: boolean}) {
+export default function UIButton({type, content, handle, submit}: {type: string, content?: string, handle: Function, submit: boolean}) {
   /*
     - type: confirm, deny, neutral
     - content: what the button says
@@ -9,13 +12,15 @@ export default function UIButton({type, content, handle, submit}: {type: string,
   let color = "";
   switch(type) {
   case "confirm":
-      color = " bg-emerald-500 ";
+      color = " bg-black ";
       break;
   case "deny":
-      color = " bg-rose-500 ";
+      color = " bg-neutral-900 ";
       break;
+  case "left":
+  case "right":
   case "neutral":
-      color = " bg-indigo-500 ";
+      color = " bg-black ";
       break;
   }
   let actiontype: "submit" | "button" = "button";
@@ -23,9 +28,18 @@ export default function UIButton({type, content, handle, submit}: {type: string,
     actiontype = "submit";
   }
 
-  const buttonClass = "m-4 rounded-lg cursor-pointer bounce-button" + color;
-  const textClass = "text-xl p-6 text-white bounce-text";
+  const buttonClass = "m-4 rounded-lg cursor-pointer bounce-button " + color;
   return (
-    <button className={buttonClass} onClick={(e) => handle(e)} type={actiontype}><span className={textClass}>{content}</span></button>
+    <button className={buttonClass} onClick={(e) => handle(e)} type={actiontype}>
+      {(() => {
+        switch(type) {
+        case "left":
+          return <FiChevronLeft className="inline mx-2 rainbow-hover"/>;
+        case "right":
+          return <FiChevronRight className="inline mx-2 rainbow-hover"/>;
+        default:
+          return (<span className="text-xl p-6 rainbow-hover">{content || ""}</span>);
+      }})()}
+    </button>
   );  
 }
