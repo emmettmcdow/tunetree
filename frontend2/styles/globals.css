@@ -35,6 +35,7 @@ code {
 
 .rainbow-svg {
   animation: rainbow 3s infinite;
+  animation-delay: var(--delay, 0s);
 }
 
 @keyframes rainbow {
@@ -44,34 +45,40 @@ code {
     border-color: red;
   }
 
-  15% {
+  14% {
     stroke: orange;
     color: orange;
     border-color: range;
   }
 
-  30% {
+  29% {
     stroke: yellow;
     color: yellow;
     border-color: yellow;
   }
 
-  45% {
+  43% {
     stroke: green;
     color: green;
     border-color: green;
   }
 
-  60% {
+  57% {
     stroke: blue;
     color: blue;
     border-color: blue;
   }
 
-  75% {
-    stroke: purple;
-    color: purple;
-    border-color: purple;
+  71% {
+    stroke: indigo;
+    color: indigo;
+    border-color: indigo;
+  }
+
+  86% {
+    stroke: violet;
+    color: violet;
+    border-color: violet;
   }
 
   100% {
