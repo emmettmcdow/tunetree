@@ -126,7 +126,7 @@ export default function Signup() {
     <div className="h-screen flex flex-col">
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 fg-color w-11/12 py-4 md:w-3/5 md:py-8 rounded-lg">
         <div className="w-11/12 md:w-5/6 mx-auto">
-          <Header msg="Signing up..."/>
+          <Header left="Signing up..."/>
           <Message content={message}/>
           <form onSubmit={handleSubmit} className="flex flex-col my-4">
             <input className="w-full rounded-lg p-1 mb-2 text-black"

@@ -1,4 +1,4 @@
-import {FiEyeOff} from 'react-icons/fi';
+import {FiChevronRight, FiEyeOff} from 'react-icons/fi';
 import {FiEye} from 'react-icons/fi';
 import {FiAlertCircle} from 'react-icons/fi';
 import { useState } from 'react';
@@ -8,11 +8,19 @@ import Link from 'next/link';
 import { setAuthenticatedUser } from '../utils/utils';
 import UIButton from '@/components/uibutton';
 
-export function Header({msg}: {msg: string}) {
+export function Header({left, right, rightLink}: {left?: string, right?: string, rightLink?: string}) {
   return (
-      <div className="text-2xl">
-        <Image src="/logo-white.png" alt="tunetree logo" className="w-12 mx-auto inline mr-2" height="1024" width="1024"/>
-        {msg}
+      <div className="w-full flex justify-between items-center">
+        <span className="text-2xl">
+          <Image src="/logo-white.png" alt="tunetree logo" className="w-12 mx-auto inline mr-2" height="1024" width="1024"/>
+          {left}
+        </span>
+        <Link href={rightLink || "/"}>
+          <span className="text-md rainbow-svg border rounded-xl px-2">
+            {right}
+            <FiChevronRight className="inline rainbow-svg"/> 
+          </span>
+        </Link>
       </div>
   )
 }
@@ -128,7 +136,7 @@ export default function Login() {
     <div className="h-screen flex flex-col">
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 fg-color w-11/12 py-4 md:w-3/5 md:py-8 rounded-lg">
         <div className="w-11/12 md:w-5/6 mx-auto">
-          <Header msg="Logging In..."/>
+          <Header left="Logging In..."/>
           <Message content={message}/>
           <form className="flex flex-col my-4" onSubmit={handleSubmit}>
             <input className="w-full rounded-lg p-1 mb-2 text-black"

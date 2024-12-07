@@ -2,7 +2,7 @@ import { useState, Dispatch, SetStateAction, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import {FiX, FiChevronRight, FiChevronLeft } from 'react-icons/fi';
 
-import { getAuthenticatedArtistLink, getAuthorizationHeader, iconForService } from "../utils/utils"
+import { getAuthenticatedArtist, getAuthenticatedArtistLink, getAuthorizationHeader, iconForService } from "../utils/utils"
 import { spotifyGetArt } from '../utils/spotify';
 import { getTrackInfo } from './[track]';
 import { Header, Message } from './login';
@@ -210,7 +210,7 @@ function EditPanel({mode, changeMode, currTrack, setCurrTrack, formData, setForm
             changeMode(Mode.Edit);
           }} submit={false}/>
           <UIButton type="neutral" content="New" handle={() => {
-            setFormData(new Track({artist: currTrack.artist}));
+            setFormData(new Track({"artistName": currTrack.artist}));
             changeMode(Mode.New)
           }} submit={false}/>
         </div>
@@ -251,8 +251,23 @@ export class Track{
   }
   // eslint-disable-next-line
   constructor(data: any) {
-    if (Object.hasOwn(data, "track")) {
+    this.name = "";
+    this.message = "";
+    this.image = "";
+    this.colors = "";
+    this.animation = "cube";
+    this.links = {
+      apple: "",
+      spotify: "",
+      youtube: "",
+      tidal: "",
+      amazon: "",
+      bandcamp: ""
+    }
+    if (Object.hasOwn(data, 'artistName')) {
       this.artist = data['artistName'];
+    }
+    if (Object.hasOwn(data, "track")) {
       this.name = data['track']['name'];
       this.message = data['track']['message'];
       this.image = data['track']['image'];
@@ -265,21 +280,6 @@ export class Track{
         tidal: data['track']['links']['tidal'] || "",
         amazon: data['track']['links']['amazon'] || "",
         bandcamp: data['track']['links']['bandcamp'] || "",
-      }
-    } else { 
-      this.name = "";
-      this.artist = "";
-      this.message = "";
-      this.image = "";
-      this.colors = "";
-      this.animation = "cube";
-      this.links = {
-        apple: "",
-        spotify: "",
-        youtube: "",
-        tidal: "",
-        amazon: "",
-        bandcamp: ""
       }
     }
   }
@@ -297,6 +297,7 @@ function lastAnim(animation: string) {
 export default function Artist() {
   const [mode, changeMode] = useState(Mode.Standby);
   const [, setLink] = useState("");
+  const [artistLink, setArtistLink] = useState("/");
   const [formData, setFormData] = useState<Track>(new Track({}));
   const [currTrack, setCurrTrack] = useState<Track>(new Track({}));
   const [isClient, setIsClient] = useState<boolean>(false);
@@ -309,19 +310,23 @@ export default function Artist() {
       if (!artistLink) {
         window.location.href = "/login"
       }
+      setArtistLink(artistLink);
+      const artistName = getAuthenticatedArtist();
       getTrackInfo(artistLink).then((ti) => {
         if (ti != "") { 
           setCurrTrack(new Track(ti));
+        } else {
+          setCurrTrack(new Track({"artistName": artistName}))
         }
       })
     }
-  }, [currTrack.artist])
+  }, [])
 
   const ratio = 3/4;
   return (
     <>
       <div className="p-4">
-        <Header msg={getHeader(mode)}/>
+        <Header left={getHeader(mode)} right={`tunetree.xyz/${currTrack.artist || ""}`} rightLink={artistLink}/>
         <div ref={boundingBox} className="relative sticky top-0 flex flex-col items-center rounded-2xl border-2 border-b-0 border-white mx-auto mt-2 overflow-hidden z-40">
           {mode != Mode.Standby && (
             <>
