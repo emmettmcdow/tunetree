@@ -15,6 +15,15 @@
   color: #FFFFFF
 }
 
+@layer base {
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    @apply outline-black;
+  }
+}
+
 @font-face {
   font-family: "kiwisoda";
   src: url("/fonts/KiwiSoda.woff");
@@ -38,7 +47,16 @@ code {
   animation-delay: var(--delay, 0s);
 }
 
-.rainbow-hover {
+.rainbow-input {
+  animation: rainbow-nobox 3s infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.rainbow-input::placeholder {
+  text-shadow: none;
+}
+
+.rainbow-input .rainbow-hover {
   stroke: white;
   color: white;
   border-color: white;
@@ -47,6 +65,64 @@ code {
 .rainbow-hover:hover {
   animation: rainbow 2s infinite;
   animation-delay: var(--delay, 0s);
+}
+
+@keyframes rainbow-nobox {
+  0% {
+    stroke: red;
+    color: red;
+    border-color: red;
+    text-shadow: 0 1px 3px red;
+  }
+
+  14% {
+    stroke: orange;
+    color: orange;
+    border-color: range;
+    text-shadow: 0 1px 3px orange;
+  }
+
+  29% {
+    stroke: yellow;
+    color: yellow;
+    border-color: yellow;
+    text-shadow: 0 1px 3px yellow;
+  }
+
+  43% {
+    stroke: green;
+    color: green;
+    border-color: green;
+    text-shadow: 0 1px 3px green;
+  }
+
+  57% {
+    stroke: blue;
+    color: blue;
+    border-color: blue;
+    text-shadow: 0 1px 3px blue;
+  }
+
+  71% {
+    stroke: indigo;
+    color: indigo;
+    border-color: indigo;
+    text-shadow: 0 1px 3px indigo;
+  }
+
+  86% {
+    stroke: violet;
+    color: violet;
+    border-color: violet;
+    text-shadow: 0 1px 3px violet;
+  }
+
+  100% {
+    stroke: red;
+    color: red;
+    border-color: red;
+    text-shadow: 0 1px 3px red;
+  }
 }
 
 @keyframes rainbow {

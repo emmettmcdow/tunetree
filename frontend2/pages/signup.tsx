@@ -137,12 +137,13 @@ export default function Signup() {
                    onChange={handleChange}/>
             <div className="mb-2">Your link will look like:</div>
             <div className="flex">
-              <span className="w-fit rounded-l-lg mb-2 pl-2 bg-slate-200 cursor-not-allowed inline mx-0 text-black" >tunetree.xyz/</span>
+              <span className="w-fit rounded-l-lg mb-2 pl-2 cursor-not-allowed inline mx-0 text-white bg-color" ><span className="rainbow-svg">tunetree.xyz/</span></span>
               <input name="link" type="text" 
-                     className={separateLink ? "w-full rounded-r-lg mb-2 mx-0 inline text-black" : "w-full rounded-r-lg mb-2 mx-0 bg-slate-200 cursor-not-allowed inline text-black"}
+                     className={separateLink ? "rainbow-input w-full rounded-r-lg mb-2 mx-0 inline text-black focus:outline-black" : "rainbow-input w-full rounded-r-lg mb-2 mx-0 bg-color cursor-not-allowed inline text-white selectable-none focus:outline-none"}
                      value={formData.link}
                      onChange={handleChange}
-                     readOnly={!separateLink}/>
+                     readOnly={!separateLink}
+                     placeholder={separateLink ? " make me as custom as a beyblade" : ""}/>
             </div>
             <UIButton type="neutral"
                       content={separateLink ? "Want the default link?": "Want a custom link?"}
@@ -154,6 +155,11 @@ export default function Signup() {
                                     setFormData(prevState => ({
                                       ...prevState,
                                       "link": encodeArtistLink(formData.artist)
+                                    }));
+                                  } else {
+                                    setFormData(prevState => ({
+                                      ...prevState,
+                                      "link": "",
                                     }));
                                   }
                                 }
