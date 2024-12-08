@@ -1,6 +1,6 @@
 import { useState, Dispatch, SetStateAction, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import {FiX, FiChevronRight, FiChevronLeft } from 'react-icons/fi';
+import {FiX} from 'react-icons/fi';
 
 import { getAuthenticatedArtist, getAuthenticatedArtistLink, getAuthorizationHeader, iconForService } from "../utils/utils"
 import { spotifyGetArt } from '../utils/spotify';
@@ -10,7 +10,6 @@ import UIButton from "@/components/uibutton";
 import Display from '@/components/display';
 import { ANIMATIONS } from '@/components/webgl2';
 import ScrollPrompt from '@/components/scrollprompt';
-import Tooltip from '@/components/tooltip';
 
 function ServiceSelectorBar({selected, setSelected}: {selected: Selected, setSelected: React.Dispatch<React.SetStateAction<Selected>>}) { 
   const buttons = [];
@@ -116,6 +115,24 @@ type Selected = {
   bandcamp: boolean;
 }
 
+function nextAnim(animation: string) {
+  const out = ANIMATIONS[(ANIMATIONS.indexOf(animation) + 1) % ANIMATIONS.length];
+  return out;
+}
+
+function lastAnim(animation: string) {
+  return ANIMATIONS[(ANIMATIONS.indexOf(animation) + 1) % ANIMATIONS.length];
+}
+
+const DISPLAY = ["center-card", "minimal"];
+function nextDisplay(display: string) {
+  const out = DISPLAY[(DISPLAY.indexOf(display) + 1) % DISPLAY.length];
+  return out;
+}
+
+function lastDisplay(display: string) {
+  return DISPLAY[(DISPLAY.indexOf(display) + 1) % DISPLAY.length];
+}
 
 function Editor({changeMode, setCurrTrack, formData, setFormData}: {changeMode: Dispatch<SetStateAction<Mode>>, setCurrTrack: Dispatch<SetStateAction<Track>>, formData: Track, setFormData: Dispatch<SetStateAction<Track>>}) {
   const initialState: Selected = {
@@ -195,6 +212,21 @@ function Editor({changeMode, setCurrTrack, formData, setFormData}: {changeMode: 
             })
           }}/>
         </div>
+        <div className="flex justify-between items-center">
+          <UIButton type="left" submit={false} handle={(_: any) => {
+            setFormData({
+              ...formData,
+              display: lastDisplay(formData.display)
+            })
+          }}/>
+          <span className="text-xl">change display</span>
+          <UIButton type="right" submit={false} handle={(_: any) => {
+            setFormData({
+              ...formData,
+              display: nextDisplay(formData.display)
+            })
+          }}/>
+        </div>
         <form onSubmit={(e) => handleSubmit(e, setMessage)} className="flex-col items-center">
           <ServiceSelectorBar selected={selected} setSelected={setSelected}/>
           <ServiceURLs formData={formData} setFormData={setFormData} selected={selected} setSelected={setSelected}/>
@@ -262,6 +294,7 @@ export class Track{
   image: string
   colors: string
   animation: string
+  display: string
   links: {
     apple: string
     spotify: string
@@ -273,7 +306,8 @@ export class Track{
   // eslint-disable-next-line
   constructor(data: any) {
     this.artist = "";
-    this.name = "";
+    this.name = "not yet set //";
+    this.display = "center-card";
     this.message = "";
     this.image = "";
     this.colors = "";
@@ -295,6 +329,7 @@ export class Track{
       this.image = data['track']['image'];
       this.colors = data['track']['colors'];
       this.animation = data['track']['animation'];
+      this.display = data['track']['display'];
       this.links = {
         apple: data['track']['links']['apple'] || "",
         spotify: data['track']['links']['spotify'] || "",
@@ -305,15 +340,6 @@ export class Track{
       }
     }
   }
-}
-
-function nextAnim(animation: string) {
-  const out = ANIMATIONS[(ANIMATIONS.indexOf(animation) + 1) % ANIMATIONS.length];
-  return out;
-}
-
-function lastAnim(animation: string) {
-  return ANIMATIONS[(ANIMATIONS.indexOf(animation) + 1) % ANIMATIONS.length];
 }
 
 export default function Artist() {

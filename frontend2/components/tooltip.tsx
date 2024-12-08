@@ -1,7 +1,7 @@
 import { useState, ReactNode } from 'react';
 
 interface TooltipProps {
-  text: string;
+  text?: string;
   children: ReactNode;
 }
 
@@ -15,7 +15,7 @@ const Tooltip = ({ text, children}: TooltipProps) => {
       onMouseLeave={() => setIsVisible(false)}
     >
       {children}
-      {isVisible && (
+      {isVisible && text && (
         <div 
           className={`
             absolute z-40 px-3 py-2 top-0 left-1/2 -translate-x-1/2 translate-y-3 
