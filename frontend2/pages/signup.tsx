@@ -143,7 +143,7 @@ export default function Signup() {
                      value={formData.link}
                      onChange={handleChange}
                      readOnly={!separateLink}
-                     placeholder={separateLink ? " make me as custom as a beyblade" : ""}/>
+                     placeholder={separateLink ? " make me custom pls" : ""}/>
             </div>
             <UIButton type="neutral"
                       content={separateLink ? "Want the default link?": "Want a custom link?"}

@@ -10,6 +10,7 @@ import UIButton from "@/components/uibutton";
 import Display from '@/components/display';
 import { ANIMATIONS } from '@/components/webgl2';
 import ScrollPrompt from '@/components/scrollprompt';
+import Tooltip from '@/components/tooltip';
 
 function ServiceSelectorBar({selected, setSelected}: {selected: Selected, setSelected: React.Dispatch<React.SetStateAction<Selected>>}) { 
   const buttons = [];
@@ -349,12 +350,14 @@ export default function Artist() {
       <div className="p-4">
         <Header left={getHeader(mode)} right={`tunetree.xyz/${currTrack.artist || ""}`} rightLink={artistLink}/>
         <div ref={boundingBox} className="relative sticky top-0 flex flex-col items-center rounded-2xl border-2 border-b-0 border-white mx-auto mt-2 overflow-hidden z-40">
-          {isClient && (<Display 
-                          track={mode == Mode.Standby ? currTrack : formData}
-                          width={boundingBox.current?.clientWidth || 0}
-                          height={window.innerHeight * ratio}
-                          setLink={setLink}
-                          />)}
+          {isClient && (
+            <Display 
+             track={mode == Mode.Standby ? currTrack : formData}
+             width={boundingBox.current?.clientWidth || 0}
+             height={window.innerHeight * ratio}
+             setLink={setLink}
+             tooltip="this is where your album art will go"/>
+          )}
         </div>
         <div className="relative flex p-5 w-full fg-color rounded-2xl z-50 border-2 border-t-1">
           <EditPanel mode={mode} changeMode={changeMode} setCurrTrack={setCurrTrack} currTrack={currTrack} formData={formData} setFormData={setFormData}/>

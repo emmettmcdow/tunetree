@@ -9,7 +9,7 @@ export default function Test() {
   }, []);
 
   const colors = ["#00FF00", "#FF0000", "#0000FF"];
-  const image = "/placeholder-square.png";
+  const image = "/placeholder.png";
   const scene = "vinyl";
   return (
     <>

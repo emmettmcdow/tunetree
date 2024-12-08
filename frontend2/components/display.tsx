@@ -3,6 +3,7 @@ import Image from 'next/image';
 
 import { Track } from '@/pages/artist';
 import {iconForService } from '../utils/utils';
+import Tooltip from './tooltip';
 
 /*
 function  getShadeColor(colors: Array<string>) {
@@ -69,7 +70,7 @@ function ButtonBox({trackInfo, setLink}: {trackInfo: Track, setLink: React.Dispa
 }
 
 
-export default function Display({track, setLink, width, height}: {track: Track, setLink: React.Dispatch<React.SetStateAction<string>>, width: number, height: number}) {
+export default function Display({track, setLink, width, height, tooltip}: {track: Track, setLink: React.Dispatch<React.SetStateAction<string>>, width: number, height: number, tooltip?: string}) {
   // Styling
   /*
   const colors = track.colors.split(';').map((color: string) => color.trim());
@@ -81,11 +82,13 @@ export default function Display({track, setLink, width, height}: {track: Track, 
   
   return (
     <div className={"relative flex flex-col justify-evenly"} style={displayStyle}>
-      <div className={"bg-black/30 flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-30"}>
-        <p className="text-4xl"><b>{track.artist}</b></p>
-        <Image alt="album-art" src={track.image || "/placeholder-square.png" } className="w-52 my-2" height="1024" width="1024"/>
-        <p className="text-2xl">{track.name}</p>
-      </div>
+      <Tooltip text={tooltip || "oops"}>
+        <div className={"bg-black/30 flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-30"}>
+          <p className="text-4xl"><b>{track.artist}</b></p>
+          <Image alt="album-art" src={track.image || "/placeholder.png" } className="w-52 my-2" height="1024" width="1024"/>
+          <p className="text-2xl">{track.name}</p>
+        </div>
+      </Tooltip>
       <ButtonBox trackInfo={track} setLink={setLink}/>
       <WebGLBackground colors={track.colors.split(';').map((color: string) => color.trim())} image={track.image} scene={track.animation} width={width} height={height}/>
     </div>

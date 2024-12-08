@@ -1,6 +1,6 @@
 import { UIPaths } from "@/pages/signup";
 
-const placeholderSquare = "/placeholder-square.png";
+const placeholderSquare = "/placeholder.png";
 const spotify = "/spotify.png"
 const youtube = "/youtube.png"
 const apple = "/apple.png"

@@ -349,7 +349,7 @@ const WebGLBackground: React.FC<SceneProps> = ({
     return <></>;
   }
   if (typeof image == "undefined" || image == "") {
-    image = "/placeholder-square.png";
+    image = "/placeholder.png";
   }
   if (typeof colors == "undefined" || colors.length < 2) {
     colors = ["#00FF00", "#FF0000", "#0000FF"];
