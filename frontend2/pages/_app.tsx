@@ -1,6 +1,5 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
-import Link from "next/link";
 import { DefaultSeo } from 'next-seo';
 import LightButton from "@/components/lightbutton";
 

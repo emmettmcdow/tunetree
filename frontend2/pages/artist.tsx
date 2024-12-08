@@ -198,14 +198,14 @@ function Editor({changeMode, setCurrTrack, formData, setFormData}: {changeMode: 
       <div className="flex flex-col mx-auto z-40">
         <Message content={message}/>
         <div className="flex justify-between items-center">
-          <UIButton type="left" submit={false} handle={(_: any) => {
+          <UIButton type="left" submit={false} handle={() => {
             setFormData({
               ...formData,
               animation: lastAnim(formData.animation)
             })
           }}/>
           <span className="text-xl">change animation</span>
-          <UIButton type="right" submit={false} handle={(_: any) => {
+          <UIButton type="right" submit={false} handle={() => {
             setFormData({
               ...formData,
               animation: nextAnim(formData.animation)
@@ -213,14 +213,14 @@ function Editor({changeMode, setCurrTrack, formData, setFormData}: {changeMode: 
           }}/>
         </div>
         <div className="flex justify-between items-center">
-          <UIButton type="left" submit={false} handle={(_: any) => {
+          <UIButton type="left" submit={false} handle={() => {
             setFormData({
               ...formData,
               display: lastDisplay(formData.display)
             })
           }}/>
           <span className="text-xl">change display</span>
-          <UIButton type="right" submit={false} handle={(_: any) => {
+          <UIButton type="right" submit={false} handle={() => {
             setFormData({
               ...formData,
               display: nextDisplay(formData.display)
@@ -368,13 +368,13 @@ export default function Artist() {
         }
       })
     }
-  }, [])
+  })
 
   const ratio = 3/4;
   return (
     <>
       <div className="p-4">
-        <Header left={getHeader(mode)} right={`tunetree.xyz/${currTrack.artist || ""}`} rightLink={artistLink}/>
+        <Header left={getHeader(mode)} right={`tunetree.xyz/${artistLink || ""}`} rightLink={artistLink}/>
         <div ref={boundingBox} className="relative sticky top-0 flex flex-col items-center rounded-2xl border-2 border-b-0 border-white mx-auto mt-2 overflow-hidden z-40">
           {isClient && (
             <Display 

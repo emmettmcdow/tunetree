@@ -85,7 +85,7 @@ export default function Display({track, setLink, width, height, tooltip}: {track
   switch(track.display) {
     case "minimal":
       const providers = Object.entries(track.links).filter(([, value]) => value != "")  
-      const buttons = providers.map((provider, _) => (
+      const buttons = providers.map((provider) => (
         <IconLink provider={provider[0]} key={provider[0]} setLink={setLink} link={provider[1]} className="w-8 md:w-16 mx-6 my-2 bounce-button"/> 
       ));
       return (
