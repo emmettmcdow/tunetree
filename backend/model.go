@@ -6,39 +6,55 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	sqlite3 "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var db *sql.DB
+func DefaultDB(runtime string) DB {
+	var err error
+	var dbpath = "./backend.db"
+	if runtime != "" {
+		dbpath = runtime + "backend.db"
+	}
 
-type User struct {
-	Id        int64
-	Email     string
-	Password  string
-	Artist    string
-	Link      string
-	SpotifyId string
+	db, err := sql.Open("sqlite3", dbpath)
+	if err != nil {
+		panic(err)
+	}
+
+	if _, err := db.Exec(USERTABLE); err != nil {
+		panic(err)
+	}
+	if _, err := db.Exec(TRACKTABLE); err != nil {
+		panic(err)
+	}
+	if _, err := db.Exec(LINKTABLE); err != nil {
+		panic(err)
+	}
+	if _, err := db.Exec(ANIMATIONJOBTABLE); err != nil {
+		panic(err)
+	}
+	if _, err := db.Exec(ANIMATIONTABLE); err != nil {
+		panic(err)
+	}
+
+	return DB{db}
 }
 
-const USERTABLE = `
-CREATE TABLE IF NOT EXISTS users(
-	email TEXT NOT NULL UNIQUE,
-	password TEXT NOT NULL,
-	artist TEXT UNIQUE,
-	link TEXT UNIQUE,
-	spotifyId TEXT UNIQUE
-);
-`
+type DB struct {
+	db *sql.DB
+}
 
+// ****************************************************************************************** Track
 type Track struct {
-	Name    string            `json:"name"`
-	Image   string            `json:"image"`
-	Links   map[string]string `json:"links"`
-	Message string            `json:"message"`
+	Name      string            `json:"name"`
+	Image     string            `json:"image"`
+	Links     map[string]string `json:"links"`
+	Message   string            `json:"message"`
 	Animation string            `json:"animation"`
-	Display string            `json:"display"`
-	Colors  string            `json:"colors"`
+	Display   string            `json:"display"`
+	Colors    string            `json:"colors"`
 }
 
 const TRACKTABLE = `
@@ -56,54 +72,14 @@ CREATE TABLE IF NOT EXISTS tracks(
 );
 `
 
-const LINKTABLE = `
-CREATE TABLE IF NOT EXISTS links(
-	name TEXT NOT NULL,
-	link TEXT,
-	track_id INTEGER NOT NULL,
-	FOREIGN KEY (track_id)
-		REFERENCES tracks (rowid)
-);
-`
-
-func InitDB(runtime string) {
-	var err error
-	var dbpath = "./backend.db"
-	if runtime != "" {
-		dbpath = runtime + "backend.db"
-	}
-
-	db, err = sql.Open("sqlite3", dbpath)
-	if err != nil {
-		panic(err)
-	}
-
-	if _, err := db.Exec(USERTABLE); err != nil {
-		panic(err)
-	}
-	if _, err := db.Exec(TRACKTABLE); err != nil {
-		panic(err)
-	}
-	if _, err := db.Exec(LINKTABLE); err != nil {
-		panic(err)
-	}
+type TrackDB interface {
+	GetTrack(user User) (track Track, ok bool)
+	PutTrack(userId int64, track Track) (err error)
 }
 
-func GetUserFromLink(artistlink string) (user User, ok bool) {
-
-	err := db.QueryRow("SELECT *, rowid FROM users u WHERE u.link = ?;", artistlink).Scan(&user.Email, &user.Password, &user.Artist, &user.Link, &user.SpotifyId, &user.Id)
-	if err == sql.ErrNoRows {
-		return user, false
-	} else if err != nil {
-		// TODO: deal with this
-		panic(err)
-	}
-	return user, true
-}
-
-func GetTrack(user User) (track Track, ok bool) {
+func (this DB) GetTrack(user User) (track Track, ok bool) {
 	var trackid int
-	err := db.QueryRow("SELECT t.name, t.image, t.message, t.animation, t.display, t.colors, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.rowid = ? ORDER BY created DESC LIMIT 1;", user.Id).Scan(&track.Name, &track.Image, &track.Message, &track.Animation, &track.Display, &track.Colors, &trackid)
+	err := this.db.QueryRow("SELECT t.name, t.image, t.message, t.animation, t.display, t.colors, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.rowid = ? ORDER BY created DESC LIMIT 1;", user.Id).Scan(&track.Name, &track.Image, &track.Message, &track.Animation, &track.Display, &track.Colors, &trackid)
 	if err == sql.ErrNoRows {
 		return track, false
 	} else if err != nil {
@@ -112,7 +88,7 @@ func GetTrack(user User) (track Track, ok bool) {
 	}
 
 	track.Links = map[string]string{}
-	rows, err := db.Query("SELECT l.name, l.link FROM links l WHERE l.track_id = ?;", trackid)
+	rows, err := this.db.Query("SELECT l.name, l.link FROM links l WHERE l.track_id = ?;", trackid)
 	if err != nil {
 		panic(err)
 	}
@@ -131,9 +107,8 @@ func GetTrack(user User) (track Track, ok bool) {
 
 	return track, true
 }
-
-func PutTrack(userId int64, track Track) (err error) {
-	res, err := db.Exec("INSERT INTO tracks VALUES (?, ?, ?, ?, ?, ?, ?, ?);", track.Name, track.Image, track.Message, track.Animation, track.Display, time.Now().Unix(), track.Colors, userId)
+func (this DB) PutTrack(userId int64, track Track) (err error) {
+	res, err := this.db.Exec("INSERT INTO tracks VALUES (?, ?, ?, ?, ?, ?, ?, ?);", track.Name, track.Image, track.Message, track.Animation, track.Display, time.Now().Unix(), track.Colors, userId)
 	if err != nil {
 		return err
 	}
@@ -142,7 +117,7 @@ func PutTrack(userId int64, track Track) (err error) {
 		return err
 	}
 	for name, link := range track.Links {
-		_, err := db.Exec("INSERT INTO links VALUES (?, ?, ?);", name, link, trackId)
+		_, err := this.db.Exec("INSERT INTO links VALUES (?, ?, ?);", name, link, trackId)
 		if err != nil {
 			return err
 		}
@@ -150,9 +125,46 @@ func PutTrack(userId int64, track Track) (err error) {
 	return err
 }
 
-func GetUser(id int64) (user User, ok bool) {
+// ******************************************************************************************* Link
+const LINKTABLE = `
+CREATE TABLE IF NOT EXISTS links(
+	name TEXT NOT NULL,
+	link TEXT,
+	track_id INTEGER NOT NULL,
+	FOREIGN KEY (track_id)
+		REFERENCES tracks (rowid)
+);
+`
+
+// ******************************************************************************************* User
+type User struct {
+	Id        int64
+	Email     string
+	Password  string
+	Artist    string
+	Link      string
+	SpotifyId string
+}
+
+const USERTABLE = `
+CREATE TABLE IF NOT EXISTS users(
+	email TEXT NOT NULL UNIQUE,
+	password TEXT NOT NULL,
+	artist TEXT UNIQUE,
+	link TEXT UNIQUE,
+	spotifyId TEXT UNIQUE
+);`
+
+type UserDB interface {
+	GetUser(id int64) (user User, ok bool)
+	GetUserFromEmail(email string) (user User, ok bool)
+	GetUserFromLink(artistlink string) (user User, ok bool)
+	PutUser(user *User) (err error)
+}
+
+func (this DB) GetUser(id int64) (user User, ok bool) {
 	user.Id = id
-	err := db.QueryRow("SELECT * FROM users WHERE rowid = ?;", id).Scan(&user.Email, &user.Password, &user.Artist, &user.Link, &user.SpotifyId)
+	err := this.db.QueryRow("SELECT * FROM users WHERE rowid = ?;", id).Scan(&user.Email, &user.Password, &user.Artist, &user.Link, &user.SpotifyId)
 	if err == sql.ErrNoRows {
 		return user, false
 	} else if err != nil {
@@ -162,8 +174,8 @@ func GetUser(id int64) (user User, ok bool) {
 	return user, true
 }
 
-func GetUserFromEmail(email string) (user User, ok bool) {
-	err := db.QueryRow("SELECT *, rowid FROM users WHERE email = ?;", email).Scan(&user.Email, &user.Password, &user.Artist, &user.Link, &user.SpotifyId, &user.Id)
+func (this DB) GetUserFromEmail(email string) (user User, ok bool) {
+	err := this.db.QueryRow("SELECT *, rowid FROM users WHERE email = ?;", email).Scan(&user.Email, &user.Password, &user.Artist, &user.Link, &user.SpotifyId, &user.Id)
 	if err == sql.ErrNoRows {
 		return user, false
 	} else if err != nil {
@@ -173,18 +185,98 @@ func GetUserFromEmail(email string) (user User, ok bool) {
 	return user, true
 }
 
-func PutUser(user *User) (err error) {
+func (this DB) PutUser(user *User) (err error) {
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	if err != nil {
 		return fmt.Errorf("Failed to hash password: %e", err)
 	}
 	if user.Artist == "" {
-		_, err = db.Exec("INSERT INTO users VALUES (?,?,NULL,NULL);", user.Email, hashedPass)
+		_, err = this.db.Exec("INSERT INTO users VALUES (?,?,NULL,NULL);", user.Email, hashedPass)
 	} else {
-		_, err = db.Exec("INSERT INTO users VALUES (?,?,?,?,?);", user.Email, hashedPass, user.Artist, user.Link, user.SpotifyId)
+		_, err = this.db.Exec("INSERT INTO users VALUES (?,?,?,?,?);", user.Email, hashedPass, user.Artist, user.Link, user.SpotifyId)
 	}
 	return err
 }
+
+func (this DB) GetUserFromLink(artistlink string) (user User, ok bool) {
+
+	err := this.db.QueryRow("SELECT *, rowid FROM users u WHERE u.link = ?;", artistlink).Scan(&user.Email, &user.Password, &user.Artist, &user.Link, &user.SpotifyId, &user.Id)
+	if err == sql.ErrNoRows {
+		return user, false
+	} else if err != nil {
+		// TODO: deal with this
+		panic(err)
+	}
+	return user, true
+}
+
+// ************************************************************************************** Animation
+type AnimationJob struct {
+	UUID          uuid.UUID `json:"uuid"`
+	UserId        int64     `json:"user_id"`
+	Status        string    `json:"status"`
+	ArtLink       string    `json:"art_link"`
+	AnimationLink string    `json:"animation_link"`
+	Prompt        string    `json:"prompt"`
+}
+
+func (a AnimationJob) String() string {
+	output := ""
+	output += fmt.Sprint("{\n")
+	output += fmt.Sprintf("  \"UUID\": %s\n", a.UUID.String())
+	output += fmt.Sprintf("  \"UserId\": %d\n", a.UserId)
+	output += fmt.Sprintf("  \"Status\": %s\n", a.Status)
+	output += fmt.Sprintf("  \"ArtLink\": %s\n", a.ArtLink)
+	output += fmt.Sprintf("  \"AnimationLink\": %s\n", a.AnimationLink)
+	output += fmt.Sprintf("  \"Prompt\": %s\n", a.Prompt)
+	output += fmt.Sprint("}\n")
+	return output
+}
+
+const ANIMATIONJOBTABLE = `
+CREATE TABLE IF NOT EXISTS backgrounds(
+	uuid TEXT NOT NULL,
+	user_id INTEGER NOT NULL,
+	status TEXT NOT NULL,
+	art_link TEXT NOT NULL,
+	animation_link TEXT,
+	prompt TEXT,
+	FOREIGN KEY (user_id)
+		REFERENCES users (rowid)
+);`
+
+type Animation struct {
+	UUID          uuid.UUID `json:"uuid"`
+	Prompt        string    `json:"prompt"`
+	AnimationLink string    `json:"animation_link"`
+	TrackId       int64     `json:"track_id"`
+}
+
+const ANIMATIONTABLE = `
+CREATE TABLE IF NOT EXISTS backgrounds(
+	uuid TEXT NOT NULL,
+	prompt TEXT,
+	animation_link TEXT,
+	track_id INTEGER NOT NULL,
+	FOREIGN KEY (track_id)
+		REFERENCES tracks (rowid)
+);`
+
+type AnimationDB interface {
+	AddJob(job AnimationJob) bool
+	UpdateJob(job AnimationJob) bool
+	DropJob(job AnimationJob) bool
+	GetJob(uuid uuid.UUID) (AnimationJob, bool)
+
+	GetAnimations(user User) ([]Animation, bool)
+}
+
+func (db DB) AddJob(job AnimationJob) bool               { return true }
+func (db DB) UpdateJob(job AnimationJob) bool            { return true }
+func (db DB) DropJob(job AnimationJob) bool              { return true }
+func (db DB) GetJob(uuid uuid.UUID) (AnimationJob, bool) { return AnimationJob{}, true }
+
+func (db DB) GetAnimations(user User) ([]Animation, bool) { return []Animation{}, true }
 
 type DBErrType int
 

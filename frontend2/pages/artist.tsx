@@ -311,7 +311,7 @@ export class Track{
     this.message = "";
     this.image = "";
     this.colors = "";
-    this.animation = "cube";
+    this.animation = "dynamic";
     this.links = {
       apple: "",
       spotify: "",

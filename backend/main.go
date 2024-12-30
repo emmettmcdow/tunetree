@@ -1,29 +1,35 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
-	"golang.org/x/crypto/bcrypt"
-	"io"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
-	"regexp"
 	"strings"
 	"sync"
 	"syscall"
 	"time"
 )
 
-var RUNTIME = "./"
-var FRONTEND_URL = ""
+type Config struct {
+	runtime     string
+	frontendUrl string
+	thisUrl     string
+
+	spotifyClientId string
+	spotifySecret   string
+
+	replicateApiToken string
+	replicateEndpoint string
+}
+
+// TODO: get rid of the global
+var config Config
 
 type RateLimiter struct {
 	handler http.Handler
@@ -44,7 +50,7 @@ type Cors struct {
 
 func (r Cors) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	headers := res.Header()
-	headers.Add("Access-Control-Allow-Origin", FRONTEND_URL)
+	headers.Add("Access-Control-Allow-Origin", config.frontendUrl)
 	headers.Add("Access-Control-Allow-Credentials", "true")
 	headers.Add("Vary", "Access-Control-Request-Method")
 	headers.Add("Vary", "Access-Control-Request-Headers")
@@ -167,162 +173,6 @@ func extractToken(r *http.Request) string {
 	return token.Value
 }
 
-type thPayload struct {
-	Track      Track  `json:"track"`
-	ArtistName string `json:"artistName"`
-}
-
-func trackHandler(res http.ResponseWriter, req *http.Request) {
-	artistlink := req.PathValue("artistlink")
-	if artistlink == "" {
-		http.Error(res, "No artist name specified", http.StatusNotFound)
-		return
-	}
-
-	switch req.Method {
-	case "GET":
-		artist, ok := GetUserFromLink(artistlink)
-		if !ok {
-			http.Error(res, "No artist associated with that link", http.StatusNotFound)
-			return
-		}
-		track, ok := GetTrack(artist)
-		if !ok {
-			http.Error(res, "No track associated with that artist", http.StatusNotFound)
-			return
-		}
-
-		res.Header().Set("Content-Type", "application/json")
-		payload := thPayload{Track: track, ArtistName: artist.Artist}
-		json.NewEncoder(res).Encode(payload)
-	case "POST":
-		var track Track
-		// TODO: validate email = artistname etc here
-		id, ok := req.Context().Value("id").(int64)
-		if !ok {
-			http.Error(res, "Invalid token", http.StatusUnauthorized)
-			return
-		}
-		user, ok := GetUser(id)
-		if !ok {
-			http.Error(res, "User with ID not found", http.StatusUnauthorized)
-			return
-		}
-		role := req.Context().Value("role")
-		if role == nil || role == "USER" {
-			http.Error(res, "Invalid token", http.StatusUnauthorized)
-			return
-		}
-		if getRole(user) != "ARTIST" {
-			http.Error(res, "Logged in user is not the requested user", http.StatusUnauthorized)
-			return
-		}
-
-		body, err := io.ReadAll(req.Body)
-		if err != nil {
-			http.Error(res, fmt.Sprintf("Failed to read body of request: %s", err), http.StatusInternalServerError)
-			return
-		}
-		if err := json.Unmarshal(body, &track); err != nil {
-			http.Error(res, fmt.Sprintf("Malformed data: %s", err), http.StatusBadRequest)
-			return
-		}
-		track.Colors = strings.Join(getColorPalette(track.Image)[:], ";")
-		if err = PutTrack(id, track); err != nil {
-			// TODO: error handling?
-			http.Error(res, fmt.Sprintf("Failed to save track: %s", err), http.StatusInternalServerError)
-			return
-		}
-	default:
-		http.Error(res, fmt.Sprintf("%s on /track not allowed", req.Method), http.StatusMethodNotAllowed)
-		return
-	}
-}
-
-func signupHandler(res http.ResponseWriter, req *http.Request) {
-	var user User
-
-	// Check if it is post
-	if req.Method != "POST" {
-		http.Error(res, fmt.Sprintf("%s on /signup not allowed", req.Method), http.StatusMethodNotAllowed)
-		return
-	}
-	body, err := io.ReadAll(req.Body)
-	if err != nil {
-		http.Error(res, fmt.Sprintf("Failed to read body of request: %s", err), http.StatusInternalServerError)
-		return
-	}
-	// Check if there is a username and password
-	if err := json.Unmarshal(body, &user); err != nil {
-		http.Error(res, fmt.Sprintf("Malformed data: %s", err), http.StatusBadRequest)
-		return
-	}
-
-	// MAKE SURE TO UPDATE THIS ON FRONTEND IF YOU CHANGE THIS
-	if !validPassword(user.Password) {
-		http.Error(res, "Password invalid", http.StatusBadRequest)
-		return
-	}
-	emailRegex := `^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`
-	if match, err := regexp.Match(emailRegex, []byte(user.Email)); err == nil && !match {
-		http.Error(res, "Email invalid", http.StatusBadRequest)
-		return
-	} else if err != nil {
-		http.Error(res, fmt.Sprintf("Failed to parse email: %s", err), http.StatusInternalServerError)
-		return
-	}
-	if user.Artist == "" {
-		http.Error(res, "Artist name invalid", http.StatusBadRequest)
-		return
-	}
-
-	// Add to DB
-	if err := PutUser(&user); err != nil {
-		dbErr := ParseDBError(err)
-		switch dbErr.Type {
-		case DbErrNotUnique:
-			http.Error(res, fmt.Sprintf("User with %s already exists", dbErr.Field), http.StatusBadRequest)
-		default:
-			http.Error(res, fmt.Sprintf("Something has gone critically wrong: %s", dbErr.Content), http.StatusInternalServerError)
-		}
-	}
-
-	return
-}
-
-func validPassword(password string) bool {
-	/* Rules:
-	 *   - All characters must be between 33 and 126 ascii inclusive
-	 *   - Password must be between 8-64 characters
-	 *   - One number
-	 *   - One Special
-	 *   - One Caps
-	 */
-
-	caps := false
-	special := false
-	number := false
-
-	if len(password) < 8 || len(password) > 64 {
-		return false
-	}
-	for _, code := range password {
-		if code < 33 || code > 126 {
-			return false
-		}
-		if code > 47 && code < 58 {
-			number = true
-		}
-		if (code > 32 && code < 48) || (code > 57 && code < 65) || (code > 90 && code < 97) || (code > 122 && code < 127) {
-			special = true
-		}
-		if code > 64 && code < 91 {
-			caps = true
-		}
-	}
-	return caps && special && number
-}
-
 func getRole(user User) string {
 	if user.Artist == "" {
 		return "USER"
@@ -357,57 +207,10 @@ func generateToken(user User) (token string, err error) {
 	return token, err
 }
 
-func loginHandler(res http.ResponseWriter, req *http.Request) {
-	var user User
-
-	// Check if it is post
-	if req.Method != "POST" {
-		http.Error(res, fmt.Sprintf("%s on /login not allowed", req.Method), http.StatusMethodNotAllowed)
-		return
-	}
-	body, err := io.ReadAll(req.Body)
-	if err != nil {
-		http.Error(res, fmt.Sprintf("Failed to read body of request: %s", err), http.StatusInternalServerError)
-		return
-	}
-	// Check if there is a username and password
-	if err := json.Unmarshal(body, &user); err != nil {
-		http.Error(res, fmt.Sprintf("Malformed data: %s", err), http.StatusBadRequest)
-		return
-	}
-
-	user2, ok := GetUserFromEmail(user.Email)
-	if !ok {
-		http.Error(res, "Username/Password incorrect", http.StatusUnauthorized)
-		return
-	}
-	err = bcrypt.CompareHashAndPassword([]byte(user2.Password), []byte(user.Password))
-	if err != nil {
-		http.Error(res, "Username/Password incorrect", http.StatusUnauthorized)
-		return
-	}
-
-	// Shake dat ass jwt-y
-	token, err := generateToken(user2)
-	if err != nil {
-		http.Error(res, fmt.Sprintf("Failed to generate token: %s", err), http.StatusInternalServerError)
-	}
-	responseBody := map[string]string{"token": token, "Artist": user2.Artist, "Email": user2.Email, "SpotifyId": user2.SpotifyId, "Link": user2.Link}
-	json.NewEncoder(res).Encode(responseBody)
-	return
-}
-
-type SpotifyHandler struct {
-	clientId string
-	secret   string
-	apiKey   string
-	expiry   time.Time
-}
-
 func getEnv(key string) (value string) {
 	value = os.Getenv(key)
 	if value == "" {
-		dotenv, err := godotenv.Read(RUNTIME + ".env")
+		dotenv, err := godotenv.Read(config.runtime + ".env")
 		if err != nil {
 			dotenv = map[string]string{}
 		}
@@ -416,180 +219,16 @@ func getEnv(key string) (value string) {
 	return value
 }
 
-// TODO turn the dotenv into a helper function
-func GetSpotifyHandler() (s SpotifyHandler) {
-	clientId := getEnv("SPOTIFY_CLIENT_ID")
-	secret := getEnv("SPOTIFY_SECRET")
-	if secret == "" || clientId == "" {
-		panic("SPOTIFY_CLIENT_ID or SPOTIFY_SECRET unset")
-	}
-
-	s = SpotifyHandler{clientId: clientId, secret: secret}
-	s.ApiKey()
-
-	return s
-}
-
 type KeyResponse struct {
 	AccessToken string `json:"access_token"`
 	ExpiresIn   int    `json:"expires_in"`
 }
 
-func (s *SpotifyHandler) ApiKey() string {
-	if s.expiry.Unix() > time.Now().Unix() {
-		return s.apiKey
-	}
-	url := "https://accounts.spotify.com/api/token"
-	body := []byte(fmt.Sprintf(`grant_type=client_credentials&client_id=%s&client_secret=%s`, s.clientId, s.secret))
+func server(wg *sync.WaitGroup, port int, runtime string) (s *http.Server) {
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
-	if err != nil {
-		panic(err)
-	}
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != 200 {
-		bodyBytes, _ := io.ReadAll(res.Body)
-		fmt.Println(string(bodyBytes))
-		panic("API KEY NOT SUCCESSFUL")
-	}
-
-	resJson := &KeyResponse{}
-	err = json.NewDecoder(res.Body).Decode(resJson)
-	if err != nil {
-		panic(err)
-	}
-	s.apiKey = resJson.AccessToken
-	s.expiry = time.Now().Add(time.Duration(resJson.ExpiresIn) * time.Second)
-
-	return s.apiKey
-
-}
-
-type SpotifySearchHandler struct {
-	parent SpotifyHandler
-}
-
-var ALLOWED_TYPES = map[string]bool{"artist": true}
-
-func (s SpotifySearchHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	// Check if it is GET
-	if req.Method != "GET" {
-		http.Error(res, fmt.Sprintf("%s on /external/search not allowed", req.Method), http.StatusMethodNotAllowed)
-		return
-	}
-
-	term := req.URL.Query().Get("term")
-	rtype := req.URL.Query().Get("type")
-	if term == "" || rtype == "" {
-		http.Error(res, "term or type not specified", http.StatusBadRequest)
-		return
-	}
-	if _, ok := ALLOWED_TYPES[rtype]; !ok {
-		http.Error(res, fmt.Sprintf("%s not a valid search type", rtype), http.StatusBadRequest)
-		return
-	}
-
-	key := s.parent.ApiKey()
-	url := "https://api.spotify.com/v1/search"
-	req, err := http.NewRequest("GET", url, http.NoBody)
-	if err != nil {
-		panic(err)
-	}
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", key))
-	q := req.URL.Query()
-	q.Add("q", term)
-	q.Add("type", rtype)
-	q.Add("market", "US")
-	q.Add("limit", "1")
-	req.URL.RawQuery = q.Encode()
-
-	client := &http.Client{}
-	spotifyResponse, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer spotifyResponse.Body.Close()
-
-	if spotifyResponse.StatusCode != 200 {
-		bodyBytes, _ := io.ReadAll(spotifyResponse.Body)
-		http.Error(res, string(bodyBytes), http.StatusNotFound)
-	}
-
-	io.Copy(res, spotifyResponse.Body)
-}
-
-type SpotifyAlbumHandler struct {
-	parent SpotifyHandler
-}
-
-func (s SpotifyAlbumHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	// Check if it is GET
-	if req.Method != "GET" {
-		http.Error(res, fmt.Sprintf("%s on /external/search not allowed", req.Method), http.StatusMethodNotAllowed)
-		return
-	}
-
-	albumId := req.URL.Query().Get("albumId")
-	if albumId == "" {
-		http.Error(res, "albumId not specified", http.StatusBadRequest)
-		return
-	}
-
-	key := s.parent.ApiKey()
-	url := "https://api.spotify.com/v1/albums"
-	req, err := http.NewRequest("GET", url, http.NoBody)
-	if err != nil {
-		panic(err)
-	}
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", key))
-	q := req.URL.Query()
-	q.Add("ids", albumId)
-	q.Add("market", "US")
-	req.URL.RawQuery = q.Encode()
-	client := &http.Client{}
-	spotifyResponse, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer spotifyResponse.Body.Close()
-
-	if spotifyResponse.StatusCode != 200 {
-		panic("API KEY NOT SUCCESSFUL")
-	}
-
-	io.Copy(res, spotifyResponse.Body)
-}
-
-func (s SpotifyHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	m := http.NewServeMux()
-	m.Handle("/external/search", SpotifySearchHandler{parent: s})
-	m.Handle("/external/albums", SpotifyAlbumHandler{parent: s})
-
-	rateLimitedMux := NewRateLimiter(m)
-
-	rateLimitedMux.ServeHTTP(res, req)
-}
-
-func server(wg *sync.WaitGroup, port int, tlsEnabled bool, runtime string) (s *http.Server) {
-	var config *tls.Config
-
-	InitDB(runtime)
+	db := DefaultDB(runtime)
 
 	m := http.NewServeMux()
-	if tlsEnabled {
-		cert, err := tls.LoadX509KeyPair("server.pem", "server.key")
-		if err != nil {
-			fmt.Printf("Failed to load certificate keypair: %s\n", err)
-		}
-		config = &tls.Config{Certificates: []tls.Certificate{cert}}
-	}
 
 	address := fmt.Sprintf(":%d", port)
 	m.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
@@ -598,18 +237,24 @@ func server(wg *sync.WaitGroup, port int, tlsEnabled bool, runtime string) (s *h
 			fmt.Printf("Failed to write response: %s", err)
 		}
 	})
-	m.HandleFunc("/login/", loginHandler)
-	m.HandleFunc("/signup/", signupHandler)
-	m.HandleFunc("/track/{artistlink}/", jwtMiddleware(trackHandler))
-	m.Handle("/external/", GetSpotifyHandler())
+	m.Handle("/login/", GetLoginHandler(config).WithDB(db))
+	m.Handle("/signup/", GetSignupHandler(config).WithDB(db))
+	m.Handle("/track/{artistlink}/", GetTrackHandler(config).WithDB(db))
+	m.Handle("/external/", GetSpotifyHandler(config))
 
-	s = &http.Server{Addr: address, Handler: NewLogger(NewCors(m)), TLSConfig: config}
+	animHandler := GetAnimationHandler(config).WithDB(db)
+	m.Handle("/animation/status/{uuid}/", animHandler)
+	m.Handle("/animation/new/", animHandler)
+	m.Handle("/animation/file/{uuid}/", animHandler)
+
+	s = &http.Server{Addr: address, Handler: NewLogger(NewCors(m))}
 	go func() {
 		defer wg.Done()
 		if err := s.ListenAndServe(); err != http.ErrServerClosed {
 			fmt.Printf("ListenAndServe failed: %s\n", err)
 		}
 	}()
+
 	// Block until server is ready
 	healthClient := http.DefaultClient
 	for i := 0; i < 5; i += 1 {
@@ -631,18 +276,50 @@ func server(wg *sync.WaitGroup, port int, tlsEnabled bool, runtime string) (s *h
 
 func main() {
 
-	RUNTIME = getEnv("RUNTIME")
-	if RUNTIME == "" {
-		RUNTIME = "./"
+	runtime := getEnv("RUNTIME")
+	if runtime == "" {
+		runtime = "./"
 	}
-	FRONTEND_URL = getEnv("FRONTEND_URL")
-	if FRONTEND_URL == "" {
-		FRONTEND_URL = "http://localhost:3000"
+	frontendUrl := getEnv("FRONTEND_URL")
+	if frontendUrl == "" {
+		frontendUrl = "http://localhost:3000"
+	}
+	thisUrl := getEnv("THIS_URL")
+	if thisUrl == "" {
+		thisUrl = "http://localhost:81"
+	}
+
+	clientId := getEnv("SPOTIFY_CLIENT_ID")
+	secret := getEnv("SPOTIFY_SECRET")
+	if secret == "" || clientId == "" {
+		panic("SPOTIFY_CLIENT_ID or SPOTIFY_SECRET unset")
+	}
+	replicateApiToken := getEnv("REPLICATE_API_TOKEN")
+	if replicateApiToken == "" {
+		fmt.Printf("WARNING: REPLICATE_API_TOKEN unset\n")
+		replicateApiToken = "TEST_TOKEN"
+		fmt.Printf("WARNING: Setting to %s\n", replicateApiToken)
+	}
+
+	replicateEndpoint := getEnv("REPLICATE_ENDPOINT")
+	if replicateEndpoint == "" {
+		fmt.Printf("WARNING: REPLICATE_ENDPOINT unset\n")
+		replicateEndpoint = "http://localhost:6969"
+		fmt.Printf("WARNING: Setting to %s\n", replicateEndpoint)
+	}
+
+	config = Config{
+		runtime:           runtime,
+		frontendUrl:       frontendUrl,
+		spotifyClientId:   clientId,
+		spotifySecret:     secret,
+		replicateApiToken: replicateApiToken,
+		replicateEndpoint: replicateEndpoint,
 	}
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
-	server := server(wg, 81, false, RUNTIME)
+	server := server(wg, 81, config.runtime)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)

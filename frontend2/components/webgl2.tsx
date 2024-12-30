@@ -5,6 +5,7 @@ import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber'
 import { Center, Text3D} from '@react-three/drei'
 import { GLTFLoader, TextGeometry } from 'three/examples/jsm/Addons.js';
 import helvetiker_regular from 'three/examples/fonts/helvetiker_regular.typeface.json'
+import Scene2 from './scene'
 // Debug
 // import {OrbitControls} from '@react-three/drei'
 // import { Perf } from 'r3f-perf'
@@ -364,6 +365,8 @@ const WebGLBackground: React.FC<SceneProps> = ({
       return <VinylScene dimensions={[width, height]} image={image}/>;
     case "mountain":
       return <MountainScene colors={colors} dimensions={[width, height]} />;
+    case "dynamic":
+      return <Scene2 dimensions={[width, height]} image={image} colors={colors}/>
     default:
       return null;
   }
