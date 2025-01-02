@@ -1,3 +1,4 @@
+import AiPrompt from '@/components/aiprompt';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiChevronRight } from "react-icons/fi";
@@ -14,6 +15,7 @@ export default function Home() {
           </span>
           <FiChevronRight className="inline rainbow-svg"/>
         </Link>
+        <AiPrompt/>
       </div>
     </>
   );

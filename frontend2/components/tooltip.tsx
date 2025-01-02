@@ -3,10 +3,15 @@ import { useState, ReactNode } from 'react';
 interface TooltipProps {
   text?: string;
   children: ReactNode;
+  hackNoArrow?: boolean;
 }
 
-const Tooltip = ({ text, children}: TooltipProps) => {
+const Tooltip = ({ text, children, hackNoArrow}: TooltipProps) => {
   const [isVisible, setIsVisible] = useState(false);
+
+  if (typeof(hackNoArrow) === "undefined") {
+    hackNoArrow = false;
+  }
 
   return (
     <div 
@@ -28,10 +33,11 @@ const Tooltip = ({ text, children}: TooltipProps) => {
           role="tooltip"
         >
           {text}
-          <div className={`absolute -translate-x-1/2 rotate-45 left-1/2
-                            bg-black w-1/12 aspect-square z-50
-                            border-r-2 border-b-2 drop-shadow-xl
-                            border-white`}></div>
+          {!hackNoArrow && (
+            <div className={`absolute -translate-x-1/2 rotate-45 left-1/2
+                              bg-black w-1/12 aspect-square z-50
+                              border-r-2 border-b-2 drop-shadow-xl
+                              border-white`}></div> )}
        </div>
       )}
     </div>
