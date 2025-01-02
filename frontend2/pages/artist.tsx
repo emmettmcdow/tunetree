@@ -10,6 +10,7 @@ import UIButton from "@/components/uibutton";
 import Display from '@/components/display';
 import { ANIMATIONS } from '@/components/webgl2';
 import ScrollPrompt from '@/components/scrollprompt';
+import AiPrompt from '@/components/aiprompt';
 
 function ServiceSelectorBar({selected, setSelected}: {selected: Selected, setSelected: React.Dispatch<React.SetStateAction<Selected>>}) { 
   const buttons = [];
@@ -78,7 +79,7 @@ function ServiceURLs({formData, setFormData, selected, setSelected}: {formData: 
       const typedProv = provider as "apple" | "amazon" | "spotify" | "tidal" | "bandcamp";
       serviceURLs.push(
         <div className="flex mb-2" key={provider}>
-          <input className="w-full rounded-lg p-1 pr-10 text-black" type="text" name={provider}  value={formData.links[typedProv]} onChange={handleChange} placeholder={provider.charAt(0).toUpperCase() + provider.slice(1) + " URL"}/>
+          <input className="w-full rounded-lg p-1 pr-10 text-black shadow-inner" type="text" name={provider}  value={formData.links[typedProv]} onChange={handleChange} placeholder={provider.charAt(0).toUpperCase() + provider.slice(1) + " URL"}/>
           <span className="flex justify-around items-center cursor-pointer" onClick={() => {
             const newSelected: Selected= {
               ...selected,
@@ -144,6 +145,7 @@ function Editor({changeMode, setCurrTrack, formData, setFormData}: {changeMode: 
     "bandcamp": formData.links.bandcamp != ""
   }
   const [selected, setSelected] = useState(initialState);
+  const [aiVisible, setAiVisible] = useState(false);
   const [message, setMessage] = useState("");
   const submitRef = useRef<HTMLDivElement>(null);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, setMessage: Dispatch<SetStateAction<string>>) => {
@@ -193,6 +195,10 @@ function Editor({changeMode, setCurrTrack, formData, setFormData}: {changeMode: 
     }
   };
 
+  const toggleVisible = () => {
+    setAiVisible(!aiVisible);
+  }
+
   return (
     <>
       <div className="flex flex-col mx-auto z-40">
@@ -212,6 +218,7 @@ function Editor({changeMode, setCurrTrack, formData, setFormData}: {changeMode: 
             })
           }}/>
         </div>
+        <UIButton type="neutral" content="make ai background" submit={false} handle={toggleVisible}/>
         <div className="flex justify-between items-center">
           <UIButton type="left" submit={false} handle={() => {
             setFormData({
@@ -244,6 +251,7 @@ function Editor({changeMode, setCurrTrack, formData, setFormData}: {changeMode: 
         </form>
       </div>
       <ScrollPrompt target={submitRef}/>
+      <AiPrompt visible={aiVisible} toggleVisible={toggleVisible}/>
     </>
   );
 }

@@ -7,6 +7,7 @@ import { getAuthenticatedArtistLink} from '../utils/utils';
 import Display from '@/components/display';
 import UIButton from '@/components/uibutton';
 import Link from 'next/link';
+import { Header } from './login';
 
 
 
@@ -15,16 +16,19 @@ import Link from 'next/link';
 function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: Track, link: string, toggle: React.Dispatch<React.SetStateAction<string>>}) {
   if (link) {
     return (
-      <div className="z-50 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 fg-color p-5 rounded-2xl text-center z-50 drop-shadow-lg">
-        <p>{"wanna be notified when "+ trackInfo.artist + " drops? (it's free)"}</p>
+    <div className={"z-50 fixed w-screen h-screen top-0 left-0 flex justify-center items-center bg-black/50 "}>
+      <div className="fg-color rounded-2xl p-5 text-center z-50 drop-shadow-2xl shadow-inner w-1/4 flex-col items-center">
+        <Header left={"Going to '" + trackInfo.name + "'..."}/>
+        <div className="mt-2">{"wanna be notified when "+ trackInfo.artist + " drops? (it's free)"}</div>
         <form className="my-2">
           <input className="text-black rounded-xl p-2 " placeholder="email" name="email"/>
-          <div className="flex">
+          <div className="flex justify-center">
             <Link href={link}><UIButton type="confirm" content="yes" handle={() => toggle("")} submit={false}/></Link>
             <Link href={link}><UIButton type="deny" content="no" handle={() => toggle("")} submit={false}/></Link>
           </div>
         </form>
       </div>
+    </div>
     );
   } else {
     return null;

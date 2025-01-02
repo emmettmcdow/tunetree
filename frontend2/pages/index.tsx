@@ -15,7 +15,6 @@ export default function Home() {
           </span>
           <FiChevronRight className="inline rainbow-svg"/>
         </Link>
-        <AiPrompt/>
       </div>
     </>
   );
