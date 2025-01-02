@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/google/uuid"
 )
@@ -16,6 +18,7 @@ type AnimationHandler struct {
 	db      AnimationDB
 	client  HttpClient
 	idGen   IDGen
+	storage string
 }
 
 type IDGen interface {
@@ -51,6 +54,7 @@ func GetAnimationHandler(config Config) (a *AnimationHandler) {
 	a = &AnimationHandler{apiKey: config.replicateApiToken, thisURL: config.thisUrl}
 	a.idGen = DefaultUUID{}
 	a.client = &http.Client{}
+	a.storage = config.runtime + "/animations"
 	return a
 }
 
@@ -58,7 +62,7 @@ func (a AnimationHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) 
 	m := http.NewServeMux()
 	m.HandleFunc("/animation/status/{uuid}/", a.ServeStatus)
 	m.HandleFunc("/animation/new/", a.ServeNew)
-	m.HandleFunc("/animation/file/{uuid}/", a.Serve)
+	m.HandleFunc("/animation/file/{uuid}/", a.ServeFile)
 
 	rateLimitedMux := NewRateLimiter(m)
 
@@ -71,27 +75,69 @@ func (a AnimationHandler) ServeStatus(res http.ResponseWriter, req *http.Request
 		http.Error(res, "No artist name specified", http.StatusBadRequest)
 		return
 	}
+	newid, err := uuid.Parse(inputUUID)
+	if err != nil {
+		http.Error(res, "Malformed uuid", http.StatusBadRequest)
+		return
+	}
+	job, ok := a.db.GetJob(newid)
+	if !ok {
+		http.Error(res, "Could not find job", http.StatusNotFound)
+		return
+	}
 	switch req.Method {
 	case "GET":
-		newid, err := uuid.Parse(inputUUID)
-		if err != nil {
-			http.Error(res, "Malformed uuid", http.StatusBadRequest)
-			return
-		}
-		job, ok := a.db.GetJob(newid)
-		if !ok {
-			http.Error(res, "Could not find job", http.StatusNotFound)
-			return
+		if job.Status == "succeeded" || job.Status == "failed" {
+			if ok := a.db.DropJob(job); !ok {
+				http.Error(res, "Unknown db error", http.StatusInternalServerError)
+				return
+			}
 		}
 		json.NewEncoder(res).Encode(job)
 		return
+	case "POST":
+		var bod webhookResponse
+		body, err := io.ReadAll(req.Body)
+		if err != nil {
+			http.Error(res, fmt.Sprintf("Failed to read body of request: %s", err), http.StatusInternalServerError)
+			return
+		}
+		if err := json.Unmarshal(body, &bod); err != nil {
+			http.Error(res, fmt.Sprintf("Malformed data: %s", err), http.StatusBadRequest)
+			return
+		}
+		job.Status = bod.Status
+		job.AnimationLink = bod.Output
+
+		if ok := a.db.UpdateJob(job); !ok {
+			http.Error(res, "Failed to update job", http.StatusInternalServerError)
+		}
+		if job.Status == "succeeded" {
+			if err := a.CommitJob(job); err != nil {
+				http.Error(res, fmt.Sprintf("Failed to download animation: %s", err), http.StatusInternalServerError)
+			}
+		}
+		return
+
 	default:
-		http.Error(res, fmt.Sprintf("%s on /animation/new/ not allowed", req.Method), http.StatusMethodNotAllowed)
+		http.Error(res, fmt.Sprintf("%s on /animation/status/ not allowed", req.Method), http.StatusMethodNotAllowed)
 		return
 	}
 }
 
-func (a AnimationHandler) Serve(res http.ResponseWriter, req *http.Request) {}
+func (a AnimationHandler) animationFilePath(uuid string) string {
+	return filepath.Join(a.storage, uuid+".mp4")
+}
+
+func (a AnimationHandler) ServeFile(res http.ResponseWriter, req *http.Request) {
+	inputUUID := req.PathValue("uuid")
+	if inputUUID == "" {
+		http.Error(res, "No artist name specified", http.StatusBadRequest)
+		return
+	}
+	path := a.animationFilePath(inputUUID)
+	http.ServeFile(res, req, path)
+}
 
 // TODO: switch errors to json
 func (a AnimationHandler) ServeNew(res http.ResponseWriter, req *http.Request) {
@@ -157,6 +203,53 @@ func (a AnimationHandler) bgRequest(backgroundId, imageLink, prompt string) (req
 	return req
 }
 
+func (a AnimationHandler) downloadAnimation(anim AnimationJob, w io.Writer) error {
+	req, err := http.NewRequest(http.MethodGet, anim.AnimationLink, http.NoBody)
+	if err != nil {
+		return fmt.Errorf("Failed to create animation download request: %s", err)
+	}
+	res, err := a.client.Do(req)
+	if err != nil {
+		return fmt.Errorf("Failed to make animation download request: %s", err)
+	}
+
+	if _, err := io.Copy(w, res.Body); err != nil {
+		return fmt.Errorf("Failed to write animation to buffer: %s", err)
+	}
+
+	return nil
+}
+
+func (a AnimationHandler) saveAnimation(anim AnimationJob, r io.Reader) error {
+	path := a.animationFilePath(anim.UUID.String())
+	if err := os.MkdirAll(a.storage, 0755); err != nil {
+		return fmt.Errorf("Failed to create animation directory: %s", err)
+	}
+
+	// Create the file
+	file, err := os.Create(path)
+	if err != nil {
+		return fmt.Errorf("Failed to create file %s: %s", path, err)
+	}
+	defer file.Close()
+
+	if _, err := io.Copy(file, r); err != nil {
+		return fmt.Errorf("Failed to write file %s: %s", path, err)
+	}
+	return nil
+}
+
+func (a AnimationHandler) CommitJob(anim AnimationJob) error {
+	buf := bytes.NewBuffer(nil)
+	if err := a.downloadAnimation(anim, buf); err != nil {
+		return err
+	}
+	if err := a.saveAnimation(anim, buf); err != nil {
+		return err
+	}
+	return nil
+}
+
 // ************************************************************************************** Replicate
 type backgroundPayload struct {
 	Model               string        `json:"model"`
@@ -167,6 +260,10 @@ type backgroundPayload struct {
 type promptPayload struct {
 	Prompt          string `json:"prompt"`
 	FirstImageFrame string `json:"first_image_frame"`
+}
+type webhookResponse struct {
+	Output string `json:"output"`
+	Status string `json:"status"`
 }
 
 func bgRequest(apiKey, thisURL, backgroundId, imageLink, prompt string) (req *http.Request) {

@@ -193,10 +193,10 @@ func TestAnimationJobHandler(t *testing.T) {
 		name             string
 		method           string
 		path             string
-		body             AnimationJob
+		body             interface{}
 		externalResponse ExternalResponse
 		expectedStatus   int
-		expectedBody     AnimationJob
+		expectedBody     interface{}
 	}{
 		{
 			name:   "Queue Basic 1",
@@ -259,6 +259,77 @@ func TestAnimationJobHandler(t *testing.T) {
 				UUID:          uuid2.FromInt(1),
 			},
 		},
+		{
+			name:   "Webhook Response 1",
+			method: http.MethodPost,
+			path:   fmt.Sprintf("/animation/status/%s/", uuid2.FromInt(1)),
+			body:   REPLICATE_WEBHOOK_SUCCESS,
+			externalResponse: ExternalResponse{
+				Body: "foobar",
+				Code: http.StatusOK,
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "Status Complete 1",
+			method:         http.MethodGet,
+			path:           fmt.Sprintf("/animation/status/%s/", uuid2.FromInt(1)),
+			body:           AnimationJob{},
+			expectedStatus: http.StatusOK,
+			expectedBody: AnimationJob{
+				AnimationLink: "https://replicate.delivery/czjl/sbnhNsfxliTKUaSGhr5C2gfLQzfVY2eiIRn7YB9J927pKRuPB/tmp0t22y4g9.output.mp4",
+				ArtLink:       "x.com/artlink1",
+				Prompt:        "prompt1",
+				Status:        "succeeded",
+				UserId:        1,
+				UUID:          uuid2.FromInt(1),
+			},
+		},
+		{
+			name:           "Status Incomplete 2",
+			method:         http.MethodGet,
+			path:           fmt.Sprintf("/animation/status/%s/", uuid2.FromInt(2)),
+			body:           AnimationJob{},
+			expectedStatus: http.StatusOK,
+			expectedBody: AnimationJob{
+				AnimationLink: "",
+				ArtLink:       "x.com/artlink2",
+				Prompt:        "prompt2",
+				Status:        "queued",
+				UserId:        1,
+				UUID:          uuid2.FromInt(2),
+			},
+		},
+		{
+			name:           "Webhook Response 2",
+			method:         http.MethodPost,
+			path:           fmt.Sprintf("/animation/status/%s/", uuid2.FromInt(2)),
+			body:           REPLICATE_WEBHOOK_FAILED,
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "Status Failed 2",
+			method:         http.MethodGet,
+			path:           fmt.Sprintf("/animation/status/%s/", uuid2.FromInt(2)),
+			body:           AnimationJob{},
+			expectedStatus: http.StatusOK,
+			expectedBody: AnimationJob{
+				AnimationLink: "",
+				ArtLink:       "x.com/artlink2",
+				Prompt:        "prompt2",
+				Status:        "failed",
+				UserId:        1,
+				UUID:          uuid2.FromInt(2),
+			},
+		},
+		{
+			name:           "File Get 1",
+			method:         http.MethodGet,
+			path:           fmt.Sprintf("/animation/file/%s/", uuid2.FromInt(1)),
+			body:           AnimationJob{},
+			expectedStatus: http.StatusOK,
+			expectedBody:   "foobar",
+		},
 	}
 
 	db := TestAnimationDB{
@@ -267,18 +338,27 @@ func TestAnimationJobHandler(t *testing.T) {
 	}
 	idGen := TestUUID{curr: 1}
 	testClient := TestClient{}
-	handler := GetAnimationHandler(Config{}).WithDB(&db).WithUUID(&idGen).WithClient(&testClient)
+	handler := GetAnimationHandler(Config{
+		runtime: t.TempDir(),
+	}).WithDB(&db).WithUUID(&idGen).WithClient(&testClient)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create a new request
 			var reqBody []byte
 			var err error
-			if tt.body != (AnimationJob{}) {
-				reqBody, err = json.Marshal(tt.body)
-				if err != nil {
-					t.Fatalf("Failed to marshal request body: %v", err)
+			switch tt.body.(type) {
+			case AnimationJob:
+				if tt.body != (AnimationJob{}) {
+					reqBody, err = json.Marshal(tt.body)
+					if err != nil {
+						t.Fatalf("Failed to marshal request body: %v", err)
+					}
 				}
+			case string:
+				// This is a replicate webhook response
+				reqBody = []byte(tt.body.(string))
+			default:
 			}
 
 			req := httptest.NewRequest(tt.method, tt.path, bytes.NewBuffer(reqBody))
@@ -298,17 +378,29 @@ func TestAnimationJobHandler(t *testing.T) {
 				t.Errorf("Expected status %d, got %d", tt.expectedStatus, w.Code)
 			}
 
-			if tt.expectedBody != (AnimationJob{}) {
-				var got AnimationJob
-				if err := json.NewDecoder(w.Body).Decode(&got); err != nil {
-					t.Fatalf("Failed to decode response body: %v", err)
+			switch tt.expectedBody.(type) {
+			case AnimationJob:
+				// TODO
+				if tt.expectedBody != (AnimationJob{}) {
+					var got AnimationJob
+					if err := json.NewDecoder(w.Body).Decode(&got); err != nil {
+						t.Fatalf("Failed to decode response body: %v", err)
+					}
+
+					expString := tt.expectedBody.(AnimationJob).String()
+					gotString := got.String()
+
+					if expString != gotString {
+						t.Errorf("Expected body:\n%s\n got\n%s", expString, gotString)
+						return
+					}
 				}
-
-				expString := tt.expectedBody.String()
-				gotString := got.String()
-
-				if expString != gotString {
-					t.Errorf("Expected body:\n%s\n got\n%s", expString, gotString)
+			case string:
+				want := tt.expectedBody.(string)
+				got := w.Body.String()
+				if want != got {
+					t.Errorf("Expected body:\n%s\n got\n%s", want, got)
+					return
 				}
 			}
 		})
