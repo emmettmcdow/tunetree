@@ -9,7 +9,6 @@ function Footer() {
         <div className="my-2" >made with 💜 in sunnyvale, ca 🌞</div>
         <LightButton link="/about" content="are you an artist?"/>
         <LightButton link="/help" content="need help?"/>
-        <LightButton link="https://fontenddev.com" content="font by jeti"/>
     </div>
   )
 }

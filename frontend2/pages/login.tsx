@@ -142,7 +142,7 @@ export default function Login() {
           <Header left="Logging In..."/>
           <Message content={message}/>
           <form className="flex flex-col my-4" onSubmit={handleSubmit}>
-            <input className="w-full rounded-lg p-1 mb-2 text-black"
+            <input className="w-full rounded-lg p-1 mb-2 text-black font-light-background-normal"
                    type="text"
                    name="email"
                    placeholder="username"

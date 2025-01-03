@@ -25,14 +25,14 @@
 }
 
 @font-face {
-  font-family: "kiwisoda";
-  src: url("/fonts/KiwiSoda.woff");
+  font-family: "doto";
+  src: url("/fonts/Doto/Doto-VariableFont_ROND,wght.ttf");
 }
 
 body {
   color: white;
   margin: 0;
-  font-family: "kiwisoda";
+  font-family: "doto";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -40,6 +40,12 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Font Weights and Sizes */
+.font-light-background-normal {
+  font-weight: 600;
+  font-style: Rounded;
 }
 
 .rainbow-svg {
