@@ -126,7 +126,7 @@ export default function Signup() {
     <div className="h-screen flex flex-col">
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 fg-color w-11/12 py-4 md:w-3/5 md:py-8 rounded-lg">
         <div className="w-11/12 md:w-5/6 mx-auto">
-          <Header left="Signing up..."/>
+          <Header left="signing up..."/>
           <Message content={message}/>
           <form onSubmit={handleSubmit} className="flex flex-col my-4">
             <input className="w-full rounded-lg p-1 mb-2 text-black font-light-bg-norm"
@@ -135,7 +135,7 @@ export default function Signup() {
                    placeholder="artist name"
                    value={formData.artist}
                    onChange={handleChange}/>
-            <div className="mb-2">Your link will look like:</div>
+            <div className="mb-2">your link will look like:</div>
             <div className="flex">
               <span className="w-fit rounded-l-lg mb-2 pl-2 cursor-not-allowed inline mx-0 text-white bg-color" ><span className="rainbow-svg">tunetree.xyz/</span></span>
               <input name="link" type="text" 
@@ -146,7 +146,7 @@ export default function Signup() {
                      placeholder={separateLink ? " make me custom pls" : ""}/>
             </div>
             <UIButton type="neutral"
-                      content={separateLink ? "Want the default link?": "Want a custom link?"}
+                      content={separateLink ? "want the default link?": "want a custom link?"}
                       submit={false} 
                       handle={ (e: React.MouseEvent<HTMLButtonElement>) => {
                                   e.preventDefault();
@@ -184,7 +184,7 @@ export default function Signup() {
                 cpassword: cpassword
               })
             }} name="cpassword"/>
-            <UIButton type="confirm" content="Submit" submit={true} handle={() => {}}/>
+            <UIButton type="confirm" content="submit" submit={true} handle={() => {}}/>
           </form>
         </div>
       </div>

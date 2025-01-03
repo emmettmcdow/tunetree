@@ -20,7 +20,7 @@ const AiPrompt = ({visible, toggleVisible}: AiPromptProps) => {
   return (
     <div className={"z-50 fixed w-screen h-screen top-0 left-0 flex justify-center items-center bg-black/50 " + (visible ? "" : "hidden")}>
       <div className="fg-color rounded-2xl p-5 text-center z-50 drop-shadow-2xl shadow-inner w-1/4">
-        <Header left="AI Background Generation"/>
+        <Header left="ai background generation"/>
         <div className="p-2">
           <div className="flex items-center justify-center">
             <Image className="rounded-2xl" alt="album art prior to ai animation" width={200} height={200} src="/photos/example-art.png"/>
@@ -42,8 +42,8 @@ const AiPrompt = ({visible, toggleVisible}: AiPromptProps) => {
           </label>
           <input className="w-full rounded-lg p-1 pr-10 text-black font-light-bg-norm" type="text" name="Prompt"  onChange={handleChange} placeholder="trippy, weird, psychedelic" />
           <div className="flex justify-center">
-            <UIButton type="deny" content="Cancel" handle={toggleVisible} submit={false}/>
-            <UIButton type="confirm" content="Generate" handle={() => {console.log("Submitted")}} submit={true}/>
+            <UIButton type="deny" content="cancel" handle={toggleVisible} submit={false}/>
+            <UIButton type="confirm" content="generate" handle={() => {console.log("Submitted")}} submit={true}/>
           </div>
         </form>
       </div>

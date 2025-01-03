@@ -18,7 +18,7 @@ function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: Track, link: 
     return (
     <div className={"z-50 fixed w-screen h-screen top-0 left-0 flex justify-center items-center bg-black/50 "}>
       <div className="fg-color rounded-2xl p-5 text-center z-50 drop-shadow-2xl shadow-inner w-1/4 flex-col items-center">
-        <Header left={"Going to '" + trackInfo.name + "'..."}/>
+        <Header left={"going to '" + trackInfo.name + "'..."}/>
         <div className="mt-2">{"wanna be notified when "+ trackInfo.artist + " drops? (it's free)"}</div>
         <form className="my-2">
           <input className="text-black rounded-xl p-2 font-light-bg-norm" placeholder="email" name="email"/>

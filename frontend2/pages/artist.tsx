@@ -237,7 +237,7 @@ function Editor({changeMode, setCurrTrack, formData, setFormData}: {changeMode: 
         <form onSubmit={(e) => handleSubmit(e, setMessage)} className="flex-col items-center">
           <ServiceSelectorBar selected={selected} setSelected={setSelected}/>
           <ServiceURLs formData={formData} setFormData={setFormData} selected={selected} setSelected={setSelected}/>
-          <textarea  className="w-full rounded-lg p-1 my-2 text-black" value={formData["message"]} onChange={(e) => {
+          <textarea  className="w-full rounded-lg p-1 my-2 text-black font-light-bg-norm" value={formData["message"]} onChange={(e) => {
             const newTrack: Track= {
               ...formData,
               message: e.target.value,
@@ -245,8 +245,8 @@ function Editor({changeMode, setCurrTrack, formData, setFormData}: {changeMode: 
             setFormData(newTrack);
           }} name="message" placeholder="A message to your fans"/>
           <div ref={submitRef} className="flex justify-center">
-            <UIButton type="deny" content="Cancel" handle={() => {changeMode(Mode.Standby)}} submit={false}/>
-            <UIButton type="confirm" content="Submit" handle={() => {}} submit={true}/>
+            <UIButton type="deny" content="cancel" handle={() => {changeMode(Mode.Standby)}} submit={false}/>
+            <UIButton type="confirm" content="submit" handle={() => {}} submit={true}/>
           </div>
         </form>
       </div>
@@ -266,11 +266,11 @@ function EditPanel({mode, changeMode, currTrack, setCurrTrack, formData, setForm
     case Mode.Standby:
       return (
         <div className="flex items-center mx-auto fg-color z-50">
-          <UIButton type="neutral" content="Edit" handle={() => {
+          <UIButton type="neutral" content="edit" handle={() => {
             setFormData(currTrack);
             changeMode(Mode.Edit);
           }} submit={false}/>
-          <UIButton type="neutral" content="New" handle={() => {
+          <UIButton type="neutral" content="new" handle={() => {
             setFormData(new Track({"artistName": currTrack.artist}));
             changeMode(Mode.New)
           }} submit={false}/>
@@ -286,11 +286,11 @@ function EditPanel({mode, changeMode, currTrack, setCurrTrack, formData, setForm
 function getHeader(mode: Mode) {
   switch(mode){
     case Mode.Standby:
-      return "Now Playing..."
+      return "now playing..."
     case Mode.Edit:
-      return "Remixing..."
+      return "remixing..."
     case Mode.New:
-      return "Dropping..."
+      return "dropping..."
     }
 }
 

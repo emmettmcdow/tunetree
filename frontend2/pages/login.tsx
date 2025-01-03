@@ -139,7 +139,7 @@ export default function Login() {
     <div className="h-screen flex flex-col">
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 fg-color w-11/12 py-4 md:w-3/5 md:py-8 rounded-lg">
         <div className="w-11/12 md:w-5/6 mx-auto">
-          <Header left="Logging In..."/>
+          <Header left="logging in..."/>
           <Message content={message}/>
           <form className="flex flex-col my-4" onSubmit={handleSubmit}>
             <input className="w-full rounded-lg p-1 mb-2 text-black font-light-bg-norm"
@@ -161,7 +161,7 @@ export default function Login() {
                 password: password
               })
             }} name="password"/>
-            <UIButton type="confirm" content="Login" submit={true} handle={() => {}}/>
+            <UIButton type="confirm" content="login" submit={true} handle={() => {}}/>
           </form>
           <div><LightButton link="/signup" content="create an account"/></div>
           <div><LightButton link="/help" content="need help?"/></div>
