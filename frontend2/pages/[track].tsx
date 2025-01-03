@@ -21,7 +21,7 @@ function SubscriptionPrompt({trackInfo, link, toggle}: {trackInfo: Track, link: 
         <Header left={"Going to '" + trackInfo.name + "'..."}/>
         <div className="mt-2">{"wanna be notified when "+ trackInfo.artist + " drops? (it's free)"}</div>
         <form className="my-2">
-          <input className="text-black rounded-xl p-2 " placeholder="email" name="email"/>
+          <input className="text-black rounded-xl p-2 font-light-bg-norm" placeholder="email" name="email"/>
           <div className="flex justify-center">
             <Link href={link}><UIButton type="confirm" content="yes" handle={() => toggle("")} submit={false}/></Link>
             <Link href={link}><UIButton type="deny" content="no" handle={() => toggle("")} submit={false}/></Link>

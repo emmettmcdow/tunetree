@@ -33,6 +33,7 @@ body {
   color: white;
   margin: 0;
   font-family: "doto";
+  font-weight: 500;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -43,9 +44,20 @@ code {
 }
 
 /* Font Weights and Sizes */
-.font-light-background-normal {
-  font-weight: 600;
-  font-style: Rounded;
+.font-light-bg-norm {
+  font-weight: 700;
+}
+
+.font-h2 {
+  font-weight: 500;
+}
+
+.font-h1 {
+  font-weight: 300;
+}
+
+.font-ui {
+  font-weight: 500;
 }
 
 .rainbow-svg {

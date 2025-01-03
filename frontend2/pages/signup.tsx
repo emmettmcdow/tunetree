@@ -129,7 +129,7 @@ export default function Signup() {
           <Header left="Signing up..."/>
           <Message content={message}/>
           <form onSubmit={handleSubmit} className="flex flex-col my-4">
-            <input className="w-full rounded-lg p-1 mb-2 text-black"
+            <input className="w-full rounded-lg p-1 mb-2 text-black font-light-bg-norm"
                    type="text"
                    name="artist"
                    placeholder="artist name"
@@ -139,7 +139,7 @@ export default function Signup() {
             <div className="flex">
               <span className="w-fit rounded-l-lg mb-2 pl-2 cursor-not-allowed inline mx-0 text-white bg-color" ><span className="rainbow-svg">tunetree.xyz/</span></span>
               <input name="link" type="text" 
-                     className={separateLink ? "rainbow-input w-full rounded-r-lg mb-2 mx-0 inline text-black focus:outline-black" : "rainbow-input w-full rounded-r-lg mb-2 mx-0 bg-color cursor-not-allowed inline text-white selectable-none focus:outline-none"}
+                     className={separateLink ? "rainbow-input font-light-bg-norm w-full rounded-r-lg mb-2 mx-0 inline text-black focus:outline-black" : "rainbow-input font-light-bg-norm w-full rounded-r-lg mb-2 mx-0 bg-color cursor-not-allowed inline text-white selectable-none focus:outline-none"}
                      value={formData.link}
                      onChange={handleChange}
                      readOnly={!separateLink}
@@ -165,7 +165,7 @@ export default function Signup() {
                                 }
                               }
             />
-            <input className="w-full rounded-lg p-1 my-2 text-black" 
+            <input className="w-full rounded-lg p-1 my-2 text-black font-light-bg-norm" 
                    type="text"
                    name="email"
                    placeholder="e-mail address"

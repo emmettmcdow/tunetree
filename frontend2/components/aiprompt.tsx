@@ -40,7 +40,7 @@ const AiPrompt = ({visible, toggleVisible}: AiPromptProps) => {
               <div><FiInfo className="inline"/> Credits Left: 5 </div>
             </Tooltip>
           </label>
-          <input className="w-full rounded-lg p-1 pr-10 text-black" type="text" name="Prompt"  onChange={handleChange} placeholder="trippy, weird, psychedelic" />
+          <input className="w-full rounded-lg p-1 pr-10 text-black font-light-bg-norm" type="text" name="Prompt"  onChange={handleChange} placeholder="trippy, weird, psychedelic" />
           <div className="flex justify-center">
             <UIButton type="deny" content="Cancel" handle={toggleVisible} submit={false}/>
             <UIButton type="confirm" content="Generate" handle={() => {console.log("Submitted")}} submit={true}/>

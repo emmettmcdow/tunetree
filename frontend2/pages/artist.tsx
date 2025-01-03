@@ -79,7 +79,7 @@ function ServiceURLs({formData, setFormData, selected, setSelected}: {formData: 
       const typedProv = provider as "apple" | "amazon" | "spotify" | "tidal" | "bandcamp";
       serviceURLs.push(
         <div className="flex mb-2" key={provider}>
-          <input className="w-full rounded-lg p-1 pr-10 text-black shadow-inner" type="text" name={provider}  value={formData.links[typedProv]} onChange={handleChange} placeholder={provider.charAt(0).toUpperCase() + provider.slice(1) + " URL"}/>
+          <input className="w-full rounded-lg p-1 pr-10 text-black shadow-inner font-light-bg-norm" type="text" name={provider}  value={formData.links[typedProv]} onChange={handleChange} placeholder={provider.charAt(0).toUpperCase() + provider.slice(1) + " URL"}/>
           <span className="flex justify-around items-center cursor-pointer" onClick={() => {
             const newSelected: Selected= {
               ...selected,

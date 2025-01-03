@@ -12,7 +12,7 @@ import LightButton from '@/components/lightbutton';
 export function Header({left, right, rightLink}: {left?: string, right?: string, rightLink?: string}) {
   return (
       <div className="w-full flex justify-between items-center">
-        <span className="text-2xl">
+        <span className="text-3xl font-h2">
           <Image src="/logo-white.png" alt="tunetree logo" className="w-12 mx-auto inline mr-2" height="1024" width="1024"/>
           {left}
         </span>
@@ -57,7 +57,7 @@ export function Password({name, password, setPassword}: {name: string, password:
 
   return (
     <div className="flex mb-2">
-      <input className="w-full rounded-lg p-1 text-black" type={type} name={name} placeholder={name == "cpassword" ? "confirm password" : name} value={password} onChange={(e) => setPassword(e.target.value)}/>
+      <input className="w-full rounded-lg p-1 text-black font-light-bg-norm" type={type} name={name} placeholder={name == "cpassword" ? "confirm password" : name} value={password} onChange={(e) => setPassword(e.target.value)}/>
       <span className="flex justify-around items-center cursor-pointer" onClick={handleToggle}>
         <Eye state={type}/>
       </span>
@@ -142,7 +142,7 @@ export default function Login() {
           <Header left="Logging In..."/>
           <Message content={message}/>
           <form className="flex flex-col my-4" onSubmit={handleSubmit}>
-            <input className="w-full rounded-lg p-1 mb-2 text-black font-light-background-normal"
+            <input className="w-full rounded-lg p-1 mb-2 text-black font-light-bg-norm"
                    type="text"
                    name="email"
                    placeholder="username"
