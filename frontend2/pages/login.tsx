@@ -14,7 +14,9 @@ export function Header({left, right, rightLink}: {left?: string, right?: string,
       <div className="w-full flex justify-between items-center">
         <span className="text-3xl font-h2">
           <Image src="/logo-white.png" alt="tunetree logo" className="w-12 mx-auto inline mr-2" height="1024" width="1024"/>
-          {left}
+          <div className="inline-block">
+            {left}
+          </div>
         </span>
         {right &&
           <Link href={rightLink || "/"}>
