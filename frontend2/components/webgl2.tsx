@@ -365,8 +365,6 @@ const WebGLBackground: React.FC<SceneProps> = ({
       return <VinylScene dimensions={[width, height]} image={image}/>;
     case "mountain":
       return <MountainScene colors={colors} dimensions={[width, height]} />;
-    case "dynamic":
-      return <Scene2 dimensions={[width, height]} image={image} colors={colors}/>
     default:
       return null;
   }

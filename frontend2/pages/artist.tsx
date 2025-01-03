@@ -319,7 +319,7 @@ export class Track{
     this.message = "";
     this.image = "";
     this.colors = "";
-    this.animation = "dynamic";
+    this.animation = "cube";
     this.links = {
       apple: "",
       spotify: "",
