@@ -1,0 +1,9 @@
+*.png
+*.mp4
+*.svg
+*.jpg
+*.ico
+*.obj
+*.gltf
+*.afdesign
+public/
