@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -67,10 +68,11 @@ func (t *TrackHandler) trackHandler(res http.ResponseWriter, req *http.Request) 
 			http.Error(res, "Invalid token", http.StatusUnauthorized)
 			return
 		}
-		user, ok := t.db.GetUser(id)
-		if !ok {
-			http.Error(res, "User with ID not found", http.StatusUnauthorized)
-			return
+		user, err := t.db.GetUser(id)
+		if err == sql.ErrNoRows {
+			http.Error(res, fmt.Sprintf("User with ID %s not found", id), http.StatusNotFound)
+		} else if err != nil {
+			panic(err)
 		}
 		role := req.Context().Value("role")
 		if role == nil || role == "USER" {

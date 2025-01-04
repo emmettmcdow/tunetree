@@ -79,7 +79,15 @@ type TrackDB interface {
 
 func (this DB) GetTrack(user User) (track Track, ok bool) {
 	var trackid int
-	err := this.db.QueryRow("SELECT t.name, t.image, t.message, t.animation, t.display, t.colors, t.rowid FROM users u JOIN tracks t ON t.user_id = u.rowid WHERE u.rowid = ? ORDER BY created DESC LIMIT 1;", user.Id).Scan(&track.Name, &track.Image, &track.Message, &track.Animation, &track.Display, &track.Colors, &trackid)
+	query := `
+	SELECT t.name, t.image, t.message, t.animation, t.display, t.colors, t.rowid 
+	FROM users u 
+	JOIN tracks t ON t.user_id = u.rowid 
+	WHERE u.rowid = ? 
+	ORDER BY created 
+	DESC LIMIT 1;
+	`
+	err := this.db.QueryRow(query, user.Id).Scan(&track.Name, &track.Image, &track.Message, &track.Animation, &track.Display, &track.Colors, &trackid)
 	if err == sql.ErrNoRows {
 		return track, false
 	} else if err != nil {
@@ -156,22 +164,16 @@ CREATE TABLE IF NOT EXISTS users(
 );`
 
 type UserDB interface {
-	GetUser(id int64) (user User, ok bool)
+	GetUser(id int64) (user User, err error)
 	GetUserFromEmail(email string) (user User, ok bool)
 	GetUserFromLink(artistlink string) (user User, ok bool)
 	PutUser(user *User) (err error)
 }
 
-func (this DB) GetUser(id int64) (user User, ok bool) {
+func (this DB) GetUser(id int64) (user User, err error) {
 	user.Id = id
-	err := this.db.QueryRow("SELECT * FROM users WHERE rowid = ?;", id).Scan(&user.Email, &user.Password, &user.Artist, &user.Link, &user.SpotifyId)
-	if err == sql.ErrNoRows {
-		return user, false
-	} else if err != nil {
-		// TODO: deal with this
-		panic(err)
-	}
-	return user, true
+	err = this.db.QueryRow("SELECT * FROM users WHERE rowid = ?;", id).Scan(&user.Email, &user.Password, &user.Artist, &user.Link, &user.SpotifyId)
+	return user, err
 }
 
 func (this DB) GetUserFromEmail(email string) (user User, ok bool) {

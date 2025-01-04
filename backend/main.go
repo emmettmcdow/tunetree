@@ -237,10 +237,12 @@ func server(wg *sync.WaitGroup, port int, runtime string) (s *http.Server) {
 			fmt.Printf("Failed to write response: %s", err)
 		}
 	})
+	// TODO: refactor login and signup to be part of the user handler
 	m.Handle("/login/", GetLoginHandler(config).WithDB(db))
 	m.Handle("/signup/", GetSignupHandler(config).WithDB(db))
 	m.Handle("/track/{artistlink}/", GetTrackHandler(config).WithDB(db))
 	m.Handle("/external/", GetSpotifyHandler(config))
+	m.Handle("/user/{userId}/", GetUserHandler(config).WithDB(db))
 
 	animHandler := GetAnimationHandler(config).WithDB(db)
 	m.Handle("/animation/status/{uuid}/", animHandler)
@@ -303,8 +305,8 @@ func main() {
 
 	replicateEndpoint := getEnv("REPLICATE_ENDPOINT")
 	if replicateEndpoint == "" {
-		fmt.Printf("WARNING: REPLICATE_ENDPOINT unset\n")
 		replicateEndpoint = REPLICATE_FAKE_ENDPOINT
+		fmt.Printf("WARNING: REPLICATE_ENDPOINT unset\n")
 		fmt.Printf("WARNING: Setting to %s\n", replicateEndpoint)
 	}
 
