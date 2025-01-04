@@ -21,7 +21,7 @@ const AiPrompt = ({ visible, toggleVisible }: AiPromptProps) => {
         (visible ? "" : "hidden")
       }
     >
-      <div className="fg-color z-50 w-1/2 rounded-2xl p-5 text-center shadow-inner drop-shadow-2xl">
+      <div className="fg-color z-50 w-11/12 rounded-2xl p-5 text-center shadow-inner drop-shadow-2xl md:w-3/5">
         <Header left="ai background" />
         <div className="p-2">
           <div className="my-4 flex items-center justify-center">

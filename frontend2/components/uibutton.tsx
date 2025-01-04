@@ -8,7 +8,7 @@ export default function UIButton({
   submit,
 }: {
   type: string;
-  content?: string;
+  content?: string | JSX.Element;
   handle: Function;
   submit: boolean;
 }) {
@@ -36,7 +36,7 @@ export default function UIButton({
     actiontype = "submit";
   }
 
-  const buttonClass = "m-4 rounded-lg cursor-pointer" + color;
+  const buttonClass = "rounded-lg cursor-pointer" + color;
   return (
     <button
       className={buttonClass}
