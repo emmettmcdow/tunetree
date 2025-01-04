@@ -7,6 +7,7 @@ import Display from "@/components/display";
 import UIButton from "@/components/uibutton";
 import Link from "next/link";
 import { Header } from "./login";
+import Head from "next/head";
 
 function SubscriptionPrompt({
   trackInfo,
@@ -193,6 +194,9 @@ export default function TrackPage({
           url: "https://tunetree.xyz/" + slug,
         }}
       />
+      <Head>
+        <link rel="icon" href={ti.image || "./favicon.ico"} />
+      </Head>
       {isClient && (
         <Display
           track={ti}
