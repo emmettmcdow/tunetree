@@ -1,23 +1,33 @@
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 // eslint-disable-next-line
-export default function UIButton({type, content, handle, submit}: {type: string, content?: string, handle: Function, submit: boolean}) {
+export default function UIButton({
+  type,
+  content,
+  handle,
+  submit,
+}: {
+  type: string;
+  content?: string;
+  handle: Function;
+  submit: boolean;
+}) {
   /*
     - type: confirm, deny, neutral
     - content: what the button says
     - handle: what ot do on click
   */
   let color = "";
-  switch(type) {
-  case "confirm":
+  switch (type) {
+    case "confirm":
       color = " bg-black ";
       break;
-  case "deny":
+    case "deny":
       color = " bg-neutral-900 ";
       break;
-  case "left":
-  case "right":
-  case "neutral":
+    case "left":
+    case "right":
+    case "neutral":
       color = " bg-black ";
       break;
   }
@@ -28,16 +38,29 @@ export default function UIButton({type, content, handle, submit}: {type: string,
 
   const buttonClass = "m-4 rounded-lg cursor-pointer" + color;
   return (
-    <button className={buttonClass} onClick={(e) => handle(e)} type={actiontype}>
+    <button
+      className={buttonClass}
+      onClick={(e) => handle(e)}
+      type={actiontype}
+    >
       {(() => {
-        switch(type) {
-        case "left":
-          return <FiChevronLeft className="inline mx-2 rainbow-hover bright-text"/>;
-        case "right":
-          return <FiChevronRight className="inline mx-2 rainbow-hover bright-text"/>;
-        default:
-          return (<span className="text-xl p-6 rainbow-hover bright-text">{content || ""}</span>);
-      }})()}
+        switch (type) {
+          case "left":
+            return (
+              <FiChevronLeft className="rainbow-hover bright-text mx-2 inline" />
+            );
+          case "right":
+            return (
+              <FiChevronRight className="rainbow-hover bright-text mx-2 inline" />
+            );
+          default:
+            return (
+              <span className="rainbow-hover bright-text p-6 text-xl">
+                {content || ""}
+              </span>
+            );
+        }
+      })()}
     </button>
-  );  
+  );
 }
