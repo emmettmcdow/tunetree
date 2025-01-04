@@ -304,7 +304,7 @@ func main() {
 	replicateEndpoint := getEnv("REPLICATE_ENDPOINT")
 	if replicateEndpoint == "" {
 		fmt.Printf("WARNING: REPLICATE_ENDPOINT unset\n")
-		replicateEndpoint = "http://localhost:6969"
+		replicateEndpoint = REPLICATE_FAKE_ENDPOINT
 		fmt.Printf("WARNING: Setting to %s\n", replicateEndpoint)
 	}
 

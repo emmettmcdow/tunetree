@@ -234,7 +234,7 @@ func (a AnimationJob) String() string {
 }
 
 const ANIMATIONJOBTABLE = `
-CREATE TABLE IF NOT EXISTS backgrounds(
+CREATE TABLE IF NOT EXISTS animation_jobs(
 	uuid TEXT NOT NULL,
 	user_id INTEGER NOT NULL,
 	status TEXT NOT NULL,
@@ -263,20 +263,39 @@ CREATE TABLE IF NOT EXISTS backgrounds(
 );`
 
 type AnimationDB interface {
-	AddJob(job AnimationJob) bool
-	UpdateJob(job AnimationJob) bool
-	DropJob(job AnimationJob) bool
-	GetJob(uuid uuid.UUID) (AnimationJob, bool)
+	AddJob(job AnimationJob) error
+	UpdateJob(job AnimationJob) error
+	DropJob(job AnimationJob) error
+	GetJob(uuid uuid.UUID) (AnimationJob, error)
 
-	GetAnimations(user User) ([]Animation, bool)
+	GetAnimations(user User) ([]Animation, error)
 }
 
-func (db DB) AddJob(job AnimationJob) bool               { return true }
-func (db DB) UpdateJob(job AnimationJob) bool            { return true }
-func (db DB) DropJob(job AnimationJob) bool              { return true }
-func (db DB) GetJob(uuid uuid.UUID) (AnimationJob, bool) { return AnimationJob{}, true }
+func (this DB) AddJob(job AnimationJob) error {
+	_, err := this.db.Exec("INSERT INTO animation_jobs VALUES (?,?,?,?,?,?);", job.UUID.String(), job.UserId, job.Status, job.ArtLink, job.AnimationLink, job.Prompt)
+	return err
+}
 
-func (db DB) GetAnimations(user User) ([]Animation, bool) { return []Animation{}, true }
+func (this DB) UpdateJob(job AnimationJob) error {
+	query := `
+	UPDATE animation_jobs
+	SET status = $2, animation_link = $3
+	WHERE uuid = $1;`
+	_, err := this.db.Exec(query, job.UUID.String(), job.Status, job.AnimationLink)
+	return err
+}
+func (db DB) DropJob(job AnimationJob) error { return nil }
+func (this DB) GetJob(uuid uuid.UUID) (job AnimationJob, err error) {
+	query := `
+	SELECT user_id, status, art_link, animation_link, prompt
+	FROM animation_jobs
+	WHERE uuid = $1`
+	res := this.db.QueryRow(query, uuid.String)
+	err = res.Scan(&job.UserId, &job.Status, &job.ArtLink, &job.AnimationLink, &job.Prompt)
+	return job, err
+}
+
+func (db DB) GetAnimations(user User) ([]Animation, error) { return []Animation{}, nil }
 
 type DBErrType int
 

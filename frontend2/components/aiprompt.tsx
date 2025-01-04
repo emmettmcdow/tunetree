@@ -1,16 +1,26 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import UIButton from "./uibutton";
 import Image from "next/image";
 import { FiArrowRight, FiInfo } from "react-icons/fi";
 import { Header } from "@/pages/login";
 import Tooltip from "./tooltip";
+import { Track } from "@/pages/artist";
 
 interface AiPromptProps {
   visible: boolean;
   toggleVisible: Dispatch<SetStateAction<boolean>>;
+  trackInfo: Track;
 }
 
-const AiPrompt = ({ visible, toggleVisible }: AiPromptProps) => {
+const AiPrompt = ({ visible, toggleVisible, trackInfo }: AiPromptProps) => {
+  const [formData, setFormData] = useState({
+    user_id: -1, // Just wanna say, for the record, why the fuck did I not use userID for auth on the FE
+    status: "requested",
+    art_link: trackInfo.image,
+    animation_link: "",
+    prompt: "",
+  });
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {};
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {};
 

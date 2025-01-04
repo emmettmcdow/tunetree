@@ -12,6 +12,9 @@ import (
 	"github.com/google/uuid"
 )
 
+const REPLICATE_FAKE_ENDPOINT = "http://localhost:6969"
+const REPLICATE_FAKE_FILE = "../frontend2/public/videos/example-animation.mp4"
+
 type AnimationHandler struct {
 	apiKey  string
 	thisURL string
@@ -80,19 +83,13 @@ func (a AnimationHandler) ServeStatus(res http.ResponseWriter, req *http.Request
 		http.Error(res, "Malformed uuid", http.StatusBadRequest)
 		return
 	}
-	job, ok := a.db.GetJob(newid)
-	if !ok {
-		http.Error(res, "Could not find job", http.StatusNotFound)
+	job, err := a.db.GetJob(newid)
+	if err != nil {
+		http.Error(res, fmt.Sprintf("Could not find job: %s", err), http.StatusNotFound)
 		return
 	}
 	switch req.Method {
 	case "GET":
-		if job.Status == "succeeded" || job.Status == "failed" {
-			if ok := a.db.DropJob(job); !ok {
-				http.Error(res, "Unknown db error", http.StatusInternalServerError)
-				return
-			}
-		}
 		json.NewEncoder(res).Encode(job)
 		return
 	case "POST":
@@ -109,13 +106,23 @@ func (a AnimationHandler) ServeStatus(res http.ResponseWriter, req *http.Request
 		job.Status = bod.Status
 		job.AnimationLink = bod.Output
 
-		if ok := a.db.UpdateJob(job); !ok {
-			http.Error(res, "Failed to update job", http.StatusInternalServerError)
+		if err := a.db.UpdateJob(job); err != nil {
+			http.Error(res, fmt.Sprintf("Failed to update job: %s", err), http.StatusInternalServerError)
 		}
-		if job.Status == "succeeded" {
-			if err := a.CommitJob(job); err != nil {
-				http.Error(res, fmt.Sprintf("Failed to download animation: %s", err), http.StatusInternalServerError)
+		if job.Status != "succeeded" {
+			return
+		}
+		if config.replicateEndpoint == REPLICATE_FAKE_ENDPOINT {
+			raw, err := os.ReadFile(REPLICATE_FAKE_FILE)
+			if err != nil {
+				http.Error(res, fmt.Sprintf("Failed to read animation file: %s", err), http.StatusInternalServerError)
 			}
+			if err = a.saveAnimation(job, bytes.NewBuffer(raw)); err != nil {
+				http.Error(res, fmt.Sprintf("Failed to save animation: %s", err), http.StatusInternalServerError)
+			}
+		}
+		if err := a.CommitJob(job); err != nil {
+			http.Error(res, fmt.Sprintf("Failed to download animation: %s", err), http.StatusInternalServerError)
 		}
 		return
 
@@ -158,11 +165,33 @@ func (a AnimationHandler) ServeNew(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	if job.ArtLink == "" {
+		http.Error(res, "ArtLink unset", http.StatusBadRequest)
+		return
+	}
+	if job.Prompt == "" {
+		http.Error(res, "Prompt unset", http.StatusBadRequest)
+		return
+	}
+
 	job.UUID = a.idGen.New()
+
+	// This is for local development; I don't wanna queue hella jobs please god
+	if config.replicateEndpoint == REPLICATE_FAKE_ENDPOINT {
+		job.Status = "succeeded"
+		err = a.db.AddJob(job)
+		if err = a.db.AddJob(job); err != nil {
+			http.Error(res, fmt.Sprintf("Failed to queue animation generation job: %s", err), http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(res).Encode(job)
+		return
+	}
+
 	job.Status = "queued"
-	ok := a.db.AddJob(job)
-	if !ok {
-		http.Error(res, "Failed to queue animation generation job", http.StatusInternalServerError)
+	if err = a.db.AddJob(job); err != nil {
+		http.Error(res, fmt.Sprintf("Failed to queue animation generation job: %s", err), http.StatusInternalServerError)
+		return
 	}
 
 	bgReq := bgRequest(a.apiKey, a.thisURL, job.UUID.String(), job.ArtLink, job.Prompt)
@@ -284,7 +313,7 @@ func bgRequest(apiKey, thisURL, backgroundId, imageLink, prompt string) (req *ht
 	}
 	body := bytes.NewBuffer(bodyString)
 
-	url := "https://api.replicate.com/v1/predictions"
+	url := fmt.Sprintf("%s/v1/predictions", config.replicateEndpoint)
 	req, err = http.NewRequest("POST", url, body)
 	if err != nil {
 		panic(err)
