@@ -146,12 +146,12 @@ CREATE TABLE IF NOT EXISTS links(
 
 // ******************************************************************************************* User
 type User struct {
-	Id        int64
-	Email     string
-	Password  string
-	Artist    string
-	Link      string
-	SpotifyId string
+	Id        int64  `json:"id"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+	Artist    string `json:"artist"`
+	Link      string `json:"link"`
+	SpotifyId string `json:"spotify_id"`
 }
 
 const USERTABLE = `

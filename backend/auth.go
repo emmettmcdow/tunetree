@@ -169,7 +169,10 @@ func (l *LoginHandler) loginHandler(res http.ResponseWriter, req *http.Request) 
 	if err != nil {
 		http.Error(res, fmt.Sprintf("Failed to generate token: %s", err), http.StatusInternalServerError)
 	}
-	responseBody := map[string]string{"token": token, "Artist": user2.Artist, "Email": user2.Email, "SpotifyId": user2.SpotifyId, "Link": user2.Link}
+	responseBody := struct {
+		Token string
+		Id    string
+	}{Token: token, Id: fmt.Sprintf("%d", user2.Id)}
 	json.NewEncoder(res).Encode(responseBody)
 	return
 }

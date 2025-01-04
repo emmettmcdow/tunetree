@@ -1,14 +1,12 @@
 import { UIPaths } from "@/pages/signup";
 
 const placeholderSquare = "/placeholder.png";
-const spotify = "/spotify.png"
-const youtube = "/youtube.png"
-const apple = "/apple.png"
-const tidal = "/tidal.png"
-const bandcamp = "/bandcamp.png"
-const amazon = "/amazon.png"
-
-
+const spotify = "/spotify.png";
+const youtube = "/youtube.png";
+const apple = "/apple.png";
+const tidal = "/tidal.png";
+const bandcamp = "/bandcamp.png";
+const amazon = "/amazon.png";
 
 export function validPassword(password: string) {
   /* Rules:
@@ -29,12 +27,17 @@ export function validPassword(password: string) {
   for (let i = 0; i < password.length; i++) {
     let code = password.charCodeAt(i);
     if (code < 33 || code > 126) {
-      return false
+      return false;
     }
     if (code > 47 && code < 58) {
       number = true;
     }
-    if ((code > 32 && code < 48) || (code > 57 && code < 65) || (code > 90 && code < 97) || (code > 122 && code < 127)) {
+    if (
+      (code > 32 && code < 48) ||
+      (code > 57 && code < 65) ||
+      (code > 90 && code < 97) ||
+      (code > 122 && code < 127)
+    ) {
       special = true;
     }
     if (code > 64 && code < 91) {
@@ -45,75 +48,64 @@ export function validPassword(password: string) {
 }
 
 export function iconForService(service: string) {
-  switch(service) {
-  case "spotify":
-    return spotify;
-  case "apple":
-    return apple;
-  case "tidal":
-    return tidal;
-  case "amazon":
-    return amazon;
-  case "bandcamp":
-    return bandcamp;
-  case "youtube":
-    return youtube;
-  default:
-    return placeholderSquare;
+  switch (service) {
+    case "spotify":
+      return spotify;
+    case "apple":
+      return apple;
+    case "tidal":
+      return tidal;
+    case "amazon":
+      return amazon;
+    case "bandcamp":
+      return bandcamp;
+    case "youtube":
+      return youtube;
+    default:
+      return placeholderSquare;
   }
 }
 
 export function setAuthenticatedUser(body: any) {
   document.cookie = "token=" + body["token"];
-  document.cookie = "artist=" + body["Artist"];
-  document.cookie = "email=" + body["Email"];
-  document.cookie = "spotify_id=" + body["SpotifyId"];
-  document.cookie = "link=" + body["Link"];
+  document.cookie = "id=" + body["Id"];
 }
 
 export function getAuthorizationHeader() {
   return "Bearer " + getCookieValue("token");
 }
 
-export function getAuthenticatedArtist() {
-  return getCookieValue("artist")
-}
-
-export function getAuthenticatedArtistLink() {
-  return getCookieValue("link");
-}
-
 export function getAuthenticatedUser() {
-  const token = getCookieValue("user");
-  if (!token) {
-    return ""
-  }
-  const jwt = parseJwt(token);
-  return jwt["sub"];
+  const id = getCookieValue("id");
+  return id;
 }
 
-const getCookieValue = (name: string) => (
-  document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')?.pop() || ''
-)
+const getCookieValue = (name: string) =>
+  document.cookie.match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)")?.pop() || "";
 
-function parseJwt (token: string) {
-    var base64Url = token.split('.')[1];
-    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+function parseJwt(token: string) {
+  var base64Url = token.split(".")[1];
+  var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  var jsonPayload = decodeURIComponent(
+    window
+      .atob(base64)
+      .split("")
+      .map(function (c) {
+        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join(""),
+  );
 
-    return JSON.parse(jsonPayload);
+  return JSON.parse(jsonPayload);
 }
 
-export function encodeArtistLink (name: string) {
-
-  name = name.replaceAll(" ", "-")  // Spaces to dashes
-             .replaceAll(/[^a-zA-Z0-9-_.~]/g, "")  // Remove not allowed characters
-             .toLowerCase();
+export function encodeArtistLink(name: string) {
+  name = name
+    .replaceAll(" ", "-") // Spaces to dashes
+    .replaceAll(/[^a-zA-Z0-9-_.~]/g, "") // Remove not allowed characters
+    .toLowerCase();
   if (UIPaths.some((path) => path == name)) {
     name += "~";
   }
   return name;
 }
-  

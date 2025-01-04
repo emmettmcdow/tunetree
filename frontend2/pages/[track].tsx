@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
 
-import { Track } from "./artist";
-import { getAuthenticatedArtistLink } from "../utils/utils";
+import { Track } from "../model";
 import Display from "@/components/display";
 import UIButton from "@/components/uibutton";
 import Link from "next/link";
@@ -65,26 +64,14 @@ function SubscriptionPrompt({
   }
 }
 
-export async function getTrackInfo(artistLink: string | null) {
+export async function getTrackInfo(artistLink: string) {
   try {
-    let response = null;
-    if (!artistLink) {
-      response = await fetch(
-        process.env.NEXT_PUBLIC_API_URL +
-          "track/" +
-          getAuthenticatedArtistLink(),
-        {
-          method: "GET",
-        },
-      );
-    } else {
-      response = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + "track/" + artistLink,
-        {
-          method: "GET",
-        },
-      );
-    }
+    let response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}track/${artistLink}`,
+      {
+        method: "GET",
+      },
+    );
 
     if (response.ok && response.body) {
       const body = await response.json();

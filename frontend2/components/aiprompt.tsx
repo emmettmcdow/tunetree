@@ -4,25 +4,84 @@ import Image from "next/image";
 import { FiArrowRight, FiInfo } from "react-icons/fi";
 import { Header } from "@/pages/login";
 import Tooltip from "./tooltip";
-import { Track } from "@/pages/artist";
+import { Track, User } from "@/model";
+import { getAuthorizationHeader } from "@/utils/utils";
 
 interface AiPromptProps {
   visible: boolean;
-  toggleVisible: Dispatch<SetStateAction<boolean>>;
-  trackInfo: Track;
+  toggleVisible: Function;
+  track: Track;
+  user: User;
 }
 
-const AiPrompt = ({ visible, toggleVisible, trackInfo }: AiPromptProps) => {
+const AiPrompt = ({ visible, toggleVisible, track, user }: AiPromptProps) => {
+  const [message, setMessage] = useState("");
   const [formData, setFormData] = useState({
-    user_id: -1, // Just wanna say, for the record, why the fuck did I not use userID for auth on the FE
+    user_id: user.id,
     status: "requested",
-    art_link: trackInfo.image,
+    art_link: track.image,
     animation_link: "",
     prompt: "",
   });
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {};
-  const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {};
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    // Convert form data to string
+    const jsonData = JSON.stringify(formData);
+    let responseBody = "";
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}animation/new/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: getAuthorizationHeader(),
+          },
+          body: jsonData,
+          credentials: "include",
+        },
+      );
+
+      if (response.ok) {
+        let responseJSON = await response.json();
+
+        toggleVisible();
+      } else {
+        responseBody = await response.text();
+        switch (response.status) {
+          case 401:
+            // Un-authorized
+            window.location.href = "/login";
+            break;
+          case 400:
+            // Bad Request
+            setMessage(responseBody);
+            break;
+          case 405:
+            // Method not allowed
+            throw new Error(responseBody);
+          case 500:
+            // Internal error
+            throw new Error(responseBody);
+          default:
+            throw new Error(
+              "Unhandled response(" + response.status + "): " + responseBody,
+            );
+        }
+      }
+    } catch (error) {
+      // Handle network or other errors
+      setMessage("Something has gone critically wrong: " + error);
+    }
+  };
+  const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      prompt: event.target.value,
+    });
+  };
 
   return (
     <div
