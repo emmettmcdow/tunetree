@@ -97,9 +97,10 @@ export default function Signup() {
 
       if (response.ok) {
         // TODO: show this to users better
-        window.location.href = "/login";
+        window.location.href = "/login/";
       } else {
         responseBody = await response.text();
+        console.log(responseBody);
         switch (response.status) {
           case 400:
             // Bad Request

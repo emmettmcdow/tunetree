@@ -55,9 +55,9 @@ export default function UIButton({
             );
           default:
             return (
-              <span className="rainbow-hover bright-text p-6 text-xl">
+              <div className="rainbow-hover bright-text px-2 py-1 text-xl">
                 {content || ""}
-              </span>
+              </div>
             );
         }
       })()}

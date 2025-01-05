@@ -355,20 +355,24 @@ function Editor({
             placeholder="A message to your fans"
           />
           <div ref={submitRef} className="flex justify-center">
-            <UIButton
-              type="deny"
-              content="cancel"
-              handle={() => {
-                changeMode(Mode.Standby);
-              }}
-              submit={false}
-            />
-            <UIButton
-              type="confirm"
-              content="submit"
-              handle={() => {}}
-              submit={true}
-            />
+            <div className="mx-2">
+              <UIButton
+                type="deny"
+                content="cancel"
+                handle={() => {
+                  changeMode(Mode.Standby);
+                }}
+                submit={false}
+              />
+            </div>
+            <div className="mx-2">
+              <UIButton
+                type="confirm"
+                content="submit"
+                handle={() => {}}
+                submit={true}
+              />
+            </div>
           </div>
         </form>
       </div>
@@ -410,24 +414,28 @@ function EditPanel({
     case Mode.Standby:
       return (
         <div className="flex items-center mx-auto fg-color z-50">
-          <UIButton
-            type="neutral"
-            content="edit"
-            handle={() => {
-              setFormData(currTrack);
-              changeMode(Mode.Edit);
-            }}
-            submit={false}
-          />
-          <UIButton
-            type="neutral"
-            content="new"
-            handle={() => {
-              setFormData(new Track({ artistName: currTrack.artist }));
-              changeMode(Mode.New);
-            }}
-            submit={false}
-          />
+          <div className="mx-2">
+            <UIButton
+              type="neutral"
+              content="edit"
+              handle={() => {
+                setFormData(currTrack);
+                changeMode(Mode.Edit);
+              }}
+              submit={false}
+            />
+          </div>
+          <div className="mx-2">
+            <UIButton
+              type="neutral"
+              content="new"
+              handle={() => {
+                setFormData(new Track({ artistName: currTrack.artist }));
+                changeMode(Mode.New);
+              }}
+              submit={false}
+            />
+          </div>
         </div>
       );
     case Mode.Edit:

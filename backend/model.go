@@ -148,7 +148,7 @@ type User struct {
 	Password  string `json:"password"`
 	Artist    string `json:"artist"`
 	Link      string `json:"link"`
-	SpotifyId string `json:"spotify_id"`
+	SpotifyId string `json:"spotifyId"`
 }
 
 const USERTABLE = `

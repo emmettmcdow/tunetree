@@ -154,20 +154,24 @@ const AiPrompt = ({
             placeholder="trippy, weird, psychedelic"
           />
           <div className="flex justify-center">
-            <UIButton
-              type="deny"
-              content="cancel"
-              handle={toggleVisible}
-              submit={false}
-            />
-            <UIButton
-              type="confirm"
-              content="generate"
-              handle={() => {
-                console.log("Submitted");
-              }}
-              submit={true}
-            />
+            <div className="m-2">
+              <UIButton
+                type="deny"
+                content="cancel"
+                handle={toggleVisible}
+                submit={false}
+              />
+            </div>
+            <div className="m-2">
+              <UIButton
+                type="confirm"
+                content="generate"
+                handle={() => {
+                  console.log("Submitted");
+                }}
+                submit={true}
+              />
+            </div>
           </div>
         </form>
       </div>
