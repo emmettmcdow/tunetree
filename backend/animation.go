@@ -117,12 +117,14 @@ func (a AnimationHandler) ServeStatus(res http.ResponseWriter, req *http.Request
 
 		if err := a.db.UpdateJob(job); err != nil {
 			http.Error(res, fmt.Sprintf("Failed to update job: %s", err), http.StatusInternalServerError)
+			return
 		}
 		if job.Status != "succeeded" {
 			return
 		}
 		if err := a.CommitJob(job); err != nil {
 			http.Error(res, fmt.Sprintf("Failed to download animation: %s", err), http.StatusInternalServerError)
+			return
 		}
 		return
 

@@ -288,7 +288,7 @@ func (this DB) GetJob(uuid uuid.UUID) (job AnimationJob, err error) {
 	query := `
 	SELECT user_id, status, art_link, animation_link, prompt
 	FROM animation_jobs
-	WHERE uuid = $1`
+	WHERE uuid = $1;`
 	res := this.db.QueryRow(query, uuid.String())
 	err = res.Scan(&job.UserId, &job.Status, &job.ArtLink, &job.AnimationLink, &job.Prompt)
 	job.UUID = uuid
