@@ -295,7 +295,7 @@ type backgroundPayload struct {
 }
 type promptPayload struct {
 	Prompt          string `json:"prompt"`
-	FirstImageFrame string `json:"first_image_frame"`
+	FirstImageFrame string `json:"first_frame_image"`
 }
 type webhookResponse struct {
 	Output string `json:"output"`
