@@ -279,30 +279,41 @@ func server(wg *sync.WaitGroup, port int, runtime string) (s *http.Server) {
 
 func main() {
 
+	config = Config{}
+
 	runtime := getEnv("RUNTIME")
 	if runtime == "" {
 		runtime = "./"
 	}
+	config.runtime = runtime
+
 	frontendUrl := getEnv("FRONTEND_URL")
 	if frontendUrl == "" {
 		frontendUrl = "http://localhost:3000"
 	}
+	config.frontendUrl = frontendUrl
+
 	thisUrl := getEnv("THIS_URL")
 	if thisUrl == "" {
 		thisUrl = "http://localhost:81"
 	}
+	config.thisUrl = thisUrl
 
 	clientId := getEnv("SPOTIFY_CLIENT_ID")
 	secret := getEnv("SPOTIFY_SECRET")
 	if secret == "" || clientId == "" {
 		panic("SPOTIFY_CLIENT_ID or SPOTIFY_SECRET unset")
 	}
+	config.spotifySecret = secret
+	config.spotifyClientId = clientId
+
 	replicateApiToken := getEnv("REPLICATE_API_TOKEN")
 	if replicateApiToken == "" {
 		fmt.Printf("WARNING: REPLICATE_API_TOKEN unset\n")
 		replicateApiToken = "TEST_TOKEN"
 		fmt.Printf("WARNING: Setting to %s\n", replicateApiToken)
 	}
+	config.replicateApiToken = replicateApiToken
 
 	replicateEndpoint := getEnv("REPLICATE_ENDPOINT")
 	if replicateEndpoint == "" {
@@ -310,15 +321,7 @@ func main() {
 		fmt.Printf("WARNING: REPLICATE_ENDPOINT unset\n")
 		fmt.Printf("WARNING: Setting to %s\n", replicateEndpoint)
 	}
-
-	config = Config{
-		runtime:           runtime,
-		frontendUrl:       frontendUrl,
-		spotifyClientId:   clientId,
-		spotifySecret:     secret,
-		replicateApiToken: replicateApiToken,
-		replicateEndpoint: replicateEndpoint,
-	}
+	config.replicateEndpoint = replicateEndpoint
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
