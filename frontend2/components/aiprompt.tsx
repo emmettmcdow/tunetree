@@ -36,7 +36,9 @@ const AiPrompt = ({
     event.preventDefault();
 
     // Convert form data to string
+    console.log(formData);
     const jsonData = JSON.stringify(formData);
+    console.log(jsonData);
     let responseBody = "";
     try {
       const response = await fetch(
@@ -85,10 +87,15 @@ const AiPrompt = ({
     }
   };
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      prompt: event.target.value,
-    });
+    setFormData(
+      new AnimationJob({
+        user_id: user.id,
+        status: "requested",
+        art_link: track.image,
+        animation_link: "",
+        prompt: event.target.value,
+      }),
+    );
   };
 
   return (

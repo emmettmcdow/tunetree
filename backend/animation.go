@@ -160,10 +160,12 @@ func (a AnimationHandler) ServeNew(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, fmt.Sprintf("Failed to read body of request: %s", err), http.StatusInternalServerError)
 		return
 	}
+
 	if err := json.Unmarshal(body, &job); err != nil {
 		http.Error(res, fmt.Sprintf("Malformed data: %s", err), http.StatusBadRequest)
 		return
 	}
+	fmt.Println(job)
 
 	if job.ArtLink == "" {
 		http.Error(res, "ArtLink unset", http.StatusBadRequest)
@@ -188,16 +190,21 @@ func (a AnimationHandler) ServeNew(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	bgReq := a.bgRequest(job.UUID.String(), job.ArtLink, job.Prompt)
+	bgRes, err := a.client.Do(bgReq)
+	if err != nil {
+		panic(err)
+	}
+	if bgRes.StatusCode != http.StatusAccepted {
+		body, _ := io.ReadAll(bgRes.Body)
+		http.Error(res, fmt.Sprintf("Failed to queue animation generation job: %s", string(body)), http.StatusInternalServerError)
+		return
+	}
+
 	job.Status = "queued"
 	if err = a.db.AddJob(job); err != nil {
 		http.Error(res, fmt.Sprintf("Failed to queue animation generation job: %s", err), http.StatusInternalServerError)
 		return
-	}
-
-	bgReq := bgRequest(a.apiKey, a.thisURL, job.UUID.String(), job.ArtLink, job.Prompt)
-	_, err = a.client.Do(bgReq)
-	if err != nil {
-		panic(err)
 	}
 
 	json.NewEncoder(res).Encode(job)
@@ -207,8 +214,7 @@ func (a AnimationHandler) bgRequest(backgroundId, imageLink, prompt string) (req
 	// TODO: Check if photo already exists
 	// Queue
 	var sBody backgroundPayload = backgroundPayload{
-		Model:               "minimax/video-01-live",
-		Webhook:             fmt.Sprintf("%s/background/%s", a.thisURL, backgroundId),
+		Webhook:             fmt.Sprintf("%s/animation/status/%s/", a.thisURL, backgroundId),
 		WebhookEventsFilter: []string{"completed"},
 		Input: promptPayload{
 			Prompt:          prompt,
@@ -221,7 +227,9 @@ func (a AnimationHandler) bgRequest(backgroundId, imageLink, prompt string) (req
 	}
 	body := bytes.NewBuffer(bodyString)
 
-	url := config.replicateEndpoint
+	// Note: replicate does not want a slash on the end - sigh
+	url := fmt.Sprintf("%s/v1/models/minimax/video-01-live/predictions", config.replicateEndpoint)
+	fmt.Printf("Requesting \n%s\nFrom\n%s\n", body, url)
 	req, err = http.NewRequest("POST", url, body)
 	if err != nil {
 		panic(err)
@@ -281,7 +289,6 @@ func (a AnimationHandler) CommitJob(anim AnimationJob) error {
 
 // ************************************************************************************** Replicate
 type backgroundPayload struct {
-	Model               string        `json:"model"`
 	Webhook             string        `json:"webhook"`
 	WebhookEventsFilter []string      `json:"webhook_events_filter"`
 	Input               promptPayload `json:"input"`
@@ -293,33 +300,4 @@ type promptPayload struct {
 type webhookResponse struct {
 	Output string `json:"output"`
 	Status string `json:"status"`
-}
-
-func bgRequest(apiKey, thisURL, backgroundId, imageLink, prompt string) (req *http.Request) {
-	// Check if photo already exists
-	// Queue
-	var sBody backgroundPayload = backgroundPayload{
-		Model:               "minimax/video-01-live",
-		Webhook:             fmt.Sprintf("%s/background/%s", thisURL, backgroundId),
-		WebhookEventsFilter: []string{"completed"},
-		Input: promptPayload{
-			Prompt:          prompt,
-			FirstImageFrame: imageLink,
-		},
-	}
-	bodyString, err := json.Marshal(sBody)
-	if err != nil {
-		panic(err)
-	}
-	body := bytes.NewBuffer(bodyString)
-
-	url := fmt.Sprintf("%s/v1/predictions", config.replicateEndpoint)
-	req, err = http.NewRequest("POST", url, body)
-	if err != nil {
-		panic(err)
-	}
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", apiKey))
-	req.Header.Add("Content-Type", "application/json")
-
-	return req
 }
