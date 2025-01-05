@@ -281,12 +281,7 @@ func main() {
 
 	runtime := getEnv("RUNTIME")
 	if runtime == "" {
-		pwd, err := os.Getwd()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		runtime = pwd
+		runtime = "./"
 	}
 	frontendUrl := getEnv("FRONTEND_URL")
 	if frontendUrl == "" {
