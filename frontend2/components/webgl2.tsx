@@ -393,8 +393,9 @@ const AIAnimation = ({
 }) => {
   const [video, setVideo] = useState("");
 
-  const checkStatus = () => {
-    console.log(uuid);
+  useEffect(() => {
+    // TODO remove me
+    console.log(colors);
     fetch(`${process.env.NEXT_PUBLIC_API_URL}animation/status/${uuid}/`, {
       method: "GET",
       headers: {
@@ -415,15 +416,12 @@ const AIAnimation = ({
         });
       }
     });
-  };
-  useEffect(() => {
-    checkStatus();
-  }, []);
+  }, []); // weird
 
   return (
     <div className="w-full h-full flex items-center justify-center fg-color">
       {video == "" ? (
-        <div>"Generating animation..."</div>
+        <div>Generating animation...</div>
       ) : (
         <video
           className="w-full z-10 rounded-3xl"

@@ -9,7 +9,7 @@ export default function UIButton({
 }: {
   type: string;
   content?: string | JSX.Element;
-  handle: Function;
+  handle: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   submit: boolean;
 }) {
   /*

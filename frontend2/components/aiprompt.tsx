@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import UIButton from "./uibutton";
 import Image from "next/image";
 import { FiArrowRight, FiInfo } from "react-icons/fi";
@@ -9,7 +9,7 @@ import { getAuthorizationHeader } from "@/utils/utils";
 
 interface AiPromptProps {
   visible: boolean;
-  toggleVisible: Function;
+  toggleVisible: () => void;
   track: Track;
   user: User;
   addJob: (job: string) => void;
@@ -22,7 +22,7 @@ const AiPrompt = ({
   user,
   addJob,
 }: AiPromptProps) => {
-  const [message, setMessage] = useState("");
+  const [, setMessage] = useState("");
   const [formData, setFormData] = useState(
     new AnimationJob({
       user_id: user.id,
@@ -53,7 +53,7 @@ const AiPrompt = ({
       );
 
       if (response.ok) {
-        let responseJSON = await response.json();
+        const responseJSON = await response.json();
         addJob(responseJSON["uuid"]);
         toggleVisible();
       } else {

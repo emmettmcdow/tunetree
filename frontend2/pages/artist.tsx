@@ -200,7 +200,7 @@ function Editor({
     setJobs([...animJobs, job]);
   };
 
-  let animations = [...ANIMATIONS, ...animJobs];
+  const animations = [...ANIMATIONS, ...animJobs];
   function nextAnim(animation: string) {
     const out =
       animations[(animations.indexOf(animation) + 1) % animations.length];
@@ -495,7 +495,7 @@ export default function Artist() {
 
     if (response.ok) {
       const body = await response.json();
-      let newUser = new User(body);
+      const newUser = new User(body);
       return newUser;
     }
     window.location.href = "/login";
@@ -505,7 +505,7 @@ export default function Artist() {
   useEffect(() => {
     setIsClient(true);
     if (!currTrack.artist) {
-      let id = getAuthenticatedUser();
+      const id = getAuthenticatedUser();
       populateUser(id).then((newUser) => {
         if (newUser.artist !== "") {
           setUser(newUser);

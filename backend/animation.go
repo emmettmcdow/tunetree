@@ -221,7 +221,7 @@ func (a AnimationHandler) bgRequest(backgroundId, imageLink, prompt string) (req
 	}
 	body := bytes.NewBuffer(bodyString)
 
-	url := "https://api.replicate.com/v1/predictions"
+	url := config.replicateEndpoint
 	req, err = http.NewRequest("POST", url, body)
 	if err != nil {
 		panic(err)

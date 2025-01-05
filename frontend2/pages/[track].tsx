@@ -67,7 +67,7 @@ function SubscriptionPrompt({
 
 export async function getTrackInfo(artistLink: string) {
   try {
-    let response = await fetch(
+    const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}track/${artistLink}`,
       {
         method: "GET",
