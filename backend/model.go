@@ -278,9 +278,9 @@ func (this DB) AddJob(job AnimationJob) error {
 func (this DB) UpdateJob(job AnimationJob) error {
 	query := `
 	UPDATE animation_jobs
-	SET status = $2, animation_link = $3
-	WHERE uuid = $1;`
-	_, err := this.db.Exec(query, job.UUID.String(), job.Status, job.AnimationLink)
+	SET status = ?, animation_link = ?
+	WHERE uuid = ?;`
+	_, err := this.db.Exec(query, job.Status, job.AnimationLink, job.UUID.String())
 	return err
 }
 func (db DB) DropJob(job AnimationJob) error { return nil }
@@ -288,7 +288,7 @@ func (this DB) GetJob(uuid uuid.UUID) (job AnimationJob, err error) {
 	query := `
 	SELECT user_id, status, art_link, animation_link, prompt
 	FROM animation_jobs
-	WHERE uuid = $1;`
+	WHERE uuid = ?;`
 	res := this.db.QueryRow(query, uuid.String())
 	err = res.Scan(&job.UserId, &job.Status, &job.ArtLink, &job.AnimationLink, &job.Prompt)
 	job.UUID = uuid
