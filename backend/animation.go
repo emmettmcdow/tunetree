@@ -221,6 +221,7 @@ func (a AnimationHandler) bgRequest(backgroundId, imageLink, prompt string) (req
 		Input: promptPayload{
 			Prompt:          prompt,
 			FirstImageFrame: imageLink,
+			PromptOptimizer: true,
 		},
 	}
 	bodyString, err := json.Marshal(sBody)
@@ -298,6 +299,7 @@ type backgroundPayload struct {
 type promptPayload struct {
 	Prompt          string `json:"prompt"`
 	FirstImageFrame string `json:"first_frame_image"`
+	PromptOptimizer bool   `json:"prompt_optimizer"`
 }
 type webhookResponse struct {
 	Output string `json:"output"`
