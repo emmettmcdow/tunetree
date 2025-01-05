@@ -195,7 +195,7 @@ func (a AnimationHandler) ServeNew(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	if bgRes.StatusCode != http.StatusAccepted {
+	if bgRes.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(bgRes.Body)
 		http.Error(res, fmt.Sprintf("Failed to queue animation generation job: %s", string(body)), http.StatusInternalServerError)
 		return
