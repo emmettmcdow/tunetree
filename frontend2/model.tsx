@@ -72,3 +72,15 @@ export class User {
     }
   }
 }
+
+export class AnimationJob {
+  user_id: string = "";
+  status: string = "";
+  art_link: string = "";
+  animation_link: string = "";
+  prompt: string = "";
+
+  constructor(params: AnimationJob) {
+    Object.assign(this, params);
+  }
+}

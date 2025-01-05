@@ -160,16 +160,6 @@ type Selected = {
   bandcamp: boolean;
 };
 
-function nextAnim(animation: string) {
-  const out =
-    ANIMATIONS[(ANIMATIONS.indexOf(animation) + 1) % ANIMATIONS.length];
-  return out;
-}
-
-function lastAnim(animation: string) {
-  return ANIMATIONS[(ANIMATIONS.indexOf(animation) + 1) % ANIMATIONS.length];
-}
-
 const DISPLAY = ["center-card", "minimal"];
 function nextDisplay(display: string) {
   const out = DISPLAY[(DISPLAY.indexOf(display) + 1) % DISPLAY.length];
@@ -205,6 +195,21 @@ function Editor({
   const [aiVisible, setAiVisible] = useState(false);
   const [message, setMessage] = useState("");
   const submitRef = useRef<HTMLDivElement>(null);
+  const [animJobs, setJobs] = useState<Array<string>>([]);
+  const addJob = (job: string) => {
+    setJobs([...animJobs, job]);
+  };
+
+  let animations = [...ANIMATIONS, ...animJobs];
+  function nextAnim(animation: string) {
+    const out =
+      animations[(animations.indexOf(animation) + 1) % animations.length];
+    return out;
+  }
+
+  function lastAnim(animation: string) {
+    return animations[(animations.indexOf(animation) + 1) % animations.length];
+  }
 
   const handleSubmit = async (
     event: React.FormEvent<HTMLFormElement>,
@@ -269,7 +274,8 @@ function Editor({
     <>
       <div className="flex flex-col mx-auto z-40">
         <Message content={message} />
-        <div className="flex justify-between items-center">
+
+        <div className="flex justify-between items-center my-2">
           <UIButton
             type="left"
             submit={false}
@@ -292,13 +298,15 @@ function Editor({
             }}
           />
         </div>
+
         <UIButton
           type="neutral"
           content="make ai background"
           submit={false}
           handle={toggleVisible}
         />
-        <div className="flex justify-between items-center">
+
+        <div className="flex justify-between items-center my-2">
           <UIButton
             type="left"
             submit={false}
@@ -321,6 +329,7 @@ function Editor({
             }}
           />
         </div>
+
         <form
           onSubmit={(e) => handleSubmit(e, setMessage)}
           className="flex-col items-center"
@@ -369,6 +378,7 @@ function Editor({
         user={user}
         visible={aiVisible}
         toggleVisible={toggleVisible}
+        addJob={addJob}
       />
     </>
   );

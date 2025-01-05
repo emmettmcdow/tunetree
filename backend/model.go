@@ -13,10 +13,7 @@ import (
 
 func DefaultDB(runtime string) DB {
 	var err error
-	var dbpath = "./backend.db"
-	if runtime != "" {
-		dbpath = runtime + "backend.db"
-	}
+	dbpath := runtime + "/backend.db"
 
 	db, err := sql.Open("sqlite3", dbpath)
 	if err != nil {
@@ -292,8 +289,9 @@ func (this DB) GetJob(uuid uuid.UUID) (job AnimationJob, err error) {
 	SELECT user_id, status, art_link, animation_link, prompt
 	FROM animation_jobs
 	WHERE uuid = $1`
-	res := this.db.QueryRow(query, uuid.String)
+	res := this.db.QueryRow(query, uuid.String())
 	err = res.Scan(&job.UserId, &job.Status, &job.ArtLink, &job.AnimationLink, &job.Prompt)
+	job.UUID = uuid
 	return job, err
 }
 

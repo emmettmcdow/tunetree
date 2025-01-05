@@ -3,9 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
-	"github.com/joho/godotenv"
 	"log/slog"
 	"net/http"
 	"os"
@@ -14,6 +11,10 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -280,7 +281,12 @@ func main() {
 
 	runtime := getEnv("RUNTIME")
 	if runtime == "" {
-		runtime = "./"
+		pwd, err := os.Getwd()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		runtime = pwd
 	}
 	frontendUrl := getEnv("FRONTEND_URL")
 	if frontendUrl == "" {

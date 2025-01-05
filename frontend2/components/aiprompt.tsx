@@ -4,7 +4,7 @@ import Image from "next/image";
 import { FiArrowRight, FiInfo } from "react-icons/fi";
 import { Header } from "@/pages/login";
 import Tooltip from "./tooltip";
-import { Track, User } from "@/model";
+import { AnimationJob, Track, User } from "@/model";
 import { getAuthorizationHeader } from "@/utils/utils";
 
 interface AiPromptProps {
@@ -12,18 +12,26 @@ interface AiPromptProps {
   toggleVisible: Function;
   track: Track;
   user: User;
+  addJob: (job: string) => void;
 }
 
-const AiPrompt = ({ visible, toggleVisible, track, user }: AiPromptProps) => {
+const AiPrompt = ({
+  visible,
+  toggleVisible,
+  track,
+  user,
+  addJob,
+}: AiPromptProps) => {
   const [message, setMessage] = useState("");
-  const [formData, setFormData] = useState({
-    user_id: user.id,
-    status: "requested",
-    art_link: track.image,
-    animation_link: "",
-    prompt: "",
-  });
-
+  const [formData, setFormData] = useState(
+    new AnimationJob({
+      user_id: user.id,
+      status: "requested",
+      art_link: track.image,
+      animation_link: "",
+      prompt: "",
+    }),
+  );
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -46,7 +54,7 @@ const AiPrompt = ({ visible, toggleVisible, track, user }: AiPromptProps) => {
 
       if (response.ok) {
         let responseJSON = await response.json();
-
+        addJob(responseJSON["uuid"]);
         toggleVisible();
       } else {
         responseBody = await response.text();

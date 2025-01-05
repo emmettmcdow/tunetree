@@ -90,6 +90,15 @@ func (a AnimationHandler) ServeStatus(res http.ResponseWriter, req *http.Request
 	}
 	switch req.Method {
 	case "GET":
+		if config.replicateEndpoint == REPLICATE_FAKE_ENDPOINT {
+			raw, err := os.ReadFile(REPLICATE_FAKE_FILE)
+			if err != nil {
+				http.Error(res, fmt.Sprintf("Failed to read animation file: %s", err), http.StatusInternalServerError)
+			}
+			if err = a.saveAnimation(job, bytes.NewBuffer(raw)); err != nil {
+				http.Error(res, fmt.Sprintf("Failed to save animation: %s", err), http.StatusInternalServerError)
+			}
+		}
 		json.NewEncoder(res).Encode(job)
 		return
 	case "POST":
@@ -112,15 +121,6 @@ func (a AnimationHandler) ServeStatus(res http.ResponseWriter, req *http.Request
 		if job.Status != "succeeded" {
 			return
 		}
-		if config.replicateEndpoint == REPLICATE_FAKE_ENDPOINT {
-			raw, err := os.ReadFile(REPLICATE_FAKE_FILE)
-			if err != nil {
-				http.Error(res, fmt.Sprintf("Failed to read animation file: %s", err), http.StatusInternalServerError)
-			}
-			if err = a.saveAnimation(job, bytes.NewBuffer(raw)); err != nil {
-				http.Error(res, fmt.Sprintf("Failed to save animation: %s", err), http.StatusInternalServerError)
-			}
-		}
 		if err := a.CommitJob(job); err != nil {
 			http.Error(res, fmt.Sprintf("Failed to download animation: %s", err), http.StatusInternalServerError)
 		}
@@ -139,10 +139,10 @@ func (a AnimationHandler) animationFilePath(uuid string) string {
 func (a AnimationHandler) ServeFile(res http.ResponseWriter, req *http.Request) {
 	inputUUID := req.PathValue("uuid")
 	if inputUUID == "" {
-		http.Error(res, "No artist name specified", http.StatusBadRequest)
+		http.Error(res, "No animation uuid specified", http.StatusBadRequest)
 		return
 	}
-	path := a.animationFilePath(inputUUID)
+	path := a.storage + "/" + inputUUID
 	http.ServeFile(res, req, path)
 }
 
