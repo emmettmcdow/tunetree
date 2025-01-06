@@ -148,16 +148,16 @@ export default function Display({
           key={provider[0]}
           setLink={setLink}
           link={provider[1]}
-          className="w-8 md:w-16 mx-6 my-2 bounce-button"
+          className="w-12 md:w-16 mx-4 my-2 bounce-button"
         />
       ));
       return (
         <div className={`relative`} style={displayStyle}>
-          <div className="absolute left-0 top-1/12 flex flex-col items-left justify-normal z-30">
+          <div className="absolute left-0 top-1/12 flex flex-col md:flex-row items-left justify-normal z-30">
             <Tooltip text={tooltip}>
               <div
                 className={
-                  "bg-black/30 flex items-center backdrop-blur-md py-2 px-4 my-2 rounded-lg z-30"
+                  "bg-black/30 flex items-center backdrop-blur-md py-2 px-4 mt-2 rounded-r-lg z-30"
                 }
               >
                 <Image
@@ -192,30 +192,29 @@ export default function Display({
     case "center-card":
     default:
       return (
-        <div
-          className={`relative flex flex-col justify-evenly`}
-          style={displayStyle}
-        >
-          <Tooltip text={tooltip}>
-            <div
-              className={
-                "bg-black/30 flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-30"
-              }
-            >
-              <p className="text-4xl">
-                <b>{track.artist}</b>
-              </p>
-              <Image
-                alt="album-art"
-                src={track.image || "/placeholder.png"}
-                className="w-52 my-2"
-                height="1024"
-                width="1024"
-              />
-              <p className="text-2xl">{track.name}</p>
-            </div>
-          </Tooltip>
-          <CircleButtonBox trackInfo={track} setLink={setLink} />
+        <div className={`relative`} style={displayStyle}>
+          <div className="absolute w-full h-full flex flex-col justify-evenly items-center">
+            <Tooltip text={tooltip}>
+              <div
+                className={
+                  "bg-black/30 flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-30"
+                }
+              >
+                <p className="text-4xl">
+                  <b>{track.artist}</b>
+                </p>
+                <Image
+                  alt="album-art"
+                  src={track.image || "/placeholder.png"}
+                  className="w-52 my-2"
+                  height="1024"
+                  width="1024"
+                />
+                <p className="text-2xl">{track.name}</p>
+              </div>
+            </Tooltip>
+            <CircleButtonBox trackInfo={track} setLink={setLink} />
+          </div>
           <WebGLBackground
             colors={track.colors
               .split(";")

@@ -384,6 +384,32 @@ function Debug() {
 */
 }
 
+const VideoElement = ({ video, size }: { video: string; size: number }) => {
+  if (video == "") {
+    return (
+      <div>
+        Generating animation...
+        <br />
+        Can take up to 2 minutes.
+      </div>
+    );
+  } else {
+    return (
+      <video
+        height={size}
+        width={size}
+        className={`z-10 rounded-3xl`}
+        autoPlay
+        muted
+        loop
+        playsInline
+      >
+        <source src={video} />
+      </video>
+    );
+  }
+};
+
 const AIAnimation = ({
   uuid,
   colors,
@@ -400,39 +426,44 @@ const AIAnimation = ({
     Math.min(window.innerHeight, window.innerWidth, width, height),
   );
 
+  let to: NodeJS.Timeout;
   useEffect(() => {
-    // TODO remove me
-    console.log(colors);
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}animation/status/${uuid}/`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then((response) => {
-      if (response.ok) {
-        response.json().then((body) => {
-          if (body["status"] == "succeeded") {
-            setVideo(
-              `${process.env.NEXT_PUBLIC_API_URL}animation/file/${uuid}.mp4`,
-            );
-          }
-        });
-      } else {
-        response.text().then((body) => {
-          console.error("Failed to get video status: " + body);
-        });
-      }
-    });
-
     const handleResize = () => {
       setsize(Math.min(window.innerHeight, window.innerWidth, width, height));
     };
-
-    // Add event listener for resize
     window.addEventListener("resize", handleResize);
+
+    const checkStatus = async () => {
+      console.log("Checking for background");
+      const response1 = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}animation/status/${uuid}/`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      if (response1.status == 200) {
+        const body = await response1.json();
+        if (body["status"] == "succeeded") {
+          setVideo(
+            `${process.env.NEXT_PUBLIC_API_URL}animation/file/${uuid}.mp4`,
+          );
+          return;
+        } else {
+          const body = await response1.text();
+          console.error("Failed to get video status: " + body);
+        }
+      }
+
+      to = setTimeout(checkStatus, 1000);
+    };
+    checkStatus();
 
     // Cleanup function to remove event listener
     return () => {
+      if (to) clearTimeout(to);
       window.removeEventListener("resize", handleResize);
     };
   }, []); // weird
@@ -446,21 +477,7 @@ const AIAnimation = ({
         height: height,
       }}
     >
-      {video == "" ? (
-        <div>Generating animation...</div>
-      ) : (
-        <video
-          height={size}
-          width={size}
-          className={`z-10 rounded-3xl`}
-          autoPlay
-          muted
-          loop
-          playsInline
-        >
-          <source src={video} />
-        </video>
-      )}
+      <VideoElement size={size} video={video} />
     </div>
   );
 };

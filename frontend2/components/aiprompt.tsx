@@ -36,9 +36,7 @@ const AiPrompt = ({
     event.preventDefault();
 
     // Convert form data to string
-    console.log(formData);
     const jsonData = JSON.stringify(formData);
-    console.log(jsonData);
     let responseBody = "";
     try {
       const response = await fetch(

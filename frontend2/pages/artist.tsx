@@ -208,7 +208,10 @@ function Editor({
   }
 
   function lastAnim(animation: string) {
-    return animations[(animations.indexOf(animation) + 1) % animations.length];
+    return animations[
+      (animations.length + animations.indexOf(animation) - 1) %
+        animations.length
+    ];
   }
 
   const handleSubmit = async (
