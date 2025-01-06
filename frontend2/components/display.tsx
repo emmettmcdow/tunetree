@@ -157,7 +157,7 @@ export default function Display({
             <Tooltip text={tooltip}>
               <div
                 className={
-                  "bg-black/30 flex items-center backdrop-blur-md py-2 px-4 my-2 rounded-lg z-30 w-48"
+                  "bg-black/30 flex items-center backdrop-blur-md py-2 px-4 my-2 rounded-lg z-30"
                 }
               >
                 <Image
@@ -168,10 +168,10 @@ export default function Display({
                   width="1024"
                 />
                 <div className="flex-1">
-                  <Marquee text={track.name + " / "} className="w-20"></Marquee>
+                  <Marquee text={track.name + " / "} className="w-30"></Marquee>
                   <Marquee
                     text={track.artist + " / "}
-                    className="w-20"
+                    className="w-30"
                   ></Marquee>
                 </div>
               </div>

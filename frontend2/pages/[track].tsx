@@ -25,7 +25,7 @@ function SubscriptionPrompt({
           "fixed left-0 top-0 z-50 flex h-screen w-screen items-center justify-center bg-black/50"
         }
       >
-        <div className="fg-color md:3/5 z-50 w-11/12 flex-col items-center rounded-2xl p-5 text-center shadow-inner drop-shadow-2xl">
+        <div className="fg-color z-50 w-11/12 flex-col items-center rounded-2xl p-5 text-center shadow-inner drop-shadow-2xl md:w-3/5">
           <Header left={"going to '" + trackInfo.name + "'..."} />
           <div className="mt-2">
             {"wanna be notified when " +
@@ -38,8 +38,8 @@ function SubscriptionPrompt({
               placeholder="email"
               name="email"
             />
-            <div className="flex justify-center">
-              <Link href={link}>
+            <div className="mt-2 flex justify-center">
+              <Link href={link} className="mx-2">
                 <UIButton
                   type="deny"
                   content="no"
@@ -47,7 +47,7 @@ function SubscriptionPrompt({
                   submit={false}
                 />
               </Link>
-              <Link href={link}>
+              <Link href={link} className="mx-2">
                 <UIButton
                   type="confirm"
                   content="yes"
@@ -163,11 +163,26 @@ export default function TrackPage({
   slug,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [link, setLink] = useState("");
+  const [height, setHeight] = useState(0);
+  const [width, setWidth] = useState(0);
   const ti = new Track(typeof trackInfo !== "undefined" ? trackInfo : {});
 
   const [isClient, setClient] = useState(false);
   useEffect(() => {
     setClient(true);
+
+    const handleResize = () => {
+      setHeight(window.innerHeight);
+      setWidth(window.innerWidth);
+    };
+
+    // Add event listener for resize
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup function to remove event listener
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   const title = ti.artist + " | " + ti.name;
@@ -201,8 +216,8 @@ export default function TrackPage({
         <Display
           track={ti}
           setLink={setLink}
-          width={window.innerWidth}
-          height={window.innerHeight}
+          width={width || window.innerWidth}
+          height={height || window.innerHeight}
         />
       )}
       <SubscriptionPrompt trackInfo={ti} link={link} toggle={setLink} />

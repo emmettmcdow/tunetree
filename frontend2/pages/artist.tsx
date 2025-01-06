@@ -524,7 +524,7 @@ export default function Artist() {
   const ratio = 3 / 4;
   return (
     <>
-      <div className="p-4">
+      <div className="p-4 min-h-dvh">
         <Header
           left={getHeader(mode)}
           right={`tunetree.xyz/${user.link}`}

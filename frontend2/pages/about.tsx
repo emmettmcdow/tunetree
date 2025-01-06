@@ -83,7 +83,7 @@ function Panel({ detail, img }: { detail: string; img: string }) {
       }
     >
       <video
-        className="w-full rounded-2xl border-2 md:w-2/5"
+        className="mx-2 w-full rounded-2xl border-2 md:w-3/5"
         width={200}
         height={200}
         autoPlay
@@ -93,7 +93,7 @@ function Panel({ detail, img }: { detail: string; img: string }) {
       >
         <source src={img} />
       </video>
-      <div className="text-md mt-2 w-full text-center md:w-2/5">{detail}</div>
+      <div className="text-md m-2 w-full text-center md:w-1/5">{detail}</div>
     </div>
   );
 }
@@ -120,18 +120,18 @@ export default function About() {
       <div className="fg-color my-2 flex w-11/12 flex-col items-center rounded-xl p-4 md:w-3/5">
         <div className="text-center text-2xl"> get started now </div>
         <div>
-          <Link href="/login">
+          <Link href="/signup" className="mx-2">
             <UIButton
               type="neutral"
-              content="login"
+              content="signup"
               handle={() => {}}
               submit={false}
             />
           </Link>
-          <Link href="/signup">
+          <Link href="/login" className="mx-2">
             <UIButton
               type="neutral"
-              content="signup"
+              content="login"
               handle={() => {}}
               submit={false}
             />

@@ -387,11 +387,18 @@ function Debug() {
 const AIAnimation = ({
   uuid,
   colors,
+  height,
+  width,
 }: {
   uuid: string;
   colors: Array<string>;
+  width: number;
+  height: number;
 }) => {
   const [video, setVideo] = useState("");
+  const [size, setsize] = useState(
+    Math.min(window.innerHeight, window.innerWidth, width, height),
+  );
 
   useEffect(() => {
     // TODO remove me
@@ -416,15 +423,36 @@ const AIAnimation = ({
         });
       }
     });
+
+    const handleResize = () => {
+      setsize(Math.min(window.innerHeight, window.innerWidth, width, height));
+    };
+
+    // Add event listener for resize
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup function to remove event listener
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []); // weird
 
   return (
-    <div className="w-full h-full flex items-center justify-center fg-color">
+    <div
+      className="w-dvw h-dvh flex items-center justify-center"
+      style={{
+        background: `linear-gradient(${colors[0]}, ${colors[colors.length - 1]})`,
+        width: width,
+        height: height,
+      }}
+    >
       {video == "" ? (
         <div>Generating animation...</div>
       ) : (
         <video
-          className="w-full z-10 rounded-3xl"
+          height={size}
+          width={size}
+          className={`z-10 rounded-3xl`}
           autoPlay
           muted
           loop
@@ -467,7 +495,15 @@ const WebGLBackground: React.FC<SceneProps> = ({
     case "mountain":
       return <MountainScene colors={colors} dimensions={[width, height]} />;
     default:
-      if (scene !== "") return <AIAnimation uuid={scene} colors={colors} />;
+      if (scene !== "")
+        return (
+          <AIAnimation
+            width={width}
+            height={height}
+            uuid={scene}
+            colors={colors}
+          />
+        );
       return null;
   }
 };
