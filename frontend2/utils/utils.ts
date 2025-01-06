@@ -67,7 +67,7 @@ export function iconForService(service: string) {
 }
 
 export function setAuthenticatedUser(body: any) {
-  document.cookie = "token=" + body["token"];
+  document.cookie = "token=" + body["Token"];
   document.cookie = "id=" + body["Id"];
 }
 
