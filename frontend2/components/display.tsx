@@ -210,7 +210,7 @@ export default function Display({
                   height="1024"
                   width="1024"
                 />
-                <p className="text-2xl">{track.name}</p>
+                <p className="font-ui text-2xl">{track.name}</p>
               </div>
             </Tooltip>
             <CircleButtonBox trackInfo={track} setLink={setLink} />

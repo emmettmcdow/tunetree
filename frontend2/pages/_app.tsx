@@ -5,7 +5,7 @@ import LightButton from "@/components/lightbutton";
 
 function Footer() {
   return (
-    <div className="flex flex-col text-center fg-color py-4">
+    <div className="fg-color font-lg font-ui flex flex-col py-4 text-center">
       <div className="my-2">made with 💜 in sunnyvale, ca 🌞</div>
       <LightButton link="/about" content="are you an artist?" />
       <LightButton link="/help" content="need help?" />
@@ -15,7 +15,7 @@ function Footer() {
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <div className="bg-color">
+    <div className="bg-color font-ui text-lg">
       <DefaultSeo
         title={"tunetree"}
         description={"join the music revolution"}

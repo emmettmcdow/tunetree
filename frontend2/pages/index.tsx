@@ -5,18 +5,18 @@ import { FiChevronRight } from "react-icons/fi";
 export default function Home() {
   return (
     <>
-      <div className="h-screen flex-col content-center text-center font-h1">
+      <div className="font-h1 h-screen flex-col content-center text-center">
         <Image
           src="/logo-white.png"
           alt="tunetree logo"
           width="1024"
           height="1024"
-          className="w-36 mx-auto"
+          className="mx-auto w-36"
         />
-        <h1 className="text-7xl txt-color">tunetree</h1>
-        <Link className="text-2xl my-2" href="/about">
-          <span className="rainbow-svg">Join the music revolution</span>
-          <FiChevronRight className="inline rainbow-svg" />
+        <h1 className="txt-color text-7xl">tunetree</h1>
+        <Link className="my-2 text-2xl" href="/about">
+          <span className="rainbow-svg font-ui">join the music revolution</span>
+          <FiChevronRight className="rainbow-svg inline" />
         </Link>
       </div>
     </>

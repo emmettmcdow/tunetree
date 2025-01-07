@@ -30,7 +30,7 @@ function ServiceSelectorBar({
       const alt = provider + "-icon";
       buttons.push(
         <button
-          className="bounce-button mx-2 cursor-pointer text-xl"
+          className="bounce-button font-ui mx-2 cursor-pointer text-xl"
           key={provider}
           onClick={() => {
             const newSelected: Selected = {
@@ -52,11 +52,11 @@ function ServiceSelectorBar({
     }
   }
   return (
-    <div className="my-2 flex">
+    <div className="flex">
       <div className="flex w-1/4 items-center justify-start">
-        <p className="text-xl">add link:</p>
+        <p className="font-ui text-xl">add link:</p>
       </div>
-      <div className="my-2 flex w-3/4 justify-evenly">{buttons}</div>
+      <div className="flex w-3/4 justify-evenly">{buttons}</div>
     </div>
   );
 }
@@ -114,16 +114,14 @@ function ServiceURLs({
         | "tidal"
         | "bandcamp";
       serviceURLs.push(
-        <div className="mb-2 flex" key={provider}>
+        <div className="mt-2 flex" key={provider}>
           <input
             className="font-light-bg-norm w-full rounded-lg p-1 pr-10 text-black shadow-inner"
             type="text"
             name={provider}
             value={formData.links[typedProv]}
             onChange={handleChange}
-            placeholder={
-              provider.charAt(0).toUpperCase() + provider.slice(1) + " URL"
-            }
+            placeholder={provider + " url"}
           />
           <span
             className="flex cursor-pointer items-center justify-around"
@@ -357,7 +355,7 @@ function Editor({
               });
             }}
           />
-          <span className="text-xl">change animation</span>
+          <span className="font-ui text-xl">change animation</span>
           <UIButton
             type="right"
             submit={false}
@@ -377,7 +375,7 @@ function Editor({
           handle={toggleVisible}
         />
 
-        <div className="my-2 flex items-center justify-between">
+        <div className="mt-2 flex items-center justify-between">
           <UIButton
             type="left"
             submit={false}
@@ -388,7 +386,7 @@ function Editor({
               });
             }}
           />
-          <span className="text-xl">change display</span>
+          <span className="font-ui text-xl">change display</span>
           <UIButton
             type="right"
             submit={false}
@@ -403,28 +401,35 @@ function Editor({
 
         <form
           onSubmit={(e) => handleSubmit(e, setMessage)}
-          className="flex-col items-center"
+          className="flex-col items-center justify-evenly"
         >
-          <ServiceSelectorBar selected={selected} setSelected={setSelected} />
-          <ServiceURLs
-            formData={formData}
-            setFormData={setFormData}
-            selected={selected}
-            setSelected={setSelected}
-          />
-          <textarea
-            className="font-light-bg-norm my-2 w-full rounded-lg p-1 text-black"
-            value={formData["message"]}
-            onChange={(e) => {
-              const newTrack: Track = {
-                ...formData,
-                message: e.target.value,
-              };
-              setFormData(newTrack);
-            }}
-            name="message"
-            placeholder="A message to your fans"
-          />
+          <div className="my-8">
+            <ServiceSelectorBar selected={selected} setSelected={setSelected} />
+            <ServiceURLs
+              formData={formData}
+              setFormData={setFormData}
+              selected={selected}
+              setSelected={setSelected}
+            />
+          </div>
+
+          <div className="my-8">
+            <label className="font-ui block text-xl">message to fans:</label>
+            <textarea
+              className="font-light-bg-norm w-full rounded-lg p-1 text-black"
+              value={formData["message"]}
+              onChange={(e) => {
+                const newTrack: Track = {
+                  ...formData,
+                  message: e.target.value,
+                };
+                setFormData(newTrack);
+              }}
+              name="message"
+              placeholder="you're gonna love this one..."
+            />
+          </div>
+
           <div ref={submitRef} className="flex justify-center">
             <div className="mx-2">
               <UIButton
@@ -447,7 +452,6 @@ function Editor({
           </div>
         </form>
       </div>
-      <ScrollPrompt target={submitRef} />
       <div
         className={
           "fixed left-0 top-0 z-50 flex h-screen w-screen items-center justify-center bg-black/50 " +
@@ -478,7 +482,7 @@ function Editor({
                 <source src="/videos/example-animation.mp4" />
               </video>
             </div>
-            <div className="m-4">
+            <div className="m-2 md:m-4">
               Using AI you can generate an animated background based on your
               album art. <br />
               <br />
@@ -498,7 +502,7 @@ function Editor({
               >
                 <div className="flex items-center">
                   <FiInfo className="m-1 inline" />
-                  credits left: 5{" "}
+                  credits: 5{" "}
                 </div>
               </Tooltip>
             </label>
@@ -537,6 +541,7 @@ function Editor({
           </form>
         </div>
       </div>
+      <ScrollPrompt target={submitRef} />
     </>
   );
 }
@@ -685,7 +690,7 @@ export default function Artist() {
         />
         <div
           ref={boundingBox}
-          className="relative sticky top-0 z-40 mx-auto mt-2 flex flex-col items-center overflow-hidden rounded-2xl border-2 border-b-0 border-white"
+          className="relative sticky top-0 z-40 mx-auto mt-2 flex flex-col items-center overflow-hidden rounded-2xl"
         >
           {isClient && (
             <Display
@@ -697,7 +702,7 @@ export default function Artist() {
             />
           )}
         </div>
-        <div className="fg-color border-t-1 relative z-50 flex w-full rounded-2xl border-2 p-5">
+        <div className="fg-color border-t-1 relative z-50 flex w-full rounded-2xl p-5">
           <EditPanel
             mode={mode}
             changeMode={changeMode}

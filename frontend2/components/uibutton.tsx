@@ -55,7 +55,7 @@ export default function UIButton({
             );
           default:
             return (
-              <div className="rainbow-hover bright-text px-2 py-1 text-xl">
+              <div className="rainbow-hover bright-text font-ui px-2 py-1 text-xl">
                 {content || ""}
               </div>
             );

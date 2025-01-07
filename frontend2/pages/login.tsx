@@ -20,7 +20,7 @@ export function Header({
 }) {
   return (
     <div className="items-left flex w-full flex-col justify-between md:flex-row md:items-center">
-      <span className="font-h2 my-2 text-2xl md:my-0 md:text-3xl">
+      <span className="font-h2 my-2 text-2xl md:my-0 md:text-4xl">
         <Image
           src="/logo-white.png"
           alt="tunetree logo"
@@ -32,8 +32,8 @@ export function Header({
       </span>
       {right && (
         <Link href={rightLink || "/"}>
-          <span className="text-md rainbow-svg rounded-xl border px-2">
-            {right}
+          <span className="text-md rainbow-svg inline-block max-w-xs truncate rounded-xl border px-2 md:max-w-full">
+            <span>{right}</span>
             <FiChevronRight className="rainbow-svg inline" />
           </span>
         </Link>
