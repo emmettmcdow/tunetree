@@ -304,11 +304,14 @@ function Editor({
       if (response.ok) {
         const responseJSON = await response.json();
         const uuid = responseJSON["uuid"];
+        setMessage("");
         addJob(uuid);
         toggleVisible();
-        setFormData({
-          ...formData,
-          animation: uuid,
+        setFormData((prev) => {
+          return {
+            ...prev,
+            animation: uuid,
+          };
         });
       } else {
         responseBody = await response.text();
@@ -320,6 +323,7 @@ function Editor({
           case 400:
             // Bad Request
             setMessage(responseBody);
+            setAiVisible(false);
             break;
           case 405:
             // Method not allowed
@@ -336,12 +340,13 @@ function Editor({
     } catch (error) {
       // Handle network or other errors
       setMessage("Something has gone critically wrong: " + error);
+      setAiVisible(false);
     }
   };
 
   return (
     <>
-      <div className="z-40 mx-auto flex flex-col">
+      <div className="z-40 flex w-11/12 flex-col md:w-3/5">
         <Message content={message} />
 
         <div className="my-2 flex items-center justify-between">
@@ -511,9 +516,11 @@ function Editor({
               type="text"
               name="Prompt"
               onChange={(e) => {
-                setAiJob({
-                  ...aiJob,
-                  prompt: e.target.value,
+                setAiJob((prev) => {
+                  return {
+                    ...prev,
+                    prompt: e.target.value,
+                  };
                 });
               }}
               placeholder="trippy, weird, psychedelic"
@@ -702,7 +709,7 @@ export default function Artist() {
             />
           )}
         </div>
-        <div className="fg-color border-t-1 relative z-50 flex w-full rounded-2xl p-5">
+        <div className="fg-color border-t-1 relative z-50 flex w-full justify-center rounded-2xl p-5">
           <EditPanel
             mode={mode}
             changeMode={changeMode}
