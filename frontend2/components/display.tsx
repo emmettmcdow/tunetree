@@ -63,8 +63,8 @@ function IconLink({
     >
       <Image
         alt={alt}
-        src={iconForService(provider)}
-        className="bounce-text"
+        src={iconForService(provider, true)}
+        className="bounce-text bright-white-text"
         height="1024"
         width="1024"
       />
@@ -148,22 +148,22 @@ export default function Display({
           key={provider[0]}
           setLink={setLink}
           link={provider[1]}
-          className="w-12 md:w-16 mx-4 my-2 bounce-button"
+          className="bounce-button mx-4 my-2 w-12 md:w-16"
         />
       ));
       return (
         <div className={`relative`} style={displayStyle}>
-          <div className="absolute left-0 top-1/12 flex flex-col md:flex-row items-left justify-normal z-30">
+          <div className="top-1/12 items-left absolute left-0 z-30 flex flex-col justify-normal md:flex-row">
             <Tooltip text={tooltip}>
               <div
                 className={
-                  "bg-black/30 flex items-center backdrop-blur-md py-2 px-4 mt-2 rounded-r-lg z-30"
+                  "z-30 mt-2 flex items-center rounded-r-lg bg-black/30 px-4 py-2 backdrop-blur-md"
                 }
               >
                 <Image
                   alt="album-art"
                   src={track.image || "/placeholder.png"}
-                  className="w-16 m-2"
+                  className="m-2 w-16"
                   height="1024"
                   width="1024"
                 />
@@ -193,11 +193,11 @@ export default function Display({
     default:
       return (
         <div className={`relative`} style={displayStyle}>
-          <div className="absolute w-full h-full flex flex-col justify-evenly items-center">
+          <div className="absolute flex h-full w-full flex-col items-center justify-evenly">
             <Tooltip text={tooltip}>
               <div
                 className={
-                  "bg-black/30 flex flex-col items-center mx-auto backdrop-blur-md py-2 px-4 rounded-lg z-30"
+                  "z-30 mx-auto flex flex-col items-center rounded-lg bg-black/30 px-4 py-2 backdrop-blur-md"
                 }
               >
                 <p className="text-4xl">
@@ -206,7 +206,7 @@ export default function Display({
                 <Image
                   alt="album-art"
                   src={track.image || "/placeholder.png"}
-                  className="w-52 my-2"
+                  className="my-2 w-52"
                   height="1024"
                   width="1024"
                 />

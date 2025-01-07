@@ -18,7 +18,7 @@ export class Track {
   constructor(data: any) {
     this.artist = "";
     this.name = "not yet set //";
-    this.display = "center-card";
+    this.display = "minimal";
     this.message = "";
     this.image = "";
     this.colors = "";

@@ -1,12 +1,18 @@
 import { UIPaths } from "@/pages/signup";
 
-const placeholderSquare = "/placeholder.png";
-const spotify = "/spotify.png";
-const youtube = "/youtube.png";
-const apple = "/apple.png";
-const tidal = "/tidal.png";
-const bandcamp = "/bandcamp.png";
-const amazon = "/amazon.png";
+const placeholderSquare = "/white-logos/placeholder.png";
+const spotify = "/white-logos/spotify.png";
+const youtube = "/white-logos/youtube.png";
+const apple = "/white-logos/apple.png";
+const tidal = "/white-logos/tidal.png";
+const bandcamp = "/white-logos/bandcamp.png";
+const amazon = "/white-logos/amazon.png";
+const black_spotify = "/black-logos/spotify.png";
+const black_youtube = "/black-logos/youtube.png";
+const black_apple = "/black-logos/apple.png";
+const black_tidal = "/black-logos/tidal.png";
+const black_bandcamp = "/black-logos/bandcamp.png";
+const black_amazon = "/black-logos/amazon.png";
 
 export function validPassword(password: string) {
   /* Rules:
@@ -47,7 +53,25 @@ export function validPassword(password: string) {
   return caps && special && number;
 }
 
-export function iconForService(service: string) {
+export function iconForService(service: string, black: boolean) {
+  if (black) {
+    switch (service) {
+      case "spotify":
+        return black_spotify;
+      case "apple":
+        return black_apple;
+      case "tidal":
+        return black_tidal;
+      case "amazon":
+        return black_amazon;
+      case "bandcamp":
+        return black_bandcamp;
+      case "youtube":
+        return black_youtube;
+      default:
+        return placeholderSquare;
+    }
+  }
   switch (service) {
     case "spotify":
       return spotify;

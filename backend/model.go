@@ -151,13 +151,14 @@ type User struct {
 	SpotifyId string `json:"spotifyId"`
 }
 
+// TODO: make spotifyId unique again, getting rid of it for now since it's more trouble than it's worth
 const USERTABLE = `
 CREATE TABLE IF NOT EXISTS users(
 	email TEXT NOT NULL UNIQUE,
 	password TEXT NOT NULL,
 	artist TEXT UNIQUE,
 	link TEXT UNIQUE,
-	spotifyId TEXT UNIQUE
+	spotifyId TEXT
 );`
 
 type UserDB interface {

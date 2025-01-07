@@ -7,3 +7,4 @@ id_*
 docker_password
 backend/.env
 backend/animations
+venv/

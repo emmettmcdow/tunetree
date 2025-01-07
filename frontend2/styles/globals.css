@@ -301,6 +301,11 @@ img {
   filter: drop-shadow(0 1px 3px #ffff66);
 }
 
+.bright-white-text {
+  /* text-shadow: 0 0 5px #ffff66; */
+  filter: drop-shadow(0 1px 3px #ffffff);
+}
+
 @keyframes marquee {
   0% {
     transform: translateX(0);
