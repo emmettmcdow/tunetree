@@ -15,7 +15,7 @@ const Tooltip = ({ text, children, hackNoArrow }: TooltipProps) => {
 
   return (
     <div
-      className="relative inline-flex"
+      className="relative inline-flex w-full"
       onMouseEnter={() => setIsVisible(true)}
       onMouseLeave={() => setIsVisible(false)}
     >

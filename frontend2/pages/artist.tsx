@@ -286,8 +286,11 @@ function Editor({
 
     // Convert form data to string
     const jsonData = JSON.stringify(aiJob);
+    console.log(aiJob);
     let responseBody = "";
     try {
+      console.log(formData);
+      console.log(jsonData);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}animation/new/`,
         {
@@ -372,13 +375,24 @@ function Editor({
             }}
           />
         </div>
-
-        <UIButton
-          type="neutral"
-          content="make ai background"
-          submit={false}
-          handle={toggleVisible}
-        />
+        {formData.links.spotify != "" && formData.image != "" ? (
+          <UIButton
+            type="neutral"
+            content="make ai background"
+            submit={false}
+            handle={toggleVisible}
+          />
+        ) : (
+          <Tooltip text="you must first set a link for spotify">
+            <UIButton
+              type="neutral"
+              className="disabled w-full cursor-not-allowed"
+              content="make ai background"
+              submit={false}
+              handle={() => {}}
+            />
+          </Tooltip>
+        )}
 
         <div className="mt-2 flex items-center justify-between">
           <UIButton
@@ -519,6 +533,7 @@ function Editor({
                 setAiJob((prev) => {
                   return {
                     ...prev,
+                    art_link: formData.image, // This is a hack but whatever
                     prompt: e.target.value,
                   };
                 });

@@ -6,11 +6,13 @@ export default function UIButton({
   content,
   handle,
   submit,
+  className,
 }: {
   type: string;
   content?: string | JSX.Element;
   handle: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   submit: boolean;
+  className?: string;
 }) {
   /*
     - type: confirm, deny, neutral
@@ -36,7 +38,7 @@ export default function UIButton({
     actiontype = "submit";
   }
 
-  const buttonClass = "rounded-lg cursor-pointer" + color;
+  const buttonClass = `rounded-lg cursor-pointer ${color} ${className}`;
   return (
     <button
       className={buttonClass}
