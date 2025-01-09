@@ -77,18 +77,6 @@ import { FiArrowRight, FiChevronRight } from "react-icons/fi";
 //   );
 // }
 
-function Panel({ detail, img }: { detail: string; img: string }) {
-  return (
-    <div
-      className={
-        "fg-color my-4 flex flex-col items-center justify-center rounded-xl md:flex-row"
-      }
-    >
-      <div className="text-md m-2 w-full text-center md:w-1/5">{detail}</div>
-    </div>
-  );
-}
-
 export default function About() {
   return (
     <div className="flex min-h-dvh w-full flex-col items-center justify-center py-8">
