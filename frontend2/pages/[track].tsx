@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
 
-import { Track } from "../model";
+import { Subscription, Track } from "../model";
 import Display from "@/components/display";
 import UIButton from "@/components/uibutton";
 import Link from "next/link";
@@ -13,11 +13,43 @@ function SubscriptionPrompt({
   trackInfo,
   link,
   toggle,
+  artistLink,
 }: {
   trackInfo: Track;
   link: string;
   toggle: React.Dispatch<React.SetStateAction<string>>;
+  artistLink: string;
 }) {
+  const [email, setEmail] = useState("");
+
+  const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+  const subscribeTo = async () => {
+    const jsonData = JSON.stringify(
+      new Subscription({ email: email, artist_link: artistLink }),
+    );
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}subscribe/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: jsonData,
+        },
+      );
+
+      if (response.ok && response.body) {
+        const body = await response.json();
+        return body;
+      }
+    } catch (error) {
+      console.error("Error FROM TUNETREE:", error);
+    }
+    return "";
+  };
+
   if (link) {
     return (
       <div
@@ -37,6 +69,9 @@ function SubscriptionPrompt({
               className="font-light-bg-norm rounded-xl p-2 text-black"
               placeholder="email"
               name="email"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setEmail(e.target.value)
+              }
             />
             <div className="mt-2 flex justify-center">
               <Link href={link} className="mx-2">
@@ -47,14 +82,22 @@ function SubscriptionPrompt({
                   submit={false}
                 />
               </Link>
-              <Link href={link} className="mx-2">
+              <div className="mx-2">
                 <UIButton
                   type="confirm"
                   content="yes"
-                  handle={() => toggle("")}
+                  handle={() => {
+                    if (!email.match(emailRegex)) {
+                      alert("Not a valid email");
+                      return;
+                    }
+                    subscribeTo();
+                    toggle("");
+                    window.location.href = link;
+                  }}
                   submit={false}
                 />
-              </Link>
+              </div>
             </div>
           </form>
         </div>
@@ -220,7 +263,12 @@ export default function TrackPage({
           height={height || window.innerHeight}
         />
       )}
-      <SubscriptionPrompt trackInfo={ti} link={link} toggle={setLink} />
+      <SubscriptionPrompt
+        artistLink={slug}
+        trackInfo={ti}
+        link={link}
+        toggle={setLink}
+      />
       {/*<ColorPalette trackInfo={ti}/>*/}
     </>
   );

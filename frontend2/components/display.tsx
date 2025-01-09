@@ -153,7 +153,7 @@ export default function Display({
       ));
       return (
         <div className={`relative`} style={displayStyle}>
-          <div className="top-1/12 items-left absolute left-0 z-30 flex flex-col justify-normal md:flex-row">
+          <div className="top-1/12 items-left absolute left-0 z-30 flex flex-col justify-normal">
             <Tooltip text={tooltip}>
               <div
                 className={

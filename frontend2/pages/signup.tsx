@@ -97,7 +97,7 @@ export default function Signup() {
 
       if (response.ok) {
         // TODO: show this to users better
-        window.location.href = "/login/";
+        window.location.replace("/login/");
       } else {
         responseBody = await response.text();
         console.log(responseBody);

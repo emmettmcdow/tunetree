@@ -84,3 +84,13 @@ export class AnimationJob {
     Object.assign(this, params);
   }
 }
+
+export class Subscription {
+  user_id?: string = "";
+  email: string = "";
+  artist_link: string = "";
+
+  constructor(params: Subscription) {
+    Object.assign(this, params);
+  }
+}

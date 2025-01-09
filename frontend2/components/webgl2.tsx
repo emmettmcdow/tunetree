@@ -166,7 +166,7 @@ const VinylScene: React.FC<{ image: string; dimensions: Array<number> }> = ({
   const camPos = new Vector3(0.4, 0.0, 0.8);
   return (
     <Canvas
-      className="absolute top-0 left-0 z-0 rounded-2xl"
+      className="absolute left-0 top-0 z-0 rounded-2xl"
       style={{
         width: dimensions[0],
         height: dimensions[1],
@@ -232,7 +232,7 @@ const CubeScene: React.FC<{ image: string; dimensions: Array<number> }> = ({
 }) => {
   return (
     <Canvas
-      className="absolute top-0 left-0 z-0 rounded-2xl"
+      className="absolute left-0 top-0 z-0 rounded-2xl"
       style={{
         width: dimensions[0],
         height: dimensions[1],
@@ -277,7 +277,7 @@ const MountainScene: React.FC<{
 }> = ({ colors, dimensions }) => {
   return (
     <Canvas
-      className="absolute top-0 left-0 z-0 rounded-2xl"
+      className="absolute left-0 top-0 z-0 rounded-2xl"
       style={{
         width: dimensions[0],
         height: dimensions[1],
@@ -470,7 +470,7 @@ const AIAnimation = ({
 
   return (
     <div
-      className="w-dvw h-dvh flex items-center justify-center"
+      className="flex h-dvh w-dvw items-center justify-center"
       style={{
         background: `linear-gradient(${colors[0]}, ${colors[colors.length - 1]})`,
         width: width,
