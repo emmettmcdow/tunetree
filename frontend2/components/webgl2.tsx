@@ -393,6 +393,12 @@ const VideoElement = ({ video, size }: { video: string; size: number }) => {
         Can take up to 2 minutes.
       </div>
     );
+  } else if (video == "failed") {
+    <div>
+      Animation Generation Failed.
+      <br />
+      Please try again.
+    </div>;
   } else {
     return (
       <video
@@ -451,6 +457,7 @@ const AIAnimation = ({
           );
           return;
         } else if (body["status"] == "failed") {
+          setVideo("failed");
           console.error("Failed to get video status: " + body);
         }
       }
