@@ -450,8 +450,7 @@ const AIAnimation = ({
             `${process.env.NEXT_PUBLIC_API_URL}animation/file/${uuid}.mp4`,
           );
           return;
-        } else {
-          const body = await response1.text();
+        } else if (body["status"] == "failed") {
           console.error("Failed to get video status: " + body);
         }
       }
