@@ -426,7 +426,6 @@ const AIAnimation = ({
     Math.min(window.innerHeight, window.innerWidth, width, height),
   );
 
-  let to: NodeJS.Timeout;
   useEffect(() => {
     const handleResize = () => {
       setsize(Math.min(window.innerHeight, window.innerWidth, width, height));
@@ -457,13 +456,12 @@ const AIAnimation = ({
         }
       }
 
-      to = setTimeout(checkStatus, 1000);
+      setTimeout(checkStatus, 1000);
     };
     checkStatus();
 
     // Cleanup function to remove event listener
     return () => {
-      if (to) clearTimeout(to);
       window.removeEventListener("resize", handleResize);
     };
   }, []); // weird
