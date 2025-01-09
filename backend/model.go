@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func DefaultDB(runtime string) DB {
+func DefaultDB(runtime string) *DB {
 	var err error
 	dbpath := runtime + "/backend.db"
 
@@ -35,12 +36,21 @@ func DefaultDB(runtime string) DB {
 	if _, err := db.Exec(ANIMATIONTABLE); err != nil {
 		panic(err)
 	}
+	if _, err := db.Exec(SUBSCRIPTIONTABLE); err != nil {
+		panic(err)
+	}
 
-	return DB{db}
+	return &DB{db: db}
+}
+
+func (db *DB) WithMessaging(t *Telegram) *DB {
+	db.tg = t
+	return db
 }
 
 type DB struct {
 	db *sql.DB
+	tg *Telegram
 }
 
 // ****************************************************************************************** Track
@@ -195,6 +205,12 @@ func (this DB) PutUser(user *User) (err error) {
 	} else {
 		_, err = this.db.Exec("INSERT INTO users VALUES (?,?,?,?,?);", user.Email, hashedPass, user.Artist, user.Link, user.SpotifyId)
 	}
+	if this.tg.ID != 0 && err != nil {
+		err := this.tg.Send("New User: " + user.Artist)
+		if err != nil {
+			log.Printf("Failed to send message: %s\n", err)
+		}
+	}
 	return err
 }
 
@@ -208,6 +224,31 @@ func (this DB) GetUserFromLink(artistlink string) (user User, ok bool) {
 		panic(err)
 	}
 	return user, true
+}
+
+// *********************************************************************************** Subscription
+type Subscription struct {
+	ArtistId int64  `json:"artist_id"`
+	Link     string `json:"artist_link"`
+	Email    string `json:"email"`
+}
+
+const SUBSCRIPTIONTABLE = `
+	CREATE TABLE IF NOT EXISTS subscriptions(
+	artist_id INTEGER NOT NULL,
+	email TEXT NOT NULL,
+	FOREIGN KEY (artist_id)
+		REFERENCES users (rowid)
+);`
+
+type SubscriptionDB interface {
+	AddSubscription(sub Subscription) error
+	GetUserFromLink(artistlink string) (user User, ok bool)
+}
+
+func (this DB) AddSubscription(sub Subscription) error {
+	_, err := this.db.Exec("INSERT INTO subscriptions VALUES (?,?);", sub.ArtistId, sub.Email)
+	return err
 }
 
 // ************************************************************************************** Animation

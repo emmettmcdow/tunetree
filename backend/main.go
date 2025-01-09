@@ -27,6 +27,8 @@ type Config struct {
 
 	replicateApiToken string
 	replicateEndpoint string
+
+	telegramToken string
 }
 
 // TODO: get rid of the global
@@ -225,9 +227,11 @@ type KeyResponse struct {
 	ExpiresIn   int    `json:"expires_in"`
 }
 
+const TELEGRAM_CHAT_ID = 6718521208
+
 func server(wg *sync.WaitGroup, port int, runtime string) (s *http.Server) {
 
-	db := DefaultDB(runtime)
+	db := DefaultDB(runtime).WithMessaging(NewTelegram(TELEGRAM_CHAT_ID, config.telegramToken))
 
 	m := http.NewServeMux()
 
@@ -249,6 +253,8 @@ func server(wg *sync.WaitGroup, port int, runtime string) (s *http.Server) {
 	m.Handle("/animation/status/{uuid}/", animHandler)
 	m.Handle("/animation/new/", animHandler)
 	m.Handle("/animation/file/{uuid}/", animHandler)
+
+	m.Handle("/subscribe/", GetSubscriptionHandler(config).WithDB(db))
 
 	s = &http.Server{Addr: address, Handler: NewLogger(NewCors(m))}
 	go func() {
@@ -322,6 +328,12 @@ func main() {
 		fmt.Printf("WARNING: Setting to %s\n", replicateEndpoint)
 	}
 	config.replicateEndpoint = replicateEndpoint
+
+	telegramToken := getEnv("TELEGRAM_TOKEN")
+	if telegramToken == "" {
+		fmt.Printf("WARNING: TELEGRAM_TOKEN  unset\n")
+	}
+	config.telegramToken = telegramToken
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)

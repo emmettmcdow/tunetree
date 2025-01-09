@@ -13,7 +13,7 @@ import (
 )
 
 const REPLICATE_FAKE_ENDPOINT = "http://localhost:6969"
-const REPLICATE_FAKE_FILE = "../frontend2/public/videos/example-animation.mp4"
+const REPLICATE_FAKE_FILE = "../frontend2/public/videos/example-animation-2.mp4"
 
 type AnimationHandler struct {
 	apiKey  string
