@@ -90,7 +90,7 @@ const Cover: React.FC<{ image: string; camPos: Vector3 }> = ({
   camPos,
 }) => {
   const objectRef = useRef<Object3D>(null);
-  console.log("re-render cover");
+  // console.log("re-render cover");
   const texture = useLoader(TextureLoader, image);
   useEffect(() => {
     if (typeof objectRef.current != "undefined") {
@@ -439,7 +439,7 @@ const AIAnimation = ({
     window.addEventListener("resize", handleResize);
 
     const checkStatus = async () => {
-      console.log("Checking for background");
+      // console.log("Checking for background");
       const response1 = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}animation/status/${uuid}/`,
         {

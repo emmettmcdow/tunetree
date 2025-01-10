@@ -100,7 +100,7 @@ export default function Signup() {
         window.location.replace("/login/");
       } else {
         responseBody = await response.text();
-        console.log(responseBody);
+        // console.log(responseBody);
         switch (response.status) {
           case 400:
             // Bad Request

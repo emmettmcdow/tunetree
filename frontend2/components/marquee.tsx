@@ -22,8 +22,8 @@ const Marquee: React.FC<MarqueeProps> = ({
     const checkIfShouldScroll = () => {
       const containerWidth = containerRef.current?.clientWidth ?? 0;
       const textWidth = textRef.current?.clientWidth ?? 0;
-      console.log(textWidth);
-      console.log(containerWidth);
+      // console.log(textWidth);
+      // console.log(containerWidth);
       setShouldScroll(textWidth > containerWidth);
       setDuplicateText(textWidth > containerWidth);
     };

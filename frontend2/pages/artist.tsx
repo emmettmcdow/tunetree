@@ -286,11 +286,11 @@ function Editor({
 
     // Convert form data to string
     const jsonData = JSON.stringify(aiJob);
-    console.log(aiJob);
+    // console.log(aiJob);
     let responseBody = "";
     try {
-      console.log(formData);
-      console.log(jsonData);
+      // console.log(formData);
+      // console.log(jsonData);
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}animation/new/`,
         {
@@ -554,7 +554,7 @@ function Editor({
                   type="confirm"
                   content="generate"
                   handle={() => {
-                    console.log("Submitted");
+                    // console.log("Submitted");
                   }}
                   submit={true}
                 />
