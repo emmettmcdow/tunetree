@@ -99,6 +99,15 @@ function SubscriptionPrompt({
                 />
               </div>
             </div>
+            <Link href={link}>
+              <UIButton
+                type="deny"
+                content="just go to the music"
+                handle={() => toggle("")}
+                className="m-2"
+                submit={false}
+              />
+            </Link>
           </form>
         </div>
       </div>
