@@ -5,8 +5,8 @@ import LightButton from "@/components/lightbutton";
 
 function Footer() {
   return (
-    <div className="fg-color font-lg font-ui flex flex-col py-4 text-center">
-      <div className="my-2">made with 💜 in sunnyvale, ca 🌞</div>
+    <div className="fg-color font-lg font-ui flex flex-col items-center py-4 text-center">
+      <div className="my-2 w-11/12">made with 💜 in sunnyvale, ca 🌞</div>
       <LightButton link="/about" content="are you an artist?" />
       <LightButton link="/help" content="need help?" />
     </div>

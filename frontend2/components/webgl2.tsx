@@ -474,7 +474,7 @@ const AIAnimation = ({
 
   return (
     <div
-      className="flex h-dvh w-dvw items-center justify-center"
+      className="flex items-center justify-center"
       style={{
         background: `linear-gradient(${colors[0]}, ${colors[colors.length - 1]})`,
         width: width,

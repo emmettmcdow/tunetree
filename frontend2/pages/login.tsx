@@ -134,7 +134,7 @@ export default function Login() {
         // TODO: show this to users better
         responseBody = await response.json();
         setAuthenticatedUser(responseBody);
-        window.location.href = "/artist/";
+        window.location.replace("/artist/");
       } else {
         responseBody = await response.text();
         switch (response.status) {

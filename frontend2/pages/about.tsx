@@ -86,8 +86,8 @@ export default function About() {
 
         <div className="my-8 flex flex-col items-center justify-center">
           <div className="flex w-11/12 flex-col items-center justify-between md:w-4/5 md:flex-row">
-            <div className="flex w-11/12 items-center justify-center md:w-2/5">
-              <span className="text-md rainbow-svg inline-block rounded-xl border px-2">
+            <div className="flex w-11/12 items-center justify-center md:w-2/3">
+              <span className="text-sm lg:text-lg rainbow-svg inline-block rounded-xl border px-2">
                 <span>tunetree.xyz/my-link</span>
                 <FiChevronRight className="rainbow-svg inline" />
               </span>
@@ -96,7 +96,7 @@ export default function About() {
             <FiArrowRight className="m-2 rotate-90 md:rotate-0" size={35} />
 
             <video
-              className="w-11/12 rounded-2xl md:w-2/5"
+              className="w-11/12 rounded-2xl md:w-1/3"
               width={500}
               height={500}
               autoPlay

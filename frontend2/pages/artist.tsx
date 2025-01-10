@@ -501,7 +501,7 @@ function Editor({
                 <source src="/videos/example-animation.mp4" />
               </video>
             </div>
-            <div className="m-2 md:m-4">
+            <div className="my-2 md:m-4 text-base">
               Using AI you can generate an animated background based on your
               album art. <br />
               <br />
@@ -514,12 +514,12 @@ function Editor({
             className="flex-col items-center border-t-2 border-neutral-900 p-2 text-left"
           >
             <label className="my-2 flex justify-between">
-              <span>your prompt:</span>
+              <span className="text-base md:text-lg">your prompt:</span>
               <Tooltip
                 text="Each credit gets you one animation generation. Limit 5 while Tunetree is in beta."
                 hackNoArrow={true}
               >
-                <div className="flex items-center">
+                <div className="flex items-center text-base md:text-lg">
                   <FiInfo className="m-1 inline" />
                   credits: 5{" "}
                 </div>

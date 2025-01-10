@@ -167,12 +167,9 @@ export default function Display({
                   height="1024"
                   width="1024"
                 />
-                <div className="flex-1">
-                  <Marquee text={track.name + " / "} className="w-30"></Marquee>
-                  <Marquee
-                    text={track.artist + " / "}
-                    className="w-30"
-                  ></Marquee>
+                <div className="flex-1 w-64">
+                  <Marquee text={track.name + " / "}></Marquee>
+                  <Marquee text={track.artist + " / "}></Marquee>
                 </div>
               </div>
             </Tooltip>
