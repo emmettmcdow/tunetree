@@ -91,9 +91,11 @@ function SubscriptionPrompt({
                       alert("Not a valid email");
                       return;
                     }
-                    subscribeTo();
-                    toggle("");
-                    window.location.href = link;
+                    subscribeTo().then(() => {
+                      console.log("subscribed");
+                      toggle("");
+                      window.location.href = link;
+                    });
                   }}
                   submit={false}
                 />
