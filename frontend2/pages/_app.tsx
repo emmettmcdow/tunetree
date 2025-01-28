@@ -24,6 +24,18 @@ export default function App({ Component, pageProps }: AppProps) {
           locale: "en_US",
           url: "https://tunetree.xyz",
           site_name: "tunetree",
+          images: [
+            {
+              url: "https://tunetree.xyz/card.png",
+              width: 1024,
+              height: 1024,
+              alt: "tunetree logo",
+            },
+          ],
+        }}
+        twitter={{
+          handle: "@mcd0w",
+          site: "tunetree.xyz",
         }}
       />
       <Component {...pageProps} />
